@@ -14,9 +14,9 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.run_number }}.0.0
-    - name: Checksums
-      uses: wangzuo/action-release-checksums@v1
+        tag_name: ${{ github.sha }}
+      #- name: Checksums
+     # uses: wangzuo/action-release-checksums@v1
     # - name: configure
     #   run: |
     #     echo done
