@@ -4,4 +4,3 @@ CFLAGS += -Wall -Wextra -Werror -Oz
 
 liblisdir.so: main.cpp
 	$(CC) $(CFLAGS) $(LDFLAGS) main.cpp -DTERMUX_PREFIX=\"$(TERMUX_PREFIX)\" -DTERMUX_BASE_DIR=\"$(TERMUX_BASE_DIR)\" -shared -fPIC -o liblisdir.so
-
