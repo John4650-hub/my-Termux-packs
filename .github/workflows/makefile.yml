@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Release
+      uses: softprops/action-gh-release@v1
     - name: Checksums
       uses: wangzuo/action-release-checksums@v1
     - name: configure
