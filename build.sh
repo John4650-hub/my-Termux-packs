@@ -1,4 +1,4 @@
-TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-exec
+TERMUX_PKG_HOMEPAGE=https://github.com/John4650-hub/my-Termux-packs
 TERMUX_PKG_DESCRIPTION="my first package"
 TERMUX_PKG_API_LEVEL=23
 TERMUX_PKG_LICENSE="Apache-2.0"
