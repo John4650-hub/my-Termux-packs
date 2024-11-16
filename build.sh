@@ -1,10 +1,10 @@
 TERMUX_PKG_HOMEPAGE=https://github.com/termux/termux-exec
-TERMUX_PKG_DESCRIPTION="An execve() wrapper to make /bin and /usr/bin shebangs work"
+TERMUX_PKG_DESCRIPTION="my first package"
 TERMUX_PKG_LICENSE="Apache-2.0"
 TERMUX_PKG_MAINTAINER="@john4650-hub"
 TERMUX_PKG_VERSION=1:1.0
 TERMUX_PKG_SRCURL=https://github.com/termux/termux-exec/archive/v${TERMUX_PKG_VERSION:2}.tar.gz
-TERMUX_PKG_SHA256=b977592f197bf3a87e8a005ea0ccefb3e144edc81d5e3dc8d1ad1a12512f4a68
+TERMUX_PKG_SHA256=df1d12cbff962b747d0cb792b8179a4f00c6cd8c
 TERMUX_PKG_ESSENTIAL=true
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_AUTO_UPDATE=true
