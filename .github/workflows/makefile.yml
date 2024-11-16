@@ -19,5 +19,5 @@ jobs:
         echo done
         gh release create ${{ github.run_number }}.0.0
       env:
-         GH_TOKEN: ${{ secrets.TK }}
+         GITHUB_TOKEN: ${{ secrets.TK }}
       shell: bash
