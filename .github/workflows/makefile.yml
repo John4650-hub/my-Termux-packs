@@ -11,16 +11,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.sha }}
-      #- name: Checksums
-     # uses: wangzuo/action-release-checksums@v1
-    # - name: configure
-    #   run: |
-    #     echo done
-    #     gh release create ${{ github.run_number }}.0.0
-    #   env:
-    #      GITHUB_TOKEN: ${{ secrets.TK }}
-    #   shell: bash
+    - name: configure
+      run: |
+        echo done
+        $(echo ${{ github.sha }}) > sha.txt
+        gh release create ${{ github.run_number }}.0.0 sha.txt
+      env:
+         GITHUB_TOKEN: ${{ secrets.TK }}
+      shell: bash
