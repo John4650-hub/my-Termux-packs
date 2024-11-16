@@ -20,3 +20,4 @@ jobs:
         gh release create ${{ github.run_number }}.0.0
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
+      shell: bash
