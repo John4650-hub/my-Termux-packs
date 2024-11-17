@@ -1,105 +1,109 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <filesystem>
-#include <unordered_map>
-#include "/usr/include/nlohmann/json.hpp"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
-using namespace std;
-namespace fs = filesystem;
-using json = nlohmann::json;
+// Utility function to check if a path is a directory
+int isDirectory(const char *path) {
+    struct stat info;
+    if (stat(path, &info) != 0) {
+        return 0; // Cannot access path
+    }
+    return (info.st_mode & S_IFDIR) != 0;
+}
 
 // Function to determine file extension and set icon based on a mapping
-string getFileIcon(const string& filename, const unordered_map<string, string>& extToIcon) {
-    string ext;
-    size_t dotPos = filename.find_last_of('.');
-    if (dotPos != string::npos) {
-        ext = filename.substr(dotPos + 1);
+const char* getFileIcon(const char *filename) {
+    const char *ext = strrchr(filename, '.');
+    if (ext && ext != filename) {
+        ext++; // Move past the dot
+        if (strcmp(ext, "py") == 0) return "fab fa-python text-primary";
+        if (strcmp(ext, "java") == 0) return "fab fa-java text-primary";
+        if (strcmp(ext, "html") == 0) return "fab fa-html5 text-primary";
+        if (strcmp(ext, "css") == 0) return "fab fa-css3 text-primary";
+        if (strcmp(ext, "js") == 0) return "fab fa-js text-primary";
+        if (strcmp(ext, "c") == 0) return "fab fa-cuttlefish text-primary";
     }
-
-    auto it = extToIcon.find(ext);
-    return it != extToIcon.end() ? it->second : "fa fa-file";
+    return "fa fa-file text-primary";
 }
 
-// Function to list directory contents recursively, building a JSON structure
-vector<json> listDir(const string& url, const unordered_map<string, string>& extToIcon, int maxDepth = 10) {
-    string path = url.empty() ? fs::current_path().string() : url + "/";
+// Recursive function to list directory contents
+void listDir(const char *path, int maxDepth, FILE *output) {
+    if (maxDepth <= 0) {
+        return;
+    }
 
-    vector<json> result;
-    try {
-        for (const auto& entry : fs::directory_iterator(path)) {
-            if (fs::is_directory(entry) && maxDepth > 0) {
-                json dirEntry;
-                dirEntry["text"] = entry.path().filename().string();
-                dirEntry["nativeURL"] = entry.path().string();
-                dirEntry["state"] = {{"checked", false}, {"expanded", false}, {"selected", false}};
-                dirEntry["nodes"] = listDir(entry.path().string(), extToIcon, maxDepth - 1);
-                result.push_back(dirEntry);
-            } else {
-                json fileEntry;
-                fileEntry["text"] = entry.path().filename().string();
-                fileEntry["nativeURL"] = entry.path().string();
-                fileEntry["onclick"] = "getUrls(this)";
-                fileEntry["icon"] = getFileIcon(entry.path().filename().string(), extToIcon);
-                result.push_back(fileEntry);
-            }
+    DIR *dir = opendir(path);
+    if (!dir) {
+        fprintf(stderr, "Error: Could not open directory %s\n", path);
+        return;
+    }
+
+    struct dirent *entry;
+    fprintf(output, "[");
+    int first = 1;
+
+    while ((entry = readdir(dir)) != NULL) {
+        char fullPath[1024];
+        snprintf(fullPath, sizeof(fullPath), "%s/%s", path, entry->d_name);
+
+        // Skip "." and ".."
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
         }
-    } catch (const fs::filesystem_error& e) {
-        cerr << "Error: " << e.what() << endl;
+
+        if (first) {
+            first = 0;
+        } else {
+            fprintf(output, ",");
+        }
+
+        if (isDirectory(fullPath)) {
+            fprintf(output, "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"type\": \"directory\", \"children\": ", entry->d_name, fullPath);
+            listDir(fullPath, maxDepth - 1, output);
+            fprintf(output, "}");
+        } else {
+            const char *icon = getFileIcon(entry->d_name);
+            fprintf(output,
+                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"onclick\": \"getUrls(this)\", \"icon\": \"%s\" }",
+                    entry->d_name, fullPath, icon);
+        }
     }
 
-    return result;
+    fprintf(output, "]");
+    closedir(dir);
 }
 
-// Function to load file contents (assuming folder.txt contains the folder path)
-
-string loadFs() {
-    string folderPath;
-    ifstream folderFile("/storage/emulated/0/.Apps/Ace-Code/folder.txt");
-
-    if (!folderFile.is_open()) {
-        cerr << "Error: Could not open folder.txt" << endl;
-        return "";
+// Function to load file system data
+void loadFs() {
+    FILE *folderFile = fopen("/storage/emulated/0/.Apps/Ace-Code/folder.txt", "r");
+    if (!folderFile) {
+        fprintf(stderr, "Error: Could not open folder.txt\n");
+        return;
     }
 
-    getline(folderFile, folderPath);
-    
-    // Safely remove trailing newlines
-    size_t pos = folderPath.find_last_of("\n\r");
-    if (pos != string::npos) {
-        folderPath.erase(pos);
+    char folderPath[1024];
+    if (!fgets(folderPath, sizeof(folderPath), folderFile)) {
+        fclose(folderFile);
+        fprintf(stderr, "Error: Could not read folder path\n");
+        return;
+    }
+    fclose(folderFile);
+
+    // Remove trailing newline
+    size_t len = strlen(folderPath);
+    if (len > 0 && (folderPath[len - 1] == '\n' || folderPath[len - 1] == '\r')) {
+        folderPath[len - 1] = '\0';
     }
 
-    unordered_map<string, string> extToIcon = {
-        {"py", "fab fa-python"},
-        {"java", "fab fa-java"},
-        {"html", "fab fa-html5"},
-        {"css", "fab fa-css3"},
-        {"js", "fab fa-js"},
-        {"c", "fab fa-cuttlefish"},
-        // Add more extensions to the mapping here
-    };
-
-    vector<json> data = listDir(folderPath, extToIcon);
-
-    json result;
-    result["data"] = data;
-
-    try {
-        return result.dump(2);
-    } catch (const std::exception& e) {
-        cerr << "Error: " << e.what() << endl;
-        return "";
-    }
+    // Output JSON to stdout
+    printf("{ \"data\": ");
+    listDir(folderPath, 10, stdout);
+    printf(" }\n");
 }
-
 
 int main() {
-    string jsonData = loadFs();
-    if (!jsonData.empty()) {
-        cout << jsonData << endl;
-    }
+    loadFs();
     return 0;
 }
