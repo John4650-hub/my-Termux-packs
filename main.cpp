@@ -13,7 +13,7 @@ int isDirectory(const char *path) {
     return (info.st_mode & S_IFDIR) != 0;
 }
 
-// Function to determine file extension and set icon based on a mapping
+// Function to determine file extension and set icon
 const char* getFileIcon(const char *filename) {
     const char *ext = strrchr(filename, '.');
     if (ext && ext != filename) {
@@ -60,13 +60,17 @@ void listDir(const char *path, int maxDepth, FILE *output) {
         }
 
         if (isDirectory(fullPath)) {
-            fprintf(output, "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"type\": \"directory\", \"children\": ", entry->d_name, fullPath);
+            // Directory entry
+            fprintf(output,
+                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }, \"nodes\": ",
+                    entry->d_name, fullPath);
             listDir(fullPath, maxDepth - 1, output);
             fprintf(output, "}");
         } else {
+            // File entry
             const char *icon = getFileIcon(entry->d_name);
             fprintf(output,
-                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"onclick\": \"getUrls(this)\", \"icon\": \"%s\" }",
+                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }, \"onclick\": \"getUrls(this)\", \"icon\": \"%s\" }",
                     entry->d_name, fullPath, icon);
         }
     }
