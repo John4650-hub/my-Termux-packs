@@ -44,6 +44,10 @@ void listDir(const char *path, int maxDepth, FILE *output) {
     fprintf(output, "[");
     int first = 1;
 
+    // Constants for JSON structure
+    const char *dirState = "\"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }";
+    const char *fileOnclick = "\"onclick\": \"getUrls(this)\"";
+
     while ((entry = readdir(dir)) != NULL) {
         char fullPath[1024];
         snprintf(fullPath, sizeof(fullPath), "%s/%s", path, entry->d_name);
@@ -62,16 +66,16 @@ void listDir(const char *path, int maxDepth, FILE *output) {
         if (isDirectory(fullPath)) {
             // Directory entry
             fprintf(output,
-                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }, \"nodes\": ",
-                    entry->d_name, fullPath);
+                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", %s, \"nodes\": ",
+                    entry->d_name, fullPath, dirState);
             listDir(fullPath, maxDepth - 1, output);
             fprintf(output, "}");
         } else {
             // File entry
             const char *icon = getFileIcon(entry->d_name);
             fprintf(output,
-                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }, \"onclick\": \"getUrls(this)\", \"icon\": \"%s\" }",
-                    entry->d_name, fullPath, icon);
+                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", %s, %s, \"icon\": \"%s\" }",
+                    entry->d_name, fullPath, dirState, fileOnclick, icon);
         }
     }
 
