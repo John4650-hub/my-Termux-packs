@@ -1,117 +1,149 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <map>
+#include <sstream>
 #include <sys/stat.h>
+#include <dirent.h>
+
+using namespace std;
 
 // Utility function to check if a path is a directory
-int isDirectory(const char *path) {
+bool isDirectory(const string& path) {
     struct stat info;
-    if (stat(path, &info) != 0) {
-        return 0; // Cannot access path
+    if (stat(path.c_str(), &info) != 0) {
+        return false; // Cannot access path
     }
     return (info.st_mode & S_IFDIR) != 0;
 }
 
-// Function to determine file extension and set icon
-const char* getFileIcon(const char *filename) {
-    const char *ext = strrchr(filename, '.');
-    if (ext && ext != filename) {
-        ext++; // Move past the dot
-        if (strcmp(ext, "py") == 0) return "fab fa-python text-primary";
-        if (strcmp(ext, "java") == 0) return "fab fa-java text-primary";
-        if (strcmp(ext, "html") == 0) return "fab fa-html5 text-primary";
-        if (strcmp(ext, "css") == 0) return "fab fa-css3 text-primary";
-        if (strcmp(ext, "js") == 0) return "fab fa-js text-primary";
-        if (strcmp(ext, "c") == 0) return "fab fa-cuttlefish text-primary";
+// Function to determine file extension and set icon based on a mapping
+string getFileIcon(const string& filename, const map<string, string>& extToIcon) {
+    string ext;
+    size_t dotPos = filename.find_last_of('.');
+    if (dotPos != string::npos) {
+        ext = filename.substr(dotPos + 1);
     }
-    return "fa fa-file text-primary";
+
+    auto it = extToIcon.find(ext);
+    return it != extToIcon.end() ? it->second : "fa fa-file text-primary";
 }
 
-// Recursive function to list directory contents
-void listDir(const char *path, int maxDepth, FILE *output) {
+// Function to list directory contents recursively, building a JSON-like structure
+vector<map<string, string>> listDir(const string& path, const map<string, string>& extToIcon, int maxDepth = 10) {
+    vector<map<string, string>> result;
+
     if (maxDepth <= 0) {
-        return;
+        return result;
     }
 
-    DIR *dir = opendir(path);
+    DIR* dir = opendir(path.c_str());
     if (!dir) {
-        fprintf(stderr, "Error: Could not open directory %s\n", path);
-        return;
+        cerr << "Error: Could not open directory " << path << endl;
+        return result;
     }
 
-    struct dirent *entry;
-    fprintf(output, "[");
-    int first = 1;
-
-    // Constants for JSON structure
-    const char *dirState = "\"state\": { \"checked\": false, \"expanded\": false, \"selected\": false }";
-    const char *fileOnclick = "\"onclick\": \"getUrls(this)\"";
-
-    while ((entry = readdir(dir)) != NULL) {
-        char fullPath[1024];
-        snprintf(fullPath, sizeof(fullPath), "%s/%s", path, entry->d_name);
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        string entryName = entry->d_name;
 
         // Skip "." and ".."
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+        if (entryName == "." || entryName == "..") {
             continue;
         }
 
-        if (first) {
-            first = 0;
-        } else {
-            fprintf(output, ",");
-        }
+        string fullPath = path + "/" + entryName;
 
         if (isDirectory(fullPath)) {
-            // Directory entry
-            fprintf(output,
-                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", %s, \"nodes\": ",
-                    entry->d_name, fullPath, dirState);
-            listDir(fullPath, maxDepth - 1, output);
-            fprintf(output, "}");
+            // Recursive call for subdirectories
+            map<string, string> dirEntry;
+            dirEntry["text"] = entryName;
+            dirEntry["nativeURL"] = fullPath;
+            dirEntry["type"] = "directory";
+
+            stringstream state;
+            state << "{\"checked\": false,\"expanded\": false,\"selected\": false}";
+            dirEntry["state"] = state.str();
+
+            vector<map<string, string>> nodes = listDir(fullPath, extToIcon, maxDepth - 1);
+            if (!nodes.empty()) {
+                stringstream ss;
+                for (const auto& child : nodes) {
+                    ss << child.at("text") << ",";
+                }
+                dirEntry["nodes"] = ss.str(); // Placeholder for child nodes
+            }
+
+            result.push_back(dirEntry);
         } else {
-            // File entry
-            const char *icon = getFileIcon(entry->d_name);
-            fprintf(output,
-                    "{ \"text\": \"%s\", \"nativeURL\": \"%s\", %s, %s, \"icon\": \"%s\" }",
-                    entry->d_name, fullPath, dirState, fileOnclick, icon);
+            // Add file entry
+            map<string, string> fileEntry;
+            fileEntry["text"] = entryName;
+            fileEntry["nativeURL"] = fullPath;
+            fileEntry["onclick"] = "getUrls(this)";
+            fileEntry["icon"] = getFileIcon(entryName, extToIcon);
+
+            result.push_back(fileEntry);
         }
     }
 
-    fprintf(output, "]");
     closedir(dir);
+    return result;
 }
 
-// Function to load file system data
-void loadFs() {
-    FILE *folderFile = fopen("/storage/emulated/0/.Apps/Ace-Code/folder.txt", "r");
-    if (!folderFile) {
-        fprintf(stderr, "Error: Could not open folder.txt\n");
-        return;
+// Function to load file system data (assuming folder.txt contains the folder path)
+string loadFs() {
+    string folderPath;
+    ifstream folderFile("/storage/emulated/0/.Apps/Ace-Code/folder.txt");
+
+    if (!folderFile.is_open()) {
+        cerr << "Error: Could not open folder.txt" << endl;
+        return "";
     }
 
-    char folderPath[1024];
-    if (!fgets(folderPath, sizeof(folderPath), folderFile)) {
-        fclose(folderFile);
-        fprintf(stderr, "Error: Could not read folder path\n");
-        return;
-    }
-    fclose(folderFile);
+    getline(folderFile, folderPath);
 
-    // Remove trailing newline
-    size_t len = strlen(folderPath);
-    if (len > 0 && (folderPath[len - 1] == '\n' || folderPath[len - 1] == '\r')) {
-        folderPath[len - 1] = '\0';
+    // Safely remove trailing newlines
+    size_t pos = folderPath.find_last_of("\n\r");
+    if (pos != string::npos) {
+        folderPath.erase(pos);
     }
 
-    // Output JSON to stdout
-    printf("{ \"data\": ");
-    listDir(folderPath, 10, stdout);
-    printf(" }\n");
+    map<string, string> extToIcon = {
+        {"py", "fab fa-python"},
+        {"java", "fab fa-java"},
+        {"html", "fab fa-html5"},
+        {"css", "fab fa-css3"},
+        {"js", "fab fa-js"},
+        {"c", "fab fa-cuttlefish"},
+        // Add more extensions to the mapping here
+    };
+
+    vector<map<string, string>> data = listDir(folderPath, extToIcon);
+
+    stringstream jsonResult;
+    jsonResult << "{ \"data\": [";
+    for (size_t i = 0; i < data.size(); ++i) {
+        jsonResult << "{";
+        for (const auto& [key, value] : data[i]) {
+            jsonResult << "\"" << key << "\": \"" << value << "\", ";
+        }
+        jsonResult.seekp(-2, jsonResult.cur); // Remove trailing comma and space
+        jsonResult << "}";
+        if (i < data.size() - 1) {
+            jsonResult << ",";
+        }
+    }
+    jsonResult << "] }";
+
+    return jsonResult.str();
 }
 
 int main() {
-    loadFs();
+    string jsonData = loadFs();
+    if (!jsonData.empty()) {
+        cout << jsonData << endl;
+    }
     return 0;
 }
