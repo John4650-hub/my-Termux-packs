@@ -40,8 +40,7 @@ void listDir(const char *path, int maxDepth, FILE *output) {
         return;
     }
 
-    struct dirent *entry;
-    fprintf(output, "[");
+    fprintf(output, "[\n");
     int first = 1;
 
     while ((entry = readdir(dir)) != NULL) {
@@ -56,16 +55,15 @@ void listDir(const char *path, int maxDepth, FILE *output) {
         if (first) {
             first = 0;
         } else {
-            fprintf(output, ",");
+            fprintf(output, ",\n");
         }
 
         if (isDirectory(fullPath)) {
-            fprintf(output, "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"type\": \"directory\", \"children\": ", entry->d_name, fullPath);
+            fprintf(output, "  {\n    \"text\": \"%s\",\n    \"nativeURL\": \"%s\",\n    \"type\": \"directory\",\n    \"children\": [\n", entry->d_name, fullPath);
             listDir(fullPath, maxDepth - 1, output);
-            fprintf(output, "}");
+            fprintf(output, "    ]\n  }\n");
         } else {
-            const char *icon = getFileIcon(entry->d_name);
-            fprintf(output, "{ \"text\": \"%s\", \"nativeURL\": \"%s\", \"type\": \"file\", \"icon\": \"%s\" }", entry->d_name, fullPath, icon);
+            fprintf(output, "  {\n    \"text\": \"%s\",\n    \"nativeURL\": \"%s\",\n    \"type\": \"file\",\n    \"icon\": \"%s\"\n  }\n", entry->d_name, fullPath, getFileIcon(entry->d_name));
         }
     }
 
@@ -105,4 +103,3 @@ int main() {
     loadFs();
     return 0;
 }
-
