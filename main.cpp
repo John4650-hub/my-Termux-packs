@@ -1,21 +1,39 @@
 #include <iostream>
-#include <vector>
+#include <string>
+#include <ctime>
 
-using std::vector;
+int main() {
+    std::string name;
+    int birthYear, birthMonth, birthDay;
 
-void vectors(){
-    vector<int> vec_a;//defines a vector for integers 
-    vector<int> vec_b(10); // with size 10
-    vector<int> vec_c(10,8);// with size 10 and has 8 as initial value
-    vector<int> vec_d{1,2,3,4,5,6,7,8,9};
-}
+    // Get the current date
+    time_t t = time(0);
+    tm* now = localtime(&t);
+    int currentYear = now->tm_year + 1900;
+    int currentMonth = now->tm_mon + 1;
+    int currentDay = now->tm_mday;
 
-int main()
-{
-    vector<int> vec(10,4);
-    std::cout << vec[5] << std::endl;
-    for(auto i=0;i<10;i++){
-        std::cout << vec[i] << std::endl;
+    // Ask for user's name
+    std::cout << "Enter your name: ";
+    std::getline(std::cin, name);
+
+    // Ask for user's birthday
+    std::cout << "Enter your birth year (e.g., 1990): ";
+    std::cin >> birthYear;
+    std::cout << "Enter your birth month (1-12): ";
+    std::cin >> birthMonth;
+    std::cout << "Enter your birth day (1-31): ";
+    std::cin >> birthDay;
+
+    // Calculate the age
+    int age = currentYear - birthYear;
+    if (currentMonth < birthMonth || (currentMonth == birthMonth && currentDay < birthDay)) {
+        age--;
     }
+
+    // Wishing the user
+    std::cout << "Hello, " << name << "! ";
+    std::cout << "Wishing you a happy " << age << "th birthday this year!" << std::endl;
+
     return 0;
 }
