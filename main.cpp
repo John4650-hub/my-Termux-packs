@@ -1,22 +1,11 @@
 #include <iostream>
-#include <ctime>
+#include <stdio>
 
-int main() {
-    // Get the current time
-    std::time_t currentTime = std::time(nullptr);
+using namespace std;
 
-    // Convert the time to a readable format
-    std::tm* localTime = std::localtime(&currentTime);
-
-    // Print the current date and time
-    std::cout << "Current Date and Time: "
-              << (localTime->tm_year + 1900) << "-" // Year
-              << (localTime->tm_mon + 1) << "-"    // Month
-              << localTime->tm_mday << " "        // Day
-              << localTime->tm_hour << ":"        // Hour
-              << localTime->tm_min << ":"         // Minute
-              << localTime->tm_sec                // Second
-              << std::endl;
-
+int main(){
+    char ch[20];
+    fgets(ch,20,stdin);
+    cout << ch <<", hi"<<endl;
     return 0;
-}
+    }
