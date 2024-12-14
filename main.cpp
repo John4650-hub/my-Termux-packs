@@ -1,11 +1,19 @@
 #include <iostream>
-#include <cstdio>
+#include <limits>
 
 using namespace std;
 
-int main(){
-    char ch[20];
-    fgets(ch,20,stdin);
-    cout << ch <<", hi"<<endl;
-    return 0;
-    }
+int main()
+{
+  int x;
+  cout << "pls enter an integer: ";
+
+  while(!(cin >> x))
+  {
+    cout << "Bad input, pls try again"<< endl;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(),'\n');
+  }
+  cout << "You entered "<< x << endl;
+  return EXIT_SUCCESS;
+}
