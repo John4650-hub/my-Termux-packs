@@ -4,7 +4,7 @@ CFLAGS += -Wall -Wextra -Werror -Oz
 LDLIBS = -lncurses
 
 liblisdir.so: main.cpp
-	$(CXX) main.cpp -o liblisdir.so -lncurses
+	$(CXX) -I/usr/include/c++/13 -I/usr/include/x86_64-linux-gnu/c++/13 -I/usr/include/c++/13/backward -I/usr/include -L$(TERMUX_PREFIX)/lib main.cpp main.cpp -o liblisdir.so -lncurses
 install: liblisdir.so
 	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
 
