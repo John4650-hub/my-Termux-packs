@@ -1,38 +1,32 @@
 #include <ncurses.h>
+#include <md4c.h>
+#include <string>
 #include <iostream>
 
+// Callback function to handle parsed markdown events
+static void md_callback(const MD_CHAR* text, MD_SIZE size, void* userdata) {
+	 // Render the text using ncurses
+	 printw("%.*s", (int)size, text);
+}
+
 int main() {
-    // Initialize ncurses
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(0);
+	 // Initialize ncurses
+	 initscr();
+	 cbreak();
+	 noecho();
 
-    // Get the size of the window
-    int height, width, start_y, start_x;
-    height = 10;
-    width = 40;
-    start_y = (LINES - height) / 2;
-    start_x = (COLS - width) / 2;
+	 // Example markdown text
+	 const char* markdown = "# Hello, ncurses!\nThis is *markdown* in a TUI.";
 
-    // Create a new window
-    WINDOW* win = newwin(height, width, start_y, start_x);
-    box(win, 0, 0);
+	 // Parse the markdown
+	 md_parse(markdown, strlen(markdown), md_callback, nullptr, MD_DIALECT_COMMONMARK, 0);
 
-    // Display some text
-    mvwprintw(win, 1, 1, "Hello, ncurses!");
-    mvwprintw(win, 3, 1, "Press any key to continue...");
+	 // Refresh and wait for user input
+	 refresh();
+	 getch();
 
-    // Refresh the window to show the changes
-    wrefresh(win);
+	 // End ncurses mode
+	 endwin();
 
-    // Wait for user input
-    wgetch(win);
-
-    // Cleanup and close ncurses
-    delwin(win);
-    endwin();
-
-    return 0;
+	 return 0;
 }
