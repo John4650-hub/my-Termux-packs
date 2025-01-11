@@ -1,7 +1,5 @@
 #!/bin/bash
-shopt -s expand_aliases
-source ~/.bashrc
-gitsh
+read msg
 git add .
-git commit -m "get completion"
+git commit -m "$msg"
 git push -f
