@@ -1,22 +1,42 @@
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <fstream>
 #include <iostream>
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/screen.hpp>
-#include <memory>
-#include "ftxui/dom/node.hpp"
+#include <string>
+#include <vector>
 
-using namespace ftxui;
+int main(int argc, const char* argv[]) {
+    using namespace ftxui;
 
-int main(void){
-	auto document = vbox({
-			text("TX AUDIO PLAYER") | borderHeavy
-			});
+    // Read items from list.txt
+    std::vector<std::wstring> items;
+    std::wifstream file("list.txt");
+    std::wstring line;
+    while (std::getline(file, line)) {
+        items.push_back(line);
+    }
 
-	auto screen = Screen::Create(
-			Dimension::Full(), // set full screen width
-			Dimension::Full() //set full screen height
-	);
-	Render(screen,document);
-	screen.Print();
-	std::cout<<std::endl;
-	return EXIT_SUCCESS;
+    // Create a list of buttons
+    std::vector<Component> buttons;
+    for (const auto& item : items) {
+        buttons.push_back(Button(item, [] { std::wcout << L"Clicked!" << std::endl; }));
+    }
+
+    // Create a vertical container for the buttons
+    auto container = Container::Vertical(buttons);
+
+    // Create a renderer for the container
+    auto renderer = Renderer(container, [&] {
+        return vbox({
+            text(L"Select an item:"),
+            separator(),
+            vbox(buttons | transformed([](auto button) { return button->Render(); })),
+        });
+    });
+
+    // Create and run the screen interactive
+    auto screen = ScreenInteractive::TerminalOutput();
+    screen.Loop(renderer);
+
+    return 0;
 }
