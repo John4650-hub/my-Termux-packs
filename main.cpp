@@ -35,7 +35,7 @@ int main(int argc, const char* argv[]) {
     // Create a list of buttons
     std::vector<Component> buttons;
     for (const auto& item : items) {
-        buttons.push_back(Button(item, [item] { std::cout << "Clicked: " << item << std::endl; }),Style());
+        buttons.push_back(Button(item, [item] { std::cout << "Clicked: " << item << std::endl; },Style()));
     }
 
     // Create a vertical container for the buttons
