@@ -55,7 +55,7 @@ int main(int argc, const char* argv[]) {
     });
 
     // Create and run the screen interactive
-    auto screen = ScreenInteractive::FullScreen();
+    auto screen = ScreenInteractive::Fullscreen();
     screen.Loop(renderer);
 
     return 0;
