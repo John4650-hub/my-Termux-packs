@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+using namespace ftxui;
+
 ButtonOption Style() {
   auto option = ButtonOption::Animated();
 	option.transform = [](const EntryState& s) {
@@ -22,7 +24,6 @@ ButtonOption Style() {
 
 
 int main(int argc, const char* argv[]) {
-    using namespace ftxui;
     // Read items from list.txt
     std::vector<std::string> items;
     std::ifstream file("list.txt");
