@@ -12,7 +12,7 @@
 using namespace ftxui;
 
 auto label;
-std::string label_text= std::make_shared<std::wstring>(L"Quit");
+auto label_text= std::make_shared<std::wstring>(L"Quit");
 
 ButtonOption Style() {
   auto option = ButtonOption::Animated();
@@ -35,8 +35,8 @@ std::vector<Component> GenerateList(){
 	}
 	std::vector<Component> buttons;
 	for (const auto& item : items) {
-			auto btn = Button(item, [item] { *label_text=item},Style());
-			buttons.push_back(Renderer(btn,[item]{return text(item);
+			auto btn = Button(item, [item] { *label_text=item;},Style());
+			buttons.push_back(Renderer(btn,[item] {return text(item);
 		}));
 	}
 	return buttons;
