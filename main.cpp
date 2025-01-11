@@ -11,8 +11,8 @@
 
 using namespace ftxui;
 
-auto label;
 auto label_text= std::make_shared<std::wstring>(L"Quit");
+auto label=Button(label_text->c_str(), []() {});
 
 ButtonOption Style() {
   auto option = ButtonOption::Animated();
@@ -35,7 +35,7 @@ std::vector<Component> GenerateList(){
 	}
 	std::vector<Component> buttons;
 	for (const auto& item : items) {
-			auto btn = Button(item, [item] { *label_text=item;},Style());
+			auto btn = Button(std::wstring(item.begin(), item.end()), [item] { *label_text = std::wstring(item.begin(), item.end()); }, Style());
 			buttons.push_back(Renderer(btn,[item] {return text(item);
 		}));
 	}
@@ -65,36 +65,37 @@ void next(){}
 
 Component PlayerWidget(){
 	class Impl : public ComponentBase{
-		Impl(){
-			auto play_button_text = std::make_shared<std::wstring>(L"Play");
-			auto play_button = Button(play_button_text->c_str(), [play_button_text] {
-			if (*play_button_text == L"Play") {
-					play();
-					*play_button_text = L"Pause";
-			} else {
-					play();
-					*play_button_text = L"Play";
-			}
-	});
+		public:
+			Impl(){
+				auto play_button_text = std::make_shared<std::wstring>(L"Play");
+				auto play_button = Button(play_button_text->c_str(), [play_button_text] {
+				if (*play_button_text == L"Play") {
+						play();
+						*play_button_text = L"Pause";
+				} else {
+						play();
+						*play_button_text = L"Play";
+				}
+		});
 
-	auto prev_button = Button(L"Prev", previousM);
-	auto next_button = Button(L"Next", next);
+		auto prev_button = Button(L"Prev", prev);
+		auto next_button = Button(L"Next", next);
 
-	auto button_container = Container::Horizontal({
-			prev_button,
-			play_button,
-			next_button,
-	});
-	Component renderer = Renderer(button_container, [&] {
-	return window(text(L"Audio Player"), hbox({
-			prev_button->Render(),
-			play_button->Render(),
-			next_button->Render(),
-	}));
-    });
-	Add(renderer);
-	}
-}
+		auto button_container = Container::Horizontal({
+				prev_button,
+				play_button,
+				next_button,
+		});
+		Component renderer = Renderer(button_container, [&] {
+		return window(text(L"Audio Player"), hbox({
+				prev_button->Render(),
+				play_button->Render(),
+				next_button->Render(),
+		}));
+			});
+		Add(renderer);
+		}
+};
 return Make<Impl>();
 }
 int main(int argc, const char* argv[]) {
