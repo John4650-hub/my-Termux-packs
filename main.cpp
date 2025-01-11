@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "scroller.hpp"
 
 using namespace ftxui;
 
@@ -31,17 +32,26 @@ std::vector<Component> GenerateList(){
 	}
 	std::vector<Component> buttons;
 	for (const auto& item : items) {
-			buttons.push_back(Button(item, [item] { std::cout << "Clicked: " << item << std::endl; },Style()));
+			auto btn = Button(item, [item] { std::cout << "Clicked: " << item << std::endl; },Style());
+			buttons.push_back(Renderer(btn,[item]{return text(item);
+		}));
 	}
 	return buttons;
 }
 
 Component MusicList(){
 	class Impl : public ComponentBase{
+		Component scroll;
 		public:
 			Impl(){
-				Add(Container::Vertical(GenerateList()));
-			}
+				scroll=Scroller(Container::Vertical(GenerateList()));
+				Add(
+#ifdef SCROLLER_INSIDE_WINDOW
+          Renderer(scroll, [&] { return window(text(" Test Log: "), vbox(scroll)); })
+#else
+     scroll
+#endif
+    );}
 	};
 	return Make<Impl>();
 }
