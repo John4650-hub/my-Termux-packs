@@ -5,9 +5,21 @@
 #include <string>
 #include <vector>
 
+ButtonOption Style() {
+  auto option = ButtonOption::Animated();
+	option.transform = [](const EntryState& s) {
+    auto element = text(s.label);
+		if (s.focused) {
+      element |= bold;
+		}
+    return element | center | borderEmpty | flex;
+  };
+	return option;
+}
+
+
 int main(int argc, const char* argv[]) {
     using namespace ftxui;
-
     // Read items from list.txt
     std::vector<std::string> items;
     std::ifstream file("list.txt");
@@ -19,7 +31,7 @@ int main(int argc, const char* argv[]) {
     // Create a list of buttons
     std::vector<Component> buttons;
     for (const auto& item : items) {
-        buttons.push_back(Button(item, [item] { std::cout << "Clicked: " << item << std::endl; }));
+        buttons.push_back(Button(item, [item] { std::cout << "Clicked: " << item << std::endl; }),Style());
     }
 
     // Create a vertical container for the buttons
