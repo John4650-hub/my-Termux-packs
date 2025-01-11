@@ -1,78 +1,42 @@
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/screen_interactive.hpp>    
+#include <memory>  // for shared_ptr, __shared_ptr_access
+#include <string>  // for operator+, to_string
+
+#include "ftxui/component/captured_mouse.hpp"  // for ftxui
+#include "ftxui/component/component.hpp"  // for Button, Horizontal, Renderer
+#include "ftxui/component/component_base.hpp"      // for ComponentBase
+#include "ftxui/component/component_options.hpp"   // for ButtonOption
+#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include "ftxui/dom/elements.hpp"  // for gauge, separator, text, vbox, operator|, Element, border
+#include "ftxui/screen/color.hpp"  // for Color, Color::Blue, Color::Green, Color::Red
+
 using namespace ftxui;
 
-Component DummyWindowContent() {
-  class Impl : public ComponentBase {                   private:
-    bool checked[3] = {false, false, false};             float slider = 50;                                                                                       public:                                               Impl() {
-      Add(Container::Vertical({                                Checkbox("Check me", &checked[0]),
-          Checkbox("Check me", &checked[1]),
-          Checkbox("Check me", &checked[2]),
-          Slider("Slider", &slider, 0.f, 100.f),
-      }));
-    }
-  };
-  return Make<Impl>();
-}
-
 int main() {
-  int window_1_left = 20;
-  int window_1_top = 10;
-  int window_1_width = 40;
-  int window_1_height = 20;
+  int value = 50;
 
-  auto window_1 = Window({
-      .inner = DummyWindowContent(),
-      .title = "First window",
-      .left = &window_1_left,
-      .top = &window_1_top,
-      .width = &window_1_width,
-      .height = &window_1_height,
+  // The tree of components. This defines how to navigate using the keyboard.
+  auto buttons = Container::Horizontal({
+      Button(
+          "Decrease", [&] { value--; }, ButtonOption::Animated(Color::Red)),
+      Button(
+          "Reset", [&] { value = 50; }, ButtonOption::Animated(Color::Green)),
+      Button(
+          "Increase", [&] { value++; }, ButtonOption::Animated(Color::Blue)),
   });
 
-  auto window_2 = Window({
-      .inner = DummyWindowContent(),
-      .title = "My window",
-      .left = 40,
-      .top = 20,
+  // Modify the way to render them on screen:
+  auto component = Renderer(buttons, [&] {
+    return vbox({
+        vbox({
+            text("value = " + std::to_string(value)),
+            separator(),
+            gauge(value * 0.01f),
+        }) | border,
+        buttons->Render(),
+    });
   });
 
-  auto window_3 = Window({
-      .inner = DummyWindowContent(),
-      .title = "My window",
-      .left = 60,
-      .top = 30,
-  });
-
-  auto window_4 = Window({
-      .inner = DummyWindowContent(),
-  });
-
-  auto window_5 = Window({});
-
-  auto window_container = Container::Stacked({
-      window_1,
-      window_2,
-      window_3,
-      window_4,
-      window_5,
-  });
-
-  auto display_win_1 = Renderer([&] {
-    return text("window_1: " +  //
-                std::to_string(window_1_width) + "x" +
-                std::to_string(window_1_height) + " + " +
-                std::to_string(window_1_left) + "," +
-                std::to_string(window_1_top));
-  });
-
-  auto layout = Container::Vertical({
-      display_win_1,
-      window_container,
-  });
-
-  auto screen = ScreenInteractive::Fullscreen();
-  screen.Loop(layout);
-
-  return EXIT_SUCCESS;
+  auto screen = ScreenInteractive::FitComponent();
+  screen.Loop(component);
+  return 0;
 }
