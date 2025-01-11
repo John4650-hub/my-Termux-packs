@@ -113,18 +113,17 @@ int main(int argc, const char* argv[]) {
 	auto audioPlayerWindow = Window({
 			.inner=PlayerWidget(),
 			.left=0,
-			.top=50,
+			.top=80,
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
 			});
 
 	auto windowContainer = Container::Stacked({
 			musicListWindow,
-			audioPlayerWindow,
-			label
+			audioPlayerWindow
 			});
     // Create and run the screen interactive;
-	auto layout = Container::Vertical({windowContainer});
+	auto layout = Container::Vertical({windowContainer,label});
   screen.Loop(layout);
 	return 0;
 }
