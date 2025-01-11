@@ -11,6 +11,9 @@
 
 using namespace ftxui;
 
+auto label;
+std::string label_text= std::make_shared<std::wstring>(L"Quit");
+
 ButtonOption Style() {
   auto option = ButtonOption::Animated();
 	option.transform = [](const EntryState& s) {
@@ -32,7 +35,7 @@ std::vector<Component> GenerateList(){
 	}
 	std::vector<Component> buttons;
 	for (const auto& item : items) {
-			auto btn = Button(item, [item] { std::cout << "Clicked: " << item << std::endl; },Style());
+			auto btn = Button(item, [item] { *label_text=item},Style());
 			buttons.push_back(Renderer(btn,[item]{return text(item);
 		}));
 	}
@@ -56,8 +59,47 @@ Component MusicList(){
 	return Make<Impl>();
 }
 
+void play(){}
+void prev(){}
+void next(){}
 
+Component PlayerWidget(){
+	class Impl : public ComponentBase{
+		Impl(){
+			auto play_button_text = std::make_shared<std::wstring>(L"Play");
+			auto play_button = Button(play_button_text->c_str(), [play_button_text] {
+			if (*play_button_text == L"Play") {
+					play();
+					*play_button_text = L"Pause";
+			} else {
+					play();
+					*play_button_text = L"Play";
+			}
+	});
+
+	auto prev_button = Button(L"Prev", previousM);
+	auto next_button = Button(L"Next", next);
+
+	auto button_container = Container::Horizontal({
+			prev_button,
+			play_button,
+			next_button,
+	});
+	Component renderer = Renderer(button_container, [&] {
+	return window(text(L"Audio Player"), hbox({
+			prev_button->Render(),
+			play_button->Render(),
+			next_button->Render(),
+	}));
+    });
+	Add(renderer);
+	}
+}
+return Make<Impl>();
+}
 int main(int argc, const char* argv[]) {
+  auto screen = ScreenInteractive::Fullscreen();
+	label = Button(label_text->c_str(),screen.ExitLoopClosure());
   auto musicListWindow = Window({
 				.inner=MusicList(),
 				.title="My Music",
@@ -67,9 +109,21 @@ int main(int argc, const char* argv[]) {
 				.height=Terminal::Size().dimy/2,
 				});
 
-    // Create and run the screen interactive
-    auto screen = ScreenInteractive::Fullscreen();
-    screen.Loop(musicListWindow);
+	auto audioPlayerWindow = Window({
+			.inner=PlayerWidget(),
+			.left=0,
+			.top=50,
+			.width=Terminal::Size().dimx,
+			.height=Terminal::Size().dimy/3,
+			});
 
-    return 0;
+	auto windowContainer = Container::Stacked({
+			musicListWindow,
+			audioPlayerWindow,
+			label
+			});
+    // Create and run the screen interactive;
+	auto layout = Container::Vertical({windowContainer});
+  screen.Loop(layout);
+	return 0;
 }
