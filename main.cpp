@@ -100,7 +100,6 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
-    auto screen = ScreenInteractive::Fullscreen();
 		auto musicListWindow = Window({
 					.inner=MusicList(),
 					.title="My Music",
@@ -118,16 +117,12 @@ int main(int argc, const char* argv[]) {
 				.height=Terminal::Size().dimy/3,
 				});
 
-    auto windowContainer = Container::Vertical({
+    auto windowContainer = Container::Stacked({
         musicListWindow,
         audioPlayerWindow,
+				label
     });
-
-    auto layout = Container::Vertical({
-        windowContainer,
-        label,
-    });
-
-    screen.Loop(layout);
+    auto screen = ScreenInteractive::Fullscreen();
+    screen.Loop(windowContainer);
     return 0;
 }
