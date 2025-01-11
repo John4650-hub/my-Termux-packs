@@ -1,3 +1,5 @@
+#include "scroller.hpp"
+
 #include <algorithm>                           // for max, min
 #include <ftxui/component/component_base.hpp>  // for Component, ComponentBase
 #include <ftxui/component/event.hpp>  // for Event, Event::ArrowDown, Event::ArrowUp, Event::End, Event::Home, Event::PageDown, Event::PageUp
