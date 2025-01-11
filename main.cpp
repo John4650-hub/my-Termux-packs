@@ -22,7 +22,7 @@ ButtonOption Style() {
 	return option;
 }
 
-vector<Component> GenerateList(){
+std::vector<Component> GenerateList(){
 	std::vector<std::string> items;
   std::ifstream file("list.txt");
 	std::string line;
@@ -42,40 +42,24 @@ Component MusicList(){
 			Impl(){
 				Add(Container::Vertical(GenerateList()));
 			}
-	}
+	};
 	return Make<Impl>();
 }
 
 
 int main(int argc, const char* argv[]) {
-    auto musicListWindow = Window({
+  auto musicListWindow = Window({
 				.inner=MusicList(),
 				.title="My Music",
-				.top=0,
 				.left=0,
-				.width=100,
-				.height=50
+				.top=0,
+				.width=Terminal::Size().dimx,
+				.height=Terminal::Size().dimy/2,
 				});
-
-    // Create a vertical container for the buttons
-    auto container = Container::Vertical(musicListWindow);
-
-    // Create a renderer for the container
-    auto renderer = Renderer(container, [&] {
-        Elements elements;
-        for (auto& button : buttons) {
-            elements.push_back(button->Render());
-        }
-        return vbox({
-            text("Select an item:"),
-            separator(),
-            vbox(std::move(elements)),
-        });
-    });
 
     // Create and run the screen interactive
     auto screen = ScreenInteractive::Fullscreen();
-    screen.Loop(renderer);
+    screen.Loop(musicListWindow);
 
     return 0;
 }
