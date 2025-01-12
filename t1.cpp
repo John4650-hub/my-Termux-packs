@@ -3,20 +3,52 @@
 #include <unistd.h>
 
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        printf("usage: %s <audio-file>\n", argv[0]);
+    int c;
+    char* streamType = NULL;
+    while ((c = getopt(argc, argv, "s:")) != -1) {
+        if (c == 's') {
+            streamType = optarg;
+        }
+    }
+
+    if (optind == argc) {
         return 1;
     }
 
     AudioPlayer player;
-    player.play(argv[1]);
 
-    while (true) {
-        SLmillisecond position = player.getPosition();
-        SLmillisecond duration = player.getDuration();
-        printf("Current position: %u ms, Duration: %u ms\n", position, duration);
-        sleep(1); // Sleep for 1 second before checking the position again
+    if (streamType != NULL) {
+        SLint32 streamTypeEnum;
+        if (strcmp("alarm", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_ALARM;
+        } else if (strcmp("media", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_MEDIA;
+        } else if (strcmp("notification", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_NOTIFICATION;
+        } else if (strcmp("ring", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_RING;
+        } else if (strcmp("system", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_SYSTEM;
+        } else if (strcmp("voice", streamType) == 0) {
+            streamTypeEnum = SL_ANDROID_STREAM_VOICE;
+        } else {
+            player.getError() = "invalid streamtype";
+            return 1;
+        }
+        player.setStreamType(streamTypeEnum);
     }
 
-    return 0;
-}
+    for (int i = optind; i < argc; i++) {
+        if (access(argv[i], R_OK) != 0) {
+            player.getError() = "not a readable file";
+            return 1;
+        }
+    }
+
+    for (int i = optind; i < argc; i++) {
+        player.play(argv[i]);
+        if (!player.getError().empty()) {
+            return 1;
+        }
+    }
+
