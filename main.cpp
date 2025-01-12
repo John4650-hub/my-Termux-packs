@@ -1,5 +1,4 @@
 #include <ftxui/component/component.hpp>
-#include <ftxui/screen/canvas.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
