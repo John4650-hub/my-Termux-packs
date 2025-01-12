@@ -17,6 +17,7 @@ using namespace ftxui;
 auto label_text = std::make_shared<std::wstring>(L"Quit");
 auto label = Button(label_text->c_str(), []() {});
 bool isPlaying = false;
+Component musicListWindow;
 
 ButtonOption Style() {
     auto option = ButtonOption::Animated();
@@ -74,11 +75,12 @@ void play() {
 }
 void prev(){
 	auto screen = ScreenInteractive::Active();
+	musicListWindow->TakeFocus();
 	screen->PostEvent(Event::ArrowUp);
 }
 void next() {
-	auto screen = ScreenInteractive::Active();
-	screen->PostEvent(Event::ArrowDown);
+	musicListWindow->TakeFocus();
+	//musicListWindow->PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
@@ -116,7 +118,7 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
-	auto musicListWindow = Window({
+	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
 			.left=0,
