@@ -3,6 +3,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
 #include "ftxui/dom/canvas.hpp"
+#include <ftxui/component/event.hpp>
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/captured_mouse.hpp"
 #include <fstream>
@@ -72,10 +73,10 @@ void play() {
 	**/
 }
 void prev(){
-	scroll->OnEvent(Event::Character('k'));
+	scroll->OnEvent(Event::ArrowUp);
 }
 void next() {
-	scroll->onEvent(Event::Character('j'));
+	scroll->onEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
