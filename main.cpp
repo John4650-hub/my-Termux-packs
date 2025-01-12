@@ -17,7 +17,6 @@ using namespace ftxui;
 auto label_text = std::make_shared<std::wstring>(L"Quit");
 auto label = Button(label_text->c_str(), []() {});
 bool isPlaying = false;
-Component scroll;
 
 ButtonOption Style() {
     auto option = ButtonOption::Animated();
@@ -48,6 +47,7 @@ std::vector<Component> GenerateList() {
 
 Component MusicList() {
     class Impl : public ComponentBase {
+		Component scroll;
     public:
         Impl() {
             scroll = Scroller(Container::Vertical(GenerateList()));
@@ -73,10 +73,12 @@ void play() {
 	**/
 }
 void prev(){
-	OnEvent(Event::ArrowUp);
+	auto screen = ScreenInteractive::Active();
+	screen.PostEvent(Event::ArrowUp);
 }
 void next() {
-	OnEvent(Event::ArrowDown);
+	auto screen = ScreenInteractive::Active();
+	screen.PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
