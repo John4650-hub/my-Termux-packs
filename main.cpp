@@ -90,7 +90,7 @@ Component PlayerWidget() {
             Component button_container = Container::Horizontal({
 								Renderer(prev_button, [prev_canvas] { return canvas(prev_canvas);}),
                 Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
-                Renderer(next_button, [next_canvas]{ return canvas(next_canvas)}),
+                Renderer(next_button, [next_canvas]{ return canvas(next_canvas);}),
             });
       Add(button_container);
         }
