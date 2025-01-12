@@ -14,6 +14,7 @@
 
 using namespace ftxui;
 
+auto screen = ScreenInteractive::Fullscreen();
 auto label_text = std::make_shared<std::wstring>(L"Quit");
 auto label = Button(label_text->c_str(), []() {});
 bool isPlaying = false;
@@ -75,11 +76,11 @@ void play() {
 }
 void prev(){
 	musicListWindow->TakeFocus();
-	musicListWindow->PostEvent(Event::ArrowUp);
+	screen->PostEvent(Event::ArrowUp);
 }
 void next() {
 	musicListWindow->TakeFocus();
-	musicListWindow->PostEvent(Event::ArrowDown);
+	screen->PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
@@ -140,7 +141,6 @@ int main(int argc, const char* argv[]) {
 			label
 			});
 
-auto screen = ScreenInteractive::Fullscreen();
 screen.Loop(windowContainer);
 return 0;
 }
