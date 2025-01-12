@@ -74,11 +74,11 @@ void play() {
 }
 void prev(){
 	auto screen = ScreenInteractive::Active();
-	screen.PostEvent(Event::ArrowUp);
+	screen->PostEvent(Event::ArrowUp);
 }
 void next() {
 	auto screen = ScreenInteractive::Active();
-	screen.PostEvent(Event::ArrowDown);
+	screen->PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
