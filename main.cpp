@@ -78,10 +78,10 @@ Component PlayerWidget() {
                     play();
                     *play_button_text = L"Play";
                 }
-            });
+            },Style());
 
-            auto prev_button = Button("Back", prev);
-            auto next_button = Button("Next", next);
+            auto prev_button = Button("Back", previ,Style());
+            auto next_button = Button("Next", next,Style());
 /**						auto prev_canvas = Canvas(10,10);
 						prev_canvas.DrawText(0,0,"<",Color::Red);
 
@@ -89,9 +89,9 @@ Component PlayerWidget() {
 						next_canvas.DrawText(0,0,">",Color::Red);
 **/
             Component button_container = Container::Horizontal({
-								Renderer(prev_button, [prev_button] { return prev_button->Render() | size(WIDTH,EQUAL,10) | bgcolor(Color::Green) | center;}),
-                Renderer(play_button, [play_button] { return play_button->Render() | flex | center; }),
-                Renderer(next_button, [next_button]{ return next_button->Render() | size(WIDTH,EQUAL,10) | bgcolor(Color::Green) | center;}),
+								Renderer(prev_button, [prev_button] { return prev_button->Render();}),
+                Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
+                Renderer(next_button, [next_button]{ return next_button->Render();}),
             });
       Add(button_container);
         }
