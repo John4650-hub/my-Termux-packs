@@ -115,6 +115,6 @@ int main(int argc, const char* argv[]) {
         label,
     });
 
-    screen.Loop(layout);
+    screen.Loop(audioPlayerWindow);
     return 0;
 }
