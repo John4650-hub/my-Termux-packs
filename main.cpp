@@ -105,7 +105,7 @@ int main(int argc, const char* argv[]) {
 	auto audioPlayerWindow = Window({
 			.inner=PlayerWidget(),
 			.left=0,
-			.top=50,
+			.top=10,
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
 			});
