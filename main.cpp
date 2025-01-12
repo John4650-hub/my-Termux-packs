@@ -73,10 +73,10 @@ void play() {
 	**/
 }
 void prev(){
-	scroll->OnEvent(Event::ArrowUp);
+	OnEvent(Event::ArrowUp);
 }
 void next() {
-	scroll->OnEvent(Event::ArrowDown);
+	OnEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {

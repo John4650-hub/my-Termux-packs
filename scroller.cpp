@@ -2,10 +2,9 @@
 
 #include <algorithm>                           // for max, min
 #include <ftxui/component/component_base.hpp>  // for Component, ComponentBase
-#include <ftxui/component/event.hpp>  // for Event, Event::ArrowDown, Event::ArrowUp, Event::End, Event::Home, Event::PageDown, Event::PageUp, Event::Return
+#include <ftxui/component/event.hpp>  // for Event, Event::ArrowDown, Event::ArrowUp, Event::End, Event::Home, Event::PageDown, Event::PageUp
 #include <memory>   // for shared_ptr, allocator, __shared_ptr_access
 #include <utility>  // for move
-#include <vector>   // for vector
 
 #include "ftxui/component/component.hpp"  // for Make
 #include "ftxui/component/mouse.hpp"  // for Mouse, Mouse::WheelDown, Mouse::WheelUp
@@ -16,10 +15,6 @@
 #include "ftxui/screen/box.hpp"       // for Box
 
 namespace ftxui {
-
-// Global variable to store selected item text value
-std::wstring selected_item_text;
-std::vector<std::wstring> items_text; // Store the text of items
 
 class ScrollerBase : public ComponentBase {
  public:
@@ -64,12 +59,6 @@ class ScrollerBase : public ComponentBase {
       selected_ = 0;
     if (event == Event::End)
       selected_ = size_;
-    if (event == Event::Return) {
-        // Access and set the selected item text value to the global variable
-        if (selected_ >= 0 && selected_ < items_text.size()) {
-            selected_item_text = items_text[selected_];
-        }
-    }
 
     selected_ = std::max(0, std::min(size_ - 1, selected_));
     return selected_old != selected_;
@@ -82,9 +71,11 @@ class ScrollerBase : public ComponentBase {
   Box box_;
 };
 
-Component Scroller(Component child, std::vector<std::wstring> items) {
-  items_text = items; // Store the items text
+Component Scroller(Component child) {
   return Make<ScrollerBase>(std::move(child));
 }
 }  // namespace ftxui
 
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
