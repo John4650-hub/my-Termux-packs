@@ -109,14 +109,14 @@ int main(int argc, const char* argv[]) {
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
 			});
-/**
+
 	auto windowContainer = Container::Stacked({
 			musicListWindow,
 			audioPlayerWindow,
 			label
 			});
-**/
+
 auto screen = ScreenInteractive::Fullscreen();
-screen.Loop(audioPlayerWindow);
+screen.Loop(windowContainer);
 return 0;
 }
