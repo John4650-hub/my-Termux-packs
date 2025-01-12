@@ -82,9 +82,9 @@ Component PlayerWidget() {
             auto prev_button = Button("<", prev);
             auto next_button = Button(">", next);
             Component button_container = Container::Horizontal({
-								Renderer(prev_button, [prev_button] { return prev_button->Render() | border; }),
-                Renderer(play_button, [play_button] { return play_button->Render() | border | flex; }),
-                Renderer(next_button, [next_button] { return next_button->Render() | border; }),
+								Renderer(prev_button, [prev_button] { return prev_button->Render(); }),
+                Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
+                Renderer(next_button, [next_button] { return next_button->Render(); }),
             });
       Add(button_container);
         }
@@ -105,7 +105,7 @@ int main(int argc, const char* argv[]) {
 	auto audioPlayerWindow = Window({
 			.inner=PlayerWidget(),
 			.left=0,
-			.top=10,
+			.top=20,
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
 			});
