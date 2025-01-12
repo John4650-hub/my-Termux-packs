@@ -80,11 +80,13 @@ Component PlayerWidget() {
 
             auto prev_button = Button(L"Prev", prev);
             auto next_button = Button(L"Next", next);
-
+						Element tabh = hbox({
+								prev_button | border,
+								play_button | border | flex,
+								next_button | border
+								});
             Component button_container = Container::Horizontal({
-                prev_button,
-                play_button,
-                next_button,
+                tabh
             });
             Add(button_container);
         }
