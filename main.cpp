@@ -15,8 +15,8 @@
 
 using namespace ftxui;
 
-AudioPlayer player;
-player.setStreamType(SL_ANDROID_STREAM_MEDIA);
+AudioPlayer Aplayer;
+Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
 std::string rootPath="";
 
 auto screen = ScreenInteractive::Fullscreen();
@@ -92,22 +92,22 @@ Component MusicList() {
 }
 void changeAudioStream(){
 	if(isPlaying){
-		player.destroy();
+		Aplayer.destroy();
 	}
-		player.play(rootPath +"/"+ selected_item_text);
+		Aplayer.play(rootPath +"/"+ selected_item_text);
 		isPlaying=true;
 }
 void play() {
 	if(isPlaying==false){
-		player.play(rootPath +"/"+ selected_item_text);
+		Aplayer.play(rootPath +"/"+ selected_item_text);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
-		player.pause();
+		Aplayer.pause();
 		isPlaying=false;
 	}
-	if (!player.getError().empty()) {
-    std::string error = player.getError();
+	if (!Aplayer.getError().empty()) {
+    std::string error = Aplayer.getError();
     // Handle the error accordingly
 }
 }
@@ -182,7 +182,7 @@ int main(int argc, const char* argv[]) {
 
 screen.Loop(windowContainer);
 screen.ExitLoopClosure() = [&](){
-	player.destroy();
+	Aplayer.destroy();
 };
 return 0;
 }
@@ -191,27 +191,27 @@ return 0;
  * #include "audio_player.h"
 
 // Create an instance of AudioPlayer
-AudioPlayer player;
+AudioPlayer Aplayer;
 
 // Play an audio file
-player.play("path/to/audio/file.mp3");
-if (!player.getError().empty()) {
-    std::string error = player.getError();
+Aplayer.play("path/to/audio/file.mp3");
+if (!Aplayer.getError().empty()) {
+    std::string error = Aplayer.getError();
     // Handle the error accordingly
 }
 
 // Set audio stream type
-player.setStreamType(SL_ANDROID_STREAM_MEDIA);
+Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
 
 // Get current stream type
-SLint32 currentStream = player.getCurrentStream();
+SLint32 currentStream = Aplayer.getCurrentStream();
 
 // Pause or resume playback
-player.pause();
+Aplayer.pause();
 
 // Get current progress
-float progress = player.getProgress();
+float progress = Aplayer.getProgress();
 
 // Destroy the player when closing the TUI
-player.destroy();
+Aplayer.destroy();
 **/
