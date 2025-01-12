@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include "scroller.hpp"
-#include "audio_player.hpp"
+#include "play_audio.hpp"
 
 using namespace ftxui;
 

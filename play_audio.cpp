@@ -1,4 +1,4 @@
-#include "audio_player.h"
+#include "play_audio.hpp"
 #include <assert.h>
 #include <getopt.h>
 #include <pthread.h>
