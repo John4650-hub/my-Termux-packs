@@ -81,19 +81,12 @@ Component PlayerWidget() {
             auto prev_button = Button(L"Prev", prev);
             auto next_button = Button(L"Next", next);
 
-            auto button_container = Container::Horizontal({
+            Component button_container = Container::Horizontal({
                 prev_button,
                 play_button,
                 next_button,
             });
-            Component renderer = Renderer(button_container, [&] {
-                return window(text(L"Audio Player"), hbox({
-                    prev_button->Render(),
-                    play_button->Render(),
-                    next_button->Render(),
-                }));
-            });
-            Add(renderer);
+            Add(button_container);
         }
     };
     return Make<Impl>();
@@ -116,13 +109,14 @@ int main(int argc, const char* argv[]) {
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
 			});
-
+/**
 	auto windowContainer = Container::Stacked({
 			musicListWindow,
 			audioPlayerWindow,
 			label
 			});
+**/
 auto screen = ScreenInteractive::Fullscreen();
-screen.Loop(musicListWindow);
+screen.Loop(audioPlayerWindow);
 return 0;
 }
