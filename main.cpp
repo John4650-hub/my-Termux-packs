@@ -67,7 +67,7 @@ std::vector<Component> GenerateList() {
 		rootPath=audioPath;
     std::vector<Component> list_items;
     for (std::string item : getAudioFiles(audioPath)) {
-        auto list_item = text(item);
+        auto list_item = Renderer([item]{ return text(item);});
 				list_items.push_back(list_item);
     }
     return list_items;
@@ -94,12 +94,12 @@ void changeAudioStream(){
 	if(isPlaying){
 		Aplayer.destroy();
 	}
-		Aplayer.play(rootPath +"/"+ selected_item_text);
+		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
 		isPlaying=true;
 }
 void play() {
 	if(isPlaying==false){
-		Aplayer.play(rootPath +"/"+ selected_item_text);
+		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
 		isPlaying=true;
 	}
 	if(isPlaying==true){
