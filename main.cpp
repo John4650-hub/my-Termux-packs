@@ -1,5 +1,5 @@
-#include "ftxui/component/component.hpp"
-#include "ftxui/component/screen_interactive.hpp"
+#include <ftxui/component/component.hpp>
+#include <ftxui/component/screen_interactive.hpp>
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/component/captured_mouse.hpp"
@@ -102,20 +102,19 @@ Component PlayerWidget() {
 int main(int argc, const char* argv[]) {
     auto screen = ScreenInteractive::Fullscreen();
 
-    auto musicListWindow = Renderer(MusicList(), [](Element inner) {
-        return window(text(L"My Music"), inner) | size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 15);
-    });
-
-    auto audioPlayerWindow = Renderer(PlayerWidget(), [](Element inner) {
-        return window(text(L"Audio Player"), inner) | size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 10);
-    });
+    auto musicListWindow = Renderer(MusicList(), [] { return window(text(L"My Music"), vbox({}))|size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 15); });
+    auto audioPlayerWindow = Renderer(PlayerWidget(), [] { return window(text(L"Audio Player"), vbox({}))|size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 10); });
 
     auto windowContainer = Container::Vertical({
         musicListWindow,
         audioPlayerWindow,
+    });
+
+    auto layout = Container::Vertical({
+        windowContainer,
         label,
     });
-    screen.Loop(windowContainer);
+
+    screen.Loop(layout);
     return 0;
 }
-
