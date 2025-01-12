@@ -7,7 +7,7 @@
 
 namespace ftxui {
 Component Scroller(Component child);
-extern std::wstring selected_item_text;
+extern std::string selected_item_text;
 }
 #endif /* end of include guard: SCROLLER_H */
 
