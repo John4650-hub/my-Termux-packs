@@ -76,11 +76,11 @@ void play() {
 }
 void prev(){
 	musicListWindow->TakeFocus();
-	screen->PostEvent(Event::ArrowUp);
+	screen.PostEvent(Event::ArrowUp);
 }
 void next() {
 	musicListWindow->TakeFocus();
-	screen->PostEvent(Event::ArrowDown);
+	screen.PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
