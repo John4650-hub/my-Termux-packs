@@ -2,6 +2,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
+#include "ftxui/dom/canvas.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/captured_mouse.hpp"
 #include <fstream>
@@ -81,10 +82,15 @@ Component PlayerWidget() {
 
             auto prev_button = Button("<", prev);
             auto next_button = Button(">", next);
+						auto prev_canvas = Canvas(10,10);
+						prev_canvas.DrawText(0,0,"<",false);
+
+						auto next_canvas = Canvas(10,10);
+						next_canvas.DrawText(0,0,">",false);
             Component button_container = Container::Horizontal({
-								Renderer(prev_button, [prev_button] { return prev_button->Render(); }),
+								Renderer(prev_button, [prev_canvas] { return canvas(prev_canvas)->Render(); }),
                 Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
-                Renderer(next_button, [next_button] { return next_button->Render(); }),
+                Renderer(next_button, [next_canvas] { return canvas(next_canvas)->Render(); }),
             });
       Add(button_container);
         }
