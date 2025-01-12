@@ -84,10 +84,10 @@ Component PlayerWidget() {
             auto prev_button = Button("<", prev);
             auto next_button = Button(">", next);
 						auto prev_canvas = Canvas(10,10);
-						prev_canvas.DrawText(0,0,"<",false);
+						prev_canvas.DrawText(0,0,"<",Color::Red);
 
 						auto next_canvas = Canvas(10,10);
-						next_canvas.DrawText(0,0,">",false);
+						next_canvas.DrawText(0,0,">",Color::Red);
             Component button_container = Container::Horizontal({
 								Renderer(prev_button, [prev_canvas] { return canvas(prev_canvas)->Render(); }),
                 Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
