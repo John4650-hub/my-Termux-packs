@@ -82,14 +82,9 @@ Component PlayerWidget() {
             auto prev_button = Button(L"Prev", prev);
             auto next_button = Button(L"Next", next);
             Component button_container = Container::Horizontal({
-								prev_button,
-								play_button,
-								next_button
-            });
-			auto aligned_elements = hbox({
-                prev_button->Render() | border,
-                play_button->Render() | border | flex,
-                next_button->Render() | border,
+								Renderer(prev_button, [] { return prev_button->Render() | border; }),
+                Renderer(play_button, [] { return play_button->Render() | border | flex; }),
+                Renderer(next_button, [] { return next_button->Render() | border; }),
             });
       Add(button_container);
         }
