@@ -79,8 +79,8 @@ Component PlayerWidget() {
                 }
             });
 
-            auto prev_button = Button(L"Prev", prev);
-            auto next_button = Button(L"Next", next);
+            auto prev_button = Button("<", prev);
+            auto next_button = Button(">", next);
             Component button_container = Container::Horizontal({
 								Renderer(prev_button, [prev_button] { return prev_button->Render() | border; }),
                 Renderer(play_button, [play_button] { return play_button->Render() | border | flex; }),
