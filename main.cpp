@@ -74,13 +74,12 @@ void play() {
 	**/
 }
 void prev(){
-	auto screen = ScreenInteractive::Active();
 	musicListWindow->TakeFocus();
-	screen->PostEvent(Event::ArrowUp);
+	musicListWindow->PostEvent(Event::ArrowUp);
 }
 void next() {
 	musicListWindow->TakeFocus();
-	//musicListWindow->PostEvent(Event::ArrowDown);
+	musicListWindow->PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
