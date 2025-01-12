@@ -123,6 +123,6 @@ int main(int argc, const char* argv[]) {
 			label
 			});
 auto screen = ScreenInteractive::Fullscreen();
-screen.Loop(audioPlayerWindow);
+screen.Loop(musicListWindow);
 return 0;
 }
