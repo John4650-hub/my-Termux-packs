@@ -1,5 +1,7 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/dom/node.hpp>
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/captured_mouse.hpp"
 #include <fstream>
@@ -7,9 +9,6 @@
 #include <string>
 #include <vector>
 #include "scroller.hpp"
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/dom/node.hpp>
-
 
 using namespace ftxui;
 
@@ -83,10 +82,15 @@ Component PlayerWidget() {
             auto prev_button = Button(L"Prev", prev);
             auto next_button = Button(L"Next", next);
             Component button_container = Container::Horizontal({
-                prev_button->Render() | border,
-								play_button->Render() | border | flex,
-								next_button->Render() | border
+								prev_button,
+								play_button,
+								next_button
             });
+						auto boxh = hbox({
+								prev_button -> Render() | border,
+								play_button -> Render()| border | flex,
+								next_button -> Render() | border~
+								});
             Add(button_container);
         }
     };
