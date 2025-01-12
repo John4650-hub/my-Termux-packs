@@ -16,7 +16,6 @@
 using namespace ftxui;
 
 AudioPlayer Aplayer;
-Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
 std::string rootPath="";
 
 auto screen = ScreenInteractive::Fullscreen();
@@ -68,7 +67,7 @@ std::vector<Component> GenerateList() {
     std::vector<Component> list_items;
     for (const auto& item : getAudioFiles(audioPath)) {
         auto list_item = text(std::wstring(item.begin(), item.end()));
-        list_items.push_back(Renderer(list_item, [item] { return text(item); }));
+        list_items.push_back(list_item);
     }
     return list_items;
 }
@@ -157,6 +156,7 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
+	Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
