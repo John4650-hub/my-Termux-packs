@@ -64,9 +64,10 @@ std::vector<Component> GenerateList() {
         audioPaths.push_back(line);
     }
 		std::string audioPath = audioPaths[0];
+		rootPath=audioPath;
     std::vector<Component> list_items;
     for (std::string item : getAudioFiles(audioPath)) {
-        Component list_item = text(item);
+        auto list_item = text(item);
 				list_items.push_back(list_item);
     }
     return list_items;
