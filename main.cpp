@@ -11,14 +11,39 @@
 #include <string>
 #include <vector>
 #include "scroller.hpp"
+#include "audio_player.hpp"
 
 using namespace ftxui;
+
+AudioPlayer player;
+player.setStreamType(SL_ANDROID_STREAM_MEDIA);
+std::string rootPath="";
 
 auto screen = ScreenInteractive::Fullscreen();
 auto label_text = std::make_shared<std::wstring>(L"Quit");
 auto label = Button(label_text->c_str(), []() {});
 bool isPlaying = false;
 Component musicListWindow;
+
+std::vector<std::string> getAudioFiles(const std::string& folderPath) {
+    std::vector<std::string> audioFiles; // Vector to store valid audio file names
+    std::vector<std::string> validExtensions = {".mp3", ".flac", ".wav"}; // List of valid audio file extensions
+
+    // Iterate through the directory specified by folderPath
+    for (const auto& entry : std::filesystem::directory_iterator(folderPath)) {
+        if (entry.is_regular_file()) { // Check if the entry is a regular file
+            std::string fileName = entry.path().filename().string(); // Get the file name
+            std::string fileExtension = entry.path().extension().string(); // Get the file extension
+
+            // Check if the file extension is in the list of valid extensions
+            if (std::find(validExtensions.begin(), validExtensions.end(), fileExtension) != validExtensions.end()) {
+                audioFiles.push_back(fileName); // Add the file name to the vector
+            }
+        }
+    }
+
+    return audioFiles; // Return the vector of valid audio file names
+}
 
 ButtonOption Style() {
     auto option = ButtonOption::Animated();
@@ -33,18 +58,19 @@ ButtonOption Style() {
 }
 
 std::vector<Component> GenerateList() {
-    std::vector<std::string> items;
-    std::ifstream file("list.txt");
+    std::vector<std::string> audioPaths;
+    std::ifstream file("/data/data/com.termux/files/home/.audioPath.txt");
     std::string line;
     while (std::getline(file, line)) {
-        items.push_back(line);
+        audioPaths.push_back(line);
     }
-    std::vector<Component> buttons;
-    for (const auto& item : items) {
-        auto btn = Button(std::wstring(item.begin(), item.end()), [item] { *label_text = std::wstring(item.begin(), item.end()); }, Style());
-        buttons.push_back(Renderer(btn, [item] { return text(item); }));
+		std::string audioPath = audioPaths[0];
+    std::vector<Component> list_items;
+    for (const auto& item : getAudioFiles(audioPath)) {
+        auto list_item = text(std::wstring(item.begin(), item.end()));
+        list_items.push_back(Renderer(list_item, [item] { return text(item); }));
     }
-    return buttons;
+    return list_items;
 }
 
 Component MusicList() {
@@ -64,23 +90,36 @@ Component MusicList() {
     };
     return Make<Impl>();
 }
-
-void play() {
-	/**if(!(isPlaying)){
-		playAudio(selected_item_text);
-		isPlaying=true;
-	} else{
-		pause();
+void changeAudioStream(){
+	if(isPlaying){
+		player.destroy();
 	}
-	**/
+		player.play(rootPath +"/"+ selected_item_text);
+		isPlaying=true;
+}
+void play() {
+	if(isPlaying==false){
+		player.play(rootPath +"/"+ selected_item_text);
+		isPlaying=true;
+	}
+	if(isPlaying==true){
+		player.pause();
+		isPlaying=false;
+	}
+	if (!player.getError().empty()) {
+    std::string error = player.getError();
+    // Handle the error accordingly
+}
 }
 void prev(){
 	musicListWindow->TakeFocus();
 	screen.PostEvent(Event::ArrowUp);
+	changeAudioStream();
 }
 void next() {
 	musicListWindow->TakeFocus();
 	screen.PostEvent(Event::ArrowDown);
+	changeAudioStream();
 }
 
 Component PlayerWidget() {
@@ -142,5 +181,38 @@ int main(int argc, const char* argv[]) {
 			});
 
 screen.Loop(windowContainer);
+screen.ExitLoopClosure() = [&](){
+	player.destroy();
+	screen.RequestQuit();
+};
 return 0;
 }
+
+/**
+ * #include "audio_player.h"
+
+// Create an instance of AudioPlayer
+AudioPlayer player;
+
+// Play an audio file
+player.play("path/to/audio/file.mp3");
+if (!player.getError().empty()) {
+    std::string error = player.getError();
+    // Handle the error accordingly
+}
+
+// Set audio stream type
+player.setStreamType(SL_ANDROID_STREAM_MEDIA);
+
+// Get current stream type
+SLint32 currentStream = player.getCurrentStream();
+
+// Pause or resume playback
+player.pause();
+
+// Get current progress
+float progress = player.getProgress();
+
+// Destroy the player when closing the TUI
+player.destroy();
+**/
