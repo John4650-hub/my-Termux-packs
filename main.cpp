@@ -87,11 +87,11 @@ Component PlayerWidget() {
 								next_button
             });
 						auto boxh = hbox({
-								prev_button -> Render() | border,
-								play_button -> Render()| border | flex,
-								next_button -> Render() | border~
-								});
-            Add(button_container);
+				prev_button->Render() | border,
+				play_button->Render() | border | flex,
+				next_button->Render() | border~
+				});
+      Add(button_container);
         }
     };
     return Make<Impl>();
