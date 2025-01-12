@@ -14,6 +14,7 @@
 #include "ftxui/dom/requirement.hpp"  // for Requirement
 #include "ftxui/screen/box.hpp"       // for Box
 
+
 namespace ftxui {
 
 class ScrollerBase : public ComponentBase {
@@ -41,7 +42,6 @@ class ScrollerBase : public ComponentBase {
   bool OnEvent(Event event) final {
     if (event.is_mouse() && box_.Contain(event.mouse().x, event.mouse().y))
       TakeFocus();
-
     int selected_old = selected_;
     if (event == Event::ArrowUp || event == Event::Character('k') ||
         (event.is_mouse() && event.mouse().button == Mouse::WheelUp)) {
@@ -61,6 +61,8 @@ class ScrollerBase : public ComponentBase {
       selected_ = size_;
 
     selected_ = std::max(0, std::min(size_ - 1, selected_));
+		auto active_child = ChildAt(selected_);
+    selected_item_text = active_child->Render()->text();
     return selected_old != selected_;
   }
 
