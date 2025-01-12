@@ -80,7 +80,7 @@ Component PlayerWidget() {
                 }
             },Style());
 
-            auto prev_button = Button("Back", previ,Style());
+            auto prev_button = Button("Back", prev,Style());
             auto next_button = Button("Next", next,Style());
 /**						auto prev_canvas = Canvas(10,10);
 						prev_canvas.DrawText(0,0,"<",Color::Red);
