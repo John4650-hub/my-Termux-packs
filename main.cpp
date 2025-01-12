@@ -183,7 +183,6 @@ int main(int argc, const char* argv[]) {
 screen.Loop(windowContainer);
 screen.ExitLoopClosure() = [&](){
 	player.destroy();
-	screen.RequestQuit();
 };
 return 0;
 }
