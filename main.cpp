@@ -76,7 +76,7 @@ void prev(){
 	scroll->OnEvent(Event::ArrowUp);
 }
 void next() {
-	scroll->onEvent(Event::ArrowDown);
+	scroll->OnEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
