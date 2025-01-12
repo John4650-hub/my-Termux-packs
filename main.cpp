@@ -100,21 +100,29 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
-    auto screen = ScreenInteractive::Fullscreen();
+	auto musicListWindow = Window({
+			.inner=MusicList(),
+			.title="My Music",
+			.left=0,
+			.top=0,
+			.width=Terminal::Size().dimx,
+			.height=Terminal::Size().dimy/2,
+			});
 
-    auto musicListWindow = Renderer(MusicList(), [] { return window(text(L"My Music"), vbox({}))|size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 15); });
-    auto audioPlayerWindow = Renderer(PlayerWidget(), [] { return window(text(L"Audio Player"), vbox({}))|size(WIDTH, LESS_THAN, 80) | size(HEIGHT, LESS_THAN, 10); });
+	auto audioPlayerWindow = Window({
+			.inner=PlayerWidget(),
+			.left=0,
+			.top=50,
+			.width=Terminal::Size().dimx,
+			.height=Terminal::Size().dimy/3,
+			});
 
-    auto windowContainer = Container::Vertical({
-        musicListWindow,
-        audioPlayerWindow,
-    });
-
-    auto layout = Container::Vertical({
-        windowContainer,
-        label,
-    });
-
-    screen.Loop(audioPlayerWindow);
-    return 0;
+	auto windowContainer = Container::Stacked({
+			musicListWindow,
+			audioPlayerWindow,
+			label
+			});
+auto screen = ScreenInteractive::Fullscreen();
+screen.Loop(audioPlayerWindow);
+return 0;
 }
