@@ -86,11 +86,11 @@ Component PlayerWidget() {
 								play_button,
 								next_button
             });
-						auto boxh = hbox({
-				prev_button->Render() | border,
-				play_button->Render() | border | flex,
-				next_button->Render() | border~
-				});
+			auto aligned_elements = hbox({
+                prev_button->Render() | border,
+                play_button->Render() | border | flex,
+                next_button->Render() | border,
+            });
       Add(button_container);
         }
     };
