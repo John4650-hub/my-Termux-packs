@@ -14,9 +14,10 @@
 #include "ftxui/dom/node.hpp"      // for Node
 #include "ftxui/dom/requirement.hpp"  // for Requirement
 #include "ftxui/screen/box.hpp"       // for Box
+#include <string>
 
 namespace ftxui {
-
+std::string selected_item_text;
 class ScrollerBase : public ComponentBase {
  public:
   ScrollerBase(Component child) { Add(child); }
