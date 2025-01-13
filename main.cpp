@@ -17,7 +17,6 @@ using namespace ftxui;
 
 ma_result result;
 ma_engine engine;
-result = ma_engine_init(NULL, &engine);
 std::string rootPath="";
 Component scroll;
 std::wstring selected_item_text;
@@ -98,7 +97,7 @@ void play() {
 	if(isPlaying==false){
 		selected_item_text = scroll.GetSelectedText();
 		std::string selected_item_text_coverted(selected_item_text.begin(),selected_item_text.end());
-		ma_engine_play_sound(&engine,rootPath +"/"+ selected_item_text_coverted, NULL);
+		ma_engine_play_sound(&engine,(rootPath +"/"+ selected_item_text_coverted).c_str(), NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
@@ -148,10 +147,7 @@ Component PlayerWidget() {
     return Make<Impl>();
 }
 
-int main(int argc, const char* argv[]) {
-	if (result != MA_SUCCESS) {
-		return -1;
-	}
+int main() {
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
