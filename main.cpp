@@ -91,12 +91,12 @@ Component MusicList() {
     return Make<Impl>();
 }
 void changeAudioStream(){
-	Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
+	Aplayer.playAudio(rootPath +"/"+ selected_item_text);
 	isPlaying=true;
 }
 void play() {
 	if(isPlaying==false){
-		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
+		Aplayer.playAudio(rootPath +"/"+ selected_item_text);
 		isPlaying=true;
 	}
 	if(isPlaying==true){

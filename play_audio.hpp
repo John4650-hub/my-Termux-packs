@@ -1,29 +1,23 @@
-#ifndef AUDIO_PLAYER_H
-#define AUDIO_PLAYER_H
+#ifndef AUDIOPLAYER_HPP
+#define AUDIOPLAYER_HPP
 
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
 #include <string>
+#include <portaudio.h>
 
 class AudioPlayer {
-        public:
-                AudioPlayer();
-                ~AudioPlayer();
-                void play(char const* uri);
-                /**
-                 * This allows setting the stream type (default:SL_ANDROID_STREAM_MEDIA):
-                 * SL_ANDROID_STREAM_ALARM - same as android.media.AudioManager.STREAM_ALARM
-                 * SL_ANDROID_STREAM_MEDIA - same as android.media.AudioManager.STREAM_MUSIC
-                 * SL_ANDROID_STREAM_NOTIFICATION - same as android.media.AudioManager.STREAM_NOTIFICATION
-                 * SL_ANDROID_STREAM_RING - same as android.media.AudioManager.STREAM_RING
-                 * SL_ANDROID_STREAM_SYSTEM - same as android.media.AudioManager.STREAM_SYSTEM
-                 * SL_ANDROID_STREAM_VOICE - same as android.media.AudioManager.STREAM_VOICE_CALL
-                 */
-                void setStreamType(SLint32 streamType) { this->androidStreamType = streamType; }
-        private:
-                SLObjectItf mSlEngineObject{NULL};
-                SLEngineItf mSlEngineInterface{NULL};
-                SLObjectItf mSlOutputMixObject{NULL};
-                SLint32 androidStreamType{SL_ANDROID_STREAM_MEDIA};
-}
-#endif // AUDIO_PLAYER_H
+public:
+    AudioPlayer();
+    ~AudioPlayer();
+    void playAudio(const std::string& filePath);
+
+private:
+    static int paCallback(const void* inputBuffer, void* outputBuffer,
+                          unsigned long framesPerBuffer,
+                          const PaStreamCallbackTimeInfo* timeInfo,
+                          PaStreamCallbackFlags statusFlags,
+                          void* userData);
+    PaStream* stream;
+    // Additional private members for audio handling
+};
+
+#endif // AUDIOPLAYER_HPP
