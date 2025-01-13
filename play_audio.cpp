@@ -7,8 +7,6 @@
 #include <unistd.h>
 #include <string>
 
-;
-
 class MutexWithCondition {
         public:
                 MutexWithCondition() {
