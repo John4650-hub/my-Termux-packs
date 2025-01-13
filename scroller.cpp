@@ -18,7 +18,11 @@ namespace ftxui {
 
 class ScrollerBase : public ComponentBase {
  public:
-  ScrollerBase(Component child) { Add(child); }
+  ScrollerBase(Component child = nullptr) {
+    if (child) {
+      Add(child);
+    }
+  }
 
   std::wstring GetSelectedText() {
     if (selected_ < 0 || selected_ >= Children().size()) {
@@ -30,6 +34,10 @@ class ScrollerBase : public ComponentBase {
       return selected_element->node()->text();
     }
     return L"";
+  }
+
+  std::vector<Component> Children() const {
+    return components_;
   }
 
  private:
