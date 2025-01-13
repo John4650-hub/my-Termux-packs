@@ -11,10 +11,6 @@ public:
     ~AudioPlayer();
     void play(const char* uri);
     void setStreamType(SLint32 streamType);
-    SLint32 getCurrentStream();
-    void pause();
-    float getProgress();
-    void destroy();
     std::string getError();
 
 private:

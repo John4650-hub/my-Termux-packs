@@ -91,11 +91,8 @@ Component MusicList() {
     return Make<Impl>();
 }
 void changeAudioStream(){
-	if(isPlaying){
-		Aplayer.destroy();
-	}
-		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
-		isPlaying=true;
+	Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
+	isPlaying=true;
 }
 void play() {
 	if(isPlaying==false){
@@ -103,13 +100,8 @@ void play() {
 		isPlaying=true;
 	}
 	if(isPlaying==true){
-		Aplayer.pause();
 		isPlaying=false;
 	}
-	if (!Aplayer.getError().empty()) {
-    std::string error = Aplayer.getError();
-    // Handle the error accordingly
-}
 }
 void prev(){
 	musicListWindow->TakeFocus();
@@ -182,9 +174,6 @@ int main(int argc, const char* argv[]) {
 			});
 
 screen.Loop(windowContainer);
-screen.ExitLoopClosure() = [&](){
-	Aplayer.destroy();
-};
 return 0;
 }
 
