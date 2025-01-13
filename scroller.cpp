@@ -61,6 +61,8 @@ class ScrollerBase : public ComponentBase {
       selected_ = size_;
 
     selected_ = std::max(0, std::min(size_ - 1, selected_));
+		std::cout << ActiveChild() <<std::endl;
+		selected_item_text="foi";
     return selected_old != selected_;
   }
 
