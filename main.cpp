@@ -11,11 +11,13 @@
 #include <string>
 #include <vector>
 #include "scroller.hpp"
-#include "play_audio.hpp"
+#include "miniaudio.h"
 
 using namespace ftxui;
 
-AudioPlayer Aplayer;
+ma_result result;
+ma_engine engine;
+result = ma_engine_init(NULL, &engine);
 std::string rootPath="";
 
 auto screen = ScreenInteractive::Fullscreen();
@@ -90,36 +92,23 @@ Component MusicList() {
     };
     return Make<Impl>();
 }
-void changeAudioStream(){
-	if(isPlaying){
-		Aplayer.destroy();
-	}
-		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
-		isPlaying=true;
-}
+
 void play() {
 	if(isPlaying==false){
-		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
+		ma_engine_play_sound(&engine,rootPath +"/"+ selected_item_text, NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
-		Aplayer.pause();
 		isPlaying=false;
 	}
-	if (!Aplayer.getError().empty()) {
-    std::string error = Aplayer.getError();
-    // Handle the error accordingly
-}
 }
 void prev(){
 	musicListWindow->TakeFocus();
 	screen.PostEvent(Event::ArrowUp);
-	changeAudioStream();
 }
 void next() {
 	musicListWindow->TakeFocus();
 	screen.PostEvent(Event::ArrowDown);
-	changeAudioStream();
 }
 
 Component PlayerWidget() {
@@ -157,7 +146,9 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
-	Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
+	if (result != MA_SUCCESS) {
+		return -1;
+	}
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
@@ -182,9 +173,6 @@ int main(int argc, const char* argv[]) {
 			});
 
 screen.Loop(windowContainer);
-screen.ExitLoopClosure() = [&](){
-	Aplayer.destroy();
-};
 return 0;
 }
 
