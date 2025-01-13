@@ -149,7 +149,6 @@ Component PlayerWidget() {
 }
 
 int main(int argc, const char* argv[]) {
-	Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
