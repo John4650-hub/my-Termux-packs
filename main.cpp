@@ -19,6 +19,8 @@ ma_result result;
 ma_engine engine;
 result = ma_engine_init(NULL, &engine);
 std::string rootPath="";
+Component scroll;
+std::wstring selected_item_text;
 
 auto screen = ScreenInteractive::Fullscreen();
 auto label_text = std::make_shared<std::wstring>(L"Quit");
@@ -77,7 +79,6 @@ std::vector<Component> GenerateList() {
 
 Component MusicList() {
     class Impl : public ComponentBase {
-		Component scroll;
     public:
         Impl() {
             scroll = Scroller(Container::Vertical(GenerateList()));
@@ -95,7 +96,9 @@ Component MusicList() {
 
 void play() {
 	if(isPlaying==false){
-		ma_engine_play_sound(&engine,rootPath +"/"+ selected_item_text, NULL);
+		selected_item_text = scroll.GetSelectedText();
+		std::string selected_item_text_coverted(selected_item_text.begin(),selected_item_text.end());
+		ma_engine_play_sound(&engine,rootPath +"/"+ selected_item_text_coverted, NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){

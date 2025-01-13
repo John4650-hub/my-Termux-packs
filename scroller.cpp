@@ -1,7 +1,6 @@
 #include "scroller.hpp"
 
 #include <algorithm>                           // for max, min
-#include <iostream>
 #include <ftxui/component/component_base.hpp>  // for Component, ComponentBase
 #include <ftxui/component/event.hpp>  // for Event, Event::ArrowDown, Event::ArrowUp, Event::End, Event::Home, Event::PageDown, Event::PageUp
 #include <memory>   // for shared_ptr, allocator, __shared_ptr_access
@@ -14,13 +13,24 @@
 #include "ftxui/dom/node.hpp"      // for Node
 #include "ftxui/dom/requirement.hpp"  // for Requirement
 #include "ftxui/screen/box.hpp"       // for Box
-#include <string>
 
 namespace ftxui {
-std::string selected_item_text;
+
 class ScrollerBase : public ComponentBase {
  public:
   ScrollerBase(Component child) { Add(child); }
+
+  std::wstring GetSelectedText() {
+    if (selected_ < 0 || selected_ >= Children().size()) {
+      return L"";
+    }
+    auto selected_child = Children()[selected_];
+    auto selected_element = selected_child->Render();
+    if (selected_element->node()->type() == Node::Type::text) {
+      return selected_element->node()->text();
+    }
+    return L"";
+  }
 
  private:
   Element Render() final {
@@ -63,8 +73,6 @@ class ScrollerBase : public ComponentBase {
       selected_ = size_;
 
     selected_ = std::max(0, std::min(size_ - 1, selected_));
-		std::cout << ActiveChild() <<std::endl;
-		selected_item_text="foi";
     return selected_old != selected_;
   }
 
@@ -79,7 +87,3 @@ Component Scroller(Component child) {
   return Make<ScrollerBase>(std::move(child));
 }
 }  // namespace ftxui
-
-// Copyright 2021 Arthur Sonzogni. All rights reserved.
-// Use of this source code is governed by the MIT license that can be found in
-// the LICENSE file.

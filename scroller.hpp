@@ -4,11 +4,9 @@
 #include <ftxui/component/component.hpp>
 
 #include "ftxui/component/component_base.hpp"  // for Component
-#include <string>
 
 namespace ftxui {
 Component Scroller(Component child);
-extern std::string selected_item_text;
 }
 #endif /* end of include guard: SCROLLER_H */
 
