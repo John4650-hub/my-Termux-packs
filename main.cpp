@@ -207,31 +207,3 @@ screen.Loop(windowContainer);
 return 0;
 }
 
-/**
- * #include "audio_player.h"
-
-// Create an instance of AudioPlayer
-AudioPlayer Aplayer;
-
-// Play an audio file
-Aplayer.play("path/to/audio/file.mp3");
-if (!Aplayer.getError().empty()) {
-    std::string error = Aplayer.getError();
-    // Handle the error accordingly
-}
-
-// Set audio stream type
-Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
-
-// Get current stream type
-SLint32 currentStream = Aplayer.getCurrentStream();
-
-// Pause or resume playback
-Aplayer.pause();
-
-// Get current progress
-float progress = Aplayer.getProgress();
-
-// Destroy the player when closing the TUI
-Aplayer.destroy();
-**/
