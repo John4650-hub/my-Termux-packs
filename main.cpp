@@ -14,7 +14,7 @@
 #include "miniaudio.h"
 
 using namespace ftxui;
-
+int selected_item = 0;
 ma_result result;
 ma_engine engine;
 std::string rootPath="";

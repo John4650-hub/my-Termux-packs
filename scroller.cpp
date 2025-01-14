@@ -15,7 +15,7 @@
 #include "ftxui/screen/box.hpp"       // for Box
 
 namespace ftxui {
-
+int selected_item = 0;
 class ScrollerBase : public ComponentBase {
  public:
   ScrollerBase(Component child) { Add(child); }
