@@ -1,10 +1,10 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
-LDFLAGS = -lftxui-screen -lftxui-dom -lftxui-component -pthread
-FILENAME = window.cpp
+LDFLAGS = -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm -ldl
+
 liblisdir.so: $(FILENAME)
-	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib window.cpp -o liblisdir.so $(LDFLAGS)
+	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib miniaudio.c scroller.cpp main.cpp -o liblisdir.so $(LDFLAGS)
 install: liblisdir.so
 	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
 

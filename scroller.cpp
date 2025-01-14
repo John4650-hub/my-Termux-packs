@@ -59,7 +59,7 @@ class ScrollerBase : public ComponentBase {
       selected_ = 0;
     if (event == Event::End)
       selected_ = size_;
-
+		selected_item = selected_;
     selected_ = std::max(0, std::min(size_ - 1, selected_));
     return selected_old != selected_;
   }

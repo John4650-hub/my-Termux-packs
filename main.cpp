@@ -18,14 +18,10 @@ using namespace ftxui;
 ma_result result;
 ma_engine engine;
 std::string rootPath="";
-Component scroll=Scroller(Container::Vertical({Renderer([&]{ return text("foo");}),}));
-std::wstring selected_item_text;
-
-auto screen = ScreenInteractive::Fullscreen();
-auto label_text = std::make_shared<std::wstring>(L"Quit");
-auto label = Button(label_text->c_str(), []() {});
-bool isPlaying = false;
+std::vector<std::string> audioNames;
 Component musicListWindow;
+auto screen = ScreenInteractive::Fullscreen();
+bool isPlaying = false;
 
 std::vector<std::string> getAudioFiles(const std::string& folderPath) {
     std::vector<std::string> audioFiles; // Vector to store valid audio file names
@@ -72,12 +68,14 @@ std::vector<Component> GenerateList() {
     for (std::string item : getAudioFiles(audioPath)) {
         auto list_item = Renderer([item]{ return text(item);});
 				list_items.push_back(list_item);
+				audioNames.push_back(item);
     }
     return list_items;
 }
 
 Component MusicList() {
     class Impl : public ComponentBase {
+		Component scroll;
     public:
         Impl() {
             scroll = Scroller(Container::Vertical(GenerateList()));
@@ -95,15 +93,14 @@ Component MusicList() {
 
 void play() {
 	if(isPlaying==false){
-		selected_item_text = scroll.GetSelectedText();
-		std::string selected_item_text_coverted(selected_item_text.begin(),selected_item_text.end());
-		ma_engine_play_sound(&engine,(rootPath +"/"+ selected_item_text_coverted).c_str(), NULL);
+		ma_engine_play_sound(&engine,(root+"/"+audioNames[selected_item]).c_str(), NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
 		isPlaying=false;
 	}
 }
+
 void prev(){
 	musicListWindow->TakeFocus();
 	screen.PostEvent(Event::ArrowUp);
@@ -148,6 +145,7 @@ Component PlayerWidget() {
 }
 
 int main() {
+	auto label = Button("Exit", screen.ExitLoopClosure());
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
