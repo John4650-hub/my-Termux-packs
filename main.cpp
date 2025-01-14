@@ -116,7 +116,7 @@ Component MusicList() {
 }
 
 void play() {
-	std::string_view audio_playing = rootPath+"/"+audioNames[selected_item_index];
+	std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
 	musicListWindow->TakeFocus();
 
 	result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
@@ -140,11 +140,13 @@ void play() {
         ma_decoder_uninit(&decoder);
         return;
     }
-
-		addLog(audio_playing);
+		msg="wait ...";
+		addLog(msg);
 		isPlaying=true;
+		msg="audio file loaded, starting... ";
+		addLog(msg);
 	}
-	if(isPlaying==true){
+	else if(isPlaying==true){
 		isPlaying=false;
 	}
 }
