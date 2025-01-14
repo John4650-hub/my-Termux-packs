@@ -11,18 +11,22 @@
 #include <string>
 #include <vector>
 #include "scroller.hpp"
-#include "play_audio.hpp"
+#include "audio_player.h"
 
 using namespace ftxui;
-
-AudioPlayer Aplayer;
+extern int selected_item_index;
+std::string textarea_txt="Hello";
+AudioPlayer audio_player;
 std::string rootPath="";
-
-auto screen = ScreenInteractive::Fullscreen();
-auto label_text = std::make_shared<std::wstring>(L"Quit");
-auto label = Button(label_text->c_str(), []() {});
-bool isPlaying = false;
+std::vector<std::string> audioNames;
 Component musicListWindow;
+auto screen = ScreenInteractive::Fullscreen();
+bool isPlaying = false;
+
+void addLog(std::string log){
+        textarea_txt=textarea_txt+"\n";
+        textarea_txt=textarea_txt + log;
+}
 
 std::vector<std::string> getAudioFiles(const std::string& folderPath) {
     std::vector<std::string> audioFiles; // Vector to store valid audio file names
@@ -63,19 +67,20 @@ std::vector<Component> GenerateList() {
     while (std::getline(file, line)) {
         audioPaths.push_back(line);
     }
-		std::string audioPath = audioPaths[0];
-		rootPath=audioPath;
+                std::string audioPath = audioPaths[0];
+                rootPath=audioPath;
     std::vector<Component> list_items;
     for (std::string item : getAudioFiles(audioPath)) {
         auto list_item = Renderer([item]{ return text(item);});
-				list_items.push_back(list_item);
+                                list_items.push_back(list_item);
+                                audioNames.push_back(item);
     }
     return list_items;
 }
 
 Component MusicList() {
     class Impl : public ComponentBase {
-		Component scroll;
+                Component scroll;
     public:
         Impl() {
             scroll = Scroller(Container::Vertical(GenerateList()));
@@ -90,28 +95,27 @@ Component MusicList() {
     };
     return Make<Impl>();
 }
-void changeAudioStream(){
-	Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
-	isPlaying=true;
-}
+
 void play() {
-	if(isPlaying==false){
-		Aplayer.play((rootPath +"/"+ selected_item_text).c_str());
-		isPlaying=true;
-	}
-	if(isPlaying==true){
-		isPlaying=false;
-	}
+        std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
+        musicListWindow->TakeFocus();
+        if(isPlaying==false){
+                addLog(audio_playing);
+                audio_player.play(audio_playing.c_str());
+                isPlaying=true;
+        }
+        if(isPlaying==true){
+                isPlaying=false;
+        }
 }
+
 void prev(){
-	musicListWindow->TakeFocus();
-	screen.PostEvent(Event::ArrowUp);
-	changeAudioStream();
+        musicListWindow->TakeFocus();
+        screen.PostEvent(Event::ArrowUp);
 }
 void next() {
-	musicListWindow->TakeFocus();
-	screen.PostEvent(Event::ArrowDown);
-	changeAudioStream();
+        musicListWindow->TakeFocus();
+        screen.PostEvent(Event::ArrowDown);
 }
 
 Component PlayerWidget() {
@@ -131,14 +135,8 @@ Component PlayerWidget() {
 
             auto prev_button = Button("Back", prev,Style());
             auto next_button = Button("Next", next,Style());
-/**						auto prev_canvas = Canvas(10,10);
-						prev_canvas.DrawText(0,0,"<",Color::Red);
-
-						auto next_canvas = Canvas(10,10);
-						next_canvas.DrawText(0,0,">",Color::Red);
-**/
             Component button_container = Container::Horizontal({
-								Renderer(prev_button, [prev_button] { return prev_button->Render();}),
+                                               Renderer(prev_button, [prev_button] { return prev_button->Render();}),
                 Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
                 Renderer(next_button, [next_button]{ return next_button->Render();}),
             });
@@ -148,30 +146,58 @@ Component PlayerWidget() {
     return Make<Impl>();
 }
 
-int main(int argc, const char* argv[]) {
-	Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
-	musicListWindow = Window({
-			.inner=MusicList(),
-			.title="My Music",
-			.left=0,
-			.top=0,
-			.width=Terminal::Size().dimx,
-			.height=Terminal::Size().dimy/2,
-			});
+Component logsWindow(){
+        class Impl : public ComponentBase{
+                public:
+                        Impl(){
+                                auto textarea_log = Input(&textarea_txt);
+                                Component txtlogs = Container::Vertical({Renderer(textarea_log,[textarea_log]{
+                                               return vbox({
+                                               text("Input"),
+                                               separator(),
+                                               textarea_log->Render() | flex|size(HEIGHT,EQUAL,50)
+                                               }) | border;
+                                               })
+                                               });
+                                Add(txtlogs);
+                        }
+        };
+        return Make<Impl>();
+}
 
-	auto audioPlayerWindow = Window({
-			.inner=PlayerWidget(),
-			.left=0,
-			.top=20,
-			.width=Terminal::Size().dimx,
-			.height=Terminal::Size().dimy/3,
-			});
+int main() {
+	audio_player.setStreamType(SL_ANDROID_STREAM_MEDIA);
+	auto label = Button("Exit", screen.ExitLoopClosure());
+        musicListWindow = Window({
+                        .inner=MusicList(),
+                        .title="My Music",
+                        .left=0,
+                        .top=0,
+                        .width=Terminal::Size().dimx,
+                        .height=Terminal::Size().dimy/2,
+                        });
 
-	auto windowContainer = Container::Stacked({
-			musicListWindow,
-			audioPlayerWindow,
-			label
-			});
+        auto audioPlayerWindow = Window({
+                        .inner=PlayerWidget(),
+                        .left=0,
+                        .top=15,
+                        .width=Terminal::Size().dimx,
+                        .height=Terminal::Size().dimy/3,
+                        });
+auto logout = Window({
+                        .inner=logsWindow(),
+                        .title="my logs",
+                        .left=0,
+                        .top=20,
+                        .width=Terminal::Size().dimx,
+                        .height=Terminal::Size().dimy/1.5,
+                        });
+
+        auto windowContainer = Container::Stacked({
+                        musicListWindow,
+                        audioPlayerWindow,
+                        logout
+                        });
 
 screen.Loop(windowContainer);
 return 0;
