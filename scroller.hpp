@@ -4,7 +4,7 @@
 #include <ftxui/component/component.hpp>
 
 #include "ftxui/component/component_base.hpp"  // for Component
-extern int selected_item{};
+extern int selected_item;
 namespace ftxui {
 Component Scroller(Component child);
 }

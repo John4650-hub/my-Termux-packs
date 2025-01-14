@@ -93,7 +93,7 @@ Component MusicList() {
 
 void play() {
 	if(isPlaying==false){
-		ma_engine_play_sound(&engine,(root+"/"+audioNames[selected_item]).c_str(), NULL);
+		ma_engine_play_sound(&engine,(rootPath+"/"+audioNames[selected_item]).c_str(), NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
