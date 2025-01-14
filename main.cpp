@@ -18,7 +18,7 @@ using namespace ftxui;
 ma_result result;
 ma_engine engine;
 std::string rootPath="";
-Component scroll;
+Component scroll=Scroller(Container::Vertical({Renderer([&]{ return text("foo");}),}));
 std::wstring selected_item_text;
 
 auto screen = ScreenInteractive::Fullscreen();

@@ -18,27 +18,7 @@ namespace ftxui {
 
 class ScrollerBase : public ComponentBase {
  public:
-  ScrollerBase(Component child = nullptr) {
-    if (child) {
-      Add(child);
-    }
-  }
-
-  std::wstring GetSelectedText() {
-    if (selected_ < 0 || selected_ >= Children().size()) {
-      return L"";
-    }
-    auto selected_child = Children()[selected_];
-    auto selected_element = selected_child->Render();
-    if (selected_element->node()->type() == Node::Type::text) {
-      return selected_element->node()->text();
-    }
-    return L"";
-  }
-
-  std::vector<Component> Children() const {
-    return components_;
-  }
+  ScrollerBase(Component child) { Add(child); }
 
  private:
   Element Render() final {
@@ -95,3 +75,7 @@ Component Scroller(Component child) {
   return Make<ScrollerBase>(std::move(child));
 }
 }  // namespace ftxui
+
+// Copyright 2021 Arthur Sonzogni. All rights reserved.
+// Use of this source code is governed by the MIT license that can be found in
+// the LICENSE file.
