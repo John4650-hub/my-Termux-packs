@@ -147,8 +147,8 @@ Component PlayerWidget() {
     return Make<Impl>();
 }
 
-Component logsWindow{
-	class Impl:public ComponentBase{
+Component logsWindow(){
+	class Impl : public ComponentBase{
 		public:
 			Impl(){
 				auto textarea_log = Input(&textarea_txt);
@@ -168,7 +168,8 @@ Component logsWindow{
 
 int main() {
 	if (result != MA_SUCCESS) {
-		addLog("Failed to initialize the engine."s);
+		std::string msg = "Failed to initialize the engine.";
+		addLog(msg);
 	}
 	auto label = Button("Exit", screen.ExitLoopClosure());
 	musicListWindow = Window({
