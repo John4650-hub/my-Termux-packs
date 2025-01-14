@@ -13,9 +13,8 @@
 #include "ftxui/dom/node.hpp"      // for Node
 #include "ftxui/dom/requirement.hpp"  // for Requirement
 #include "ftxui/screen/box.hpp"       // for Box
-
+int selected_item_index = 0;
 namespace ftxui {
-int selected_item = 0;
 class ScrollerBase : public ComponentBase {
  public:
   ScrollerBase(Component child) { Add(child); }
@@ -59,7 +58,7 @@ class ScrollerBase : public ComponentBase {
       selected_ = 0;
     if (event == Event::End)
       selected_ = size_;
-		selected_item = selected_;
+		selected_item_index = selected_;
     selected_ = std::max(0, std::min(size_ - 1, selected_));
     return selected_old != selected_;
   }

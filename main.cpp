@@ -14,7 +14,7 @@
 #include "miniaudio.h"
 
 using namespace ftxui;
-int selected_item = 0;
+extern int selected_item_index;
 std::string textarea_txt="Hello";
 ma_result result;
 ma_engine engine;
@@ -98,7 +98,7 @@ Component MusicList() {
 }
 
 void play() {
-	std::string audio_playing = rootPath+"/"+audioNames[selected_item];
+	std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
 	musicListWindow->TakeFocus();
 	if(isPlaying==false){
 		addLog(audio_playing);
