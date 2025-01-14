@@ -28,13 +28,6 @@ ma_decoder decoder;
 ma_device_config deviceConfig;
 ma_device device;
 
-deviceConfig = ma_device_config_init(ma_device_type_playback);
-deviceConfig.playback.format   = decoder.outputFormat;
-deviceConfig.playback.channels = decoder.outputChannels;
-deviceConfig.sampleRate        = decoder.outputSampleRate;
-deviceConfig.dataCallback      = data_callback;
-deviceConfig.pUserData         = &decoder;
-
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
@@ -213,6 +206,14 @@ Component logsWindow(){
 }
 
 int main() {
+	deviceConfig = ma_device_config_init(ma_device_type_playback);
+	deviceConfig.playback.format   = decoder.outputFormat;
+	deviceConfig.playback.channels = decoder.outputChannels;
+	deviceConfig.sampleRate        = decoder.outputSampleRate;
+	deviceConfig.dataCallback      = data_callback;
+	deviceConfig.pUserData         = &decoder;
+
+
 	if (result != MA_SUCCESS) {
 		msg = "Failed to initialize the engine.";
 		addLog(msg);
