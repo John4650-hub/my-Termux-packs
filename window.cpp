@@ -1,29 +1,62 @@
-#include <functional>  // for function
-#include <iostream>  // for basic_ostream::operator<<, operator<<, endl, basic_ostream, basic_ostream<>::__ostream_type, cout, ostream
-#include <string>    // for string, basic_string, allocator
-#include <vector>    // for vector
+#define MINIAUDIO_IMPLEMENTATION
+#include "miniaudio.h"
 
-#include "ftxui/component/captured_mouse.hpp"      // for ftxui
-#include "ftxui/component/component.hpp"           // for Menu
-#include "ftxui/component/component_options.hpp"   // for MenuOption
-#include "ftxui/component/screen_interactive.hpp"  // for ScreenInteractive
+#include <stdio.h>
 
-int main() {
-  using namespace ftxui;
-  auto screen = ScreenInteractive::TerminalOutput();
+void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
+{
+    ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
+    if (pDecoder == NULL) {
+        return;
+    }
 
-  std::vector<std::string> entries = {
-      "entry 1",
-      "entry 2",
-      "entry 3",
-  };
-  int selected = 0;
+    ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount, NULL);
 
-  MenuOption option;
-  option.on_enter = screen.ExitLoopClosure();
-  auto menu = Menu(&entries, &selected, option);
+    (void)pInput;
+}
 
-  screen.Loop(menu);
+int main(int argc, char** argv)
+{
+    ma_result result;
+    ma_decoder decoder;
+    ma_device_config deviceConfig;
+    ma_device device;
 
-  std::cout << "Selected element = " << selected << std::endl;
+    if (argc < 2) {
+        printf("No input file.\n");
+        return -1;
+    }
+
+    result = ma_decoder_init_file(argv[1], NULL, &decoder);
+    if (result != MA_SUCCESS) {
+        return -2;
+    }
+
+    deviceConfig = ma_device_config_init(ma_device_type_playback);
+    deviceConfig.playback.format   = decoder.outputFormat;
+    deviceConfig.playback.channels = decoder.outputChannels;
+    deviceConfig.sampleRate        = decoder.outputSampleRate;
+    deviceConfig.dataCallback      = data_callback;
+    deviceConfig.pUserData         = &decoder;
+
+    if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
+        printf("Failed to open playback device.\n");
+        ma_decoder_uninit(&decoder);
+        return -3;
+    }
+
+    if (ma_device_start(&device) != MA_SUCCESS) {
+        printf("Failed to start playback device.\n");
+        ma_device_uninit(&device);
+        ma_decoder_uninit(&decoder);
+        return -4;
+    }
+
+    printf("Press Enter to quit...");
+    getchar();
+
+    ma_device_uninit(&device);
+    ma_decoder_uninit(&decoder);
+
+    return 0;
 }
