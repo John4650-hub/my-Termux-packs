@@ -16,13 +16,38 @@
 using namespace ftxui;
 extern int selected_item_index;
 std::string textarea_txt="Hello";
-ma_result result;
-ma_engine engine;
 std::string rootPath="";
+std::string msg{};
 std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
+
+ma_result result;
+ma_decoder decoder;
+ma_device_config deviceConfig;
+ma_device device;
+
+deviceConfig = ma_device_config_init(ma_device_type_playback);
+deviceConfig.playback.format   = decoder.outputFormat;
+deviceConfig.playback.channels = decoder.outputChannels;
+deviceConfig.sampleRate        = decoder.outputSampleRate;
+deviceConfig.dataCallback      = data_callback;
+deviceConfig.pUserData         = &decoder;
+
+
+void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
+{
+    ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
+    if (pDecoder == NULL) {
+        return;
+    }
+
+		ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount, NULL);
+
+    (void)pInput;
+}
+
 
 void addLog(std::string log){
 	textarea_txt=textarea_txt+"\n";
@@ -98,11 +123,32 @@ Component MusicList() {
 }
 
 void play() {
-	std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
+	std::string_view audio_playing = rootPath+"/"+audioNames[selected_item_index];
 	musicListWindow->TakeFocus();
+
+	result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	if(isPlaying==false){
+			if (result != MA_SUCCESS) {
+				msg="could not play the audio file";
+				addLog(msg);
+				return;
+				}
+			if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
+        msg="Failed to open playback device.\n";
+				addLog(msg);
+        ma_decoder_uninit(&decoder);
+        return;
+    }
+
+    if (ma_device_start(&device) != MA_SUCCESS) {
+        msg="Failed to start playback device.\n";
+				addLog(msg);
+        ma_device_uninit(&device);
+        ma_decoder_uninit(&decoder);
+        return;
+    }
+
 		addLog(audio_playing);
-		ma_engine_play_sound(&engine,audio_playing.c_str(), NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
@@ -168,10 +214,15 @@ Component logsWindow(){
 
 int main() {
 	if (result != MA_SUCCESS) {
-		std::string msg = "Failed to initialize the engine.";
+		msg = "Failed to initialize the engine.";
 		addLog(msg);
 	}
-	auto label = Button("Exit", screen.ExitLoopClosure());
+	auto label = Button("Exit", [&]{
+			screen.ExitLoopClosure();
+			ma_device_uninit(&device);
+			ma_decoder_uninit(&decoder);
+			});
+
 	musicListWindow = Window({
 			.inner=MusicList(),
 			.title="My Music",
