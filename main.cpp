@@ -15,6 +15,7 @@
 
 using namespace ftxui;
 int selected_item = 0;
+std::string textarea_txt="Hello";
 ma_result result;
 ma_engine engine;
 std::string rootPath="";
@@ -22,6 +23,11 @@ std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
+
+void addLog(std::string log){
+	textarea_txt=textarea_txt+"\n";
+	textarea_txt=textarea_txt + log;
+}
 
 std::vector<std::string> getAudioFiles(const std::string& folderPath) {
     std::vector<std::string> audioFiles; // Vector to store valid audio file names
@@ -92,8 +98,11 @@ Component MusicList() {
 }
 
 void play() {
+	std::string audio_playing = rootPath+"/"+audioNames[selected_item];
+	musicListWindow->TakeFocus();
 	if(isPlaying==false){
-		ma_engine_play_sound(&engine,(rootPath+"/"+audioNames[selected_item]).c_str(), NULL);
+		addLog(audio_playing);
+		ma_engine_play_sound(&engine,audio_playing.c_str(), NULL);
 		isPlaying=true;
 	}
 	if(isPlaying==true){
@@ -127,12 +136,6 @@ Component PlayerWidget() {
 
             auto prev_button = Button("Back", prev,Style());
             auto next_button = Button("Next", next,Style());
-/**						auto prev_canvas = Canvas(10,10);
-						prev_canvas.DrawText(0,0,"<",Color::Red);
-
-						auto next_canvas = Canvas(10,10);
-						next_canvas.DrawText(0,0,">",Color::Red);
-**/
             Component button_container = Container::Horizontal({
 								Renderer(prev_button, [prev_button] { return prev_button->Render();}),
                 Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
@@ -144,7 +147,29 @@ Component PlayerWidget() {
     return Make<Impl>();
 }
 
+Component logsWindow{
+	class Impl:public ComponentBase{
+		public:
+			Impl(){
+				auto textarea_log = Input(&textarea_txt);
+				Component txtlogs = Container::Vertical({Renderer(textarea_log,[textarea_log]{
+						return vbox({
+								text("Input"),
+								separator(),
+								textarea_log->Render() | flex|size(HEIGHT,EQUAL,50)
+								}) | border;
+						})
+						});
+				Add(txtlogs);
+			}
+	};
+	return Make<Impl>();
+}
+
 int main() {
+	if (result != MA_SUCCESS) {
+		addLog("Failed to initialize the engine."s);
+	}
 	auto label = Button("Exit", screen.ExitLoopClosure());
 	musicListWindow = Window({
 			.inner=MusicList(),
@@ -158,15 +183,23 @@ int main() {
 	auto audioPlayerWindow = Window({
 			.inner=PlayerWidget(),
 			.left=0,
-			.top=20,
+			.top=15,
 			.width=Terminal::Size().dimx,
 			.height=Terminal::Size().dimy/3,
+			});
+auto logout = Window({
+			.inner=logsWindow(),
+			.title="my logs",
+			.left=0,
+			.top=20,
+			.width=Terminal::Size().dimx,
+			.height=Terminal::Size().dimy/1.5,
 			});
 
 	auto windowContainer = Container::Stacked({
 			musicListWindow,
 			audioPlayerWindow,
-			label
+			logout
 			});
 
 screen.Loop(windowContainer);
