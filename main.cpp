@@ -1,233 +1,94 @@
-#include <ftxui/component/component.hpp>
-#include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/dom/node.hpp>
-#include "ftxui/dom/canvas.hpp"
-#include <ftxui/component/event.hpp>
-#include "ftxui/component/component_base.hpp"
-#include "ftxui/component/captured_mouse.hpp"
-#include <fstream>
+////////////////////////////////////////////////////////////
+// Headers
+////////////////////////////////////////////////////////////
+#include <SFML/Audio.hpp>
+
 #include <iostream>
-#include <string>
-#include <vector>
-#include "scroller.hpp"
-#include "audio_player.h"
 
-using namespace ftxui;
-extern int selected_item_index;
-std::string textarea_txt="Hello";
-AudioPlayer audio_player;
-std::string rootPath="";
-std::vector<std::string> audioNames;
-Component musicListWindow;
-auto screen = ScreenInteractive::Fullscreen();
-bool isPlaying = false;
 
-void addLog(std::string log){
-        textarea_txt=textarea_txt+"\n";
-        textarea_txt=textarea_txt + log;
-}
+namespace
+{
+////////////////////////////////////////////////////////////
+/// Play a sound
+///
+////////////////////////////////////////////////////////////
+void playSound()
+{
+    // Load a sound buffer from a wav file
+    const sf::SoundBuffer buffer("resources/killdeer.wav");
 
-std::vector<std::string> getAudioFiles(const std::string& folderPath) {
-    std::vector<std::string> audioFiles; // Vector to store valid audio file names
-    std::vector<std::string> validExtensions = {".mp3", ".flac", ".wav"}; // List of valid audio file extensions
+    // Display sound information
+    std::cout << "killdeer.wav:" << '\n'
+              << " " << buffer.getDuration().asSeconds() << " seconds" << '\n'
+              << " " << buffer.getSampleRate() << " samples / sec" << '\n'
+              << " " << buffer.getChannelCount() << " channels" << '\n';
 
-    // Iterate through the directory specified by folderPath
-    for (const auto& entry : std::filesystem::directory_iterator(folderPath)) {
-        if (entry.is_regular_file()) { // Check if the entry is a regular file
-            std::string fileName = entry.path().filename().string(); // Get the file name
-            std::string fileExtension = entry.path().extension().string(); // Get the file extension
+    // Create a sound instance and play it
+    sf::Sound sound(buffer);
+    sound.play();
 
-            // Check if the file extension is in the list of valid extensions
-            if (std::find(validExtensions.begin(), validExtensions.end(), fileExtension) != validExtensions.end()) {
-                audioFiles.push_back(fileName); // Add the file name to the vector
-            }
-        }
+    // Loop while the sound is playing
+    while (sound.getStatus() == sf::Sound::Status::Playing)
+    {
+        // Leave some CPU time for other processes
+        sf::sleep(sf::milliseconds(100));
+
+        // Display the playing position
+        std::cout << "\rPlaying... " << sound.getPlayingOffset().asSeconds() << " sec        " << std::flush;
     }
 
-    return audioFiles; // Return the vector of valid audio file names
+    std::cout << '\n' << std::endl;
 }
 
-ButtonOption Style() {
-    auto option = ButtonOption::Animated();
-    option.transform = [](const EntryState& s) {
-        auto element = text(s.label);
-        if (s.focused) {
-            element |= bold;
-        }
-        return element | center | borderEmpty | flex;
-    };
-    return option;
-}
 
-std::vector<Component> GenerateList() {
-    std::vector<std::string> audioPaths;
-    std::ifstream file("/data/data/com.termux/files/home/.audioPath.txt");
-    std::string line;
-    while (std::getline(file, line)) {
-        audioPaths.push_back(line);
+////////////////////////////////////////////////////////////
+/// Play a music
+///
+////////////////////////////////////////////////////////////
+void playMusic(const std::filesystem::path& filename)
+{
+    // Load an ogg music file
+    sf::Music music("resources" / filename);
+
+    // Display music information
+    std::cout << filename << ":" << '\n'
+              << " " << music.getDuration().asSeconds() << " seconds" << '\n'
+              << " " << music.getSampleRate() << " samples / sec" << '\n'
+              << " " << music.getChannelCount() << " channels" << '\n';
+
+    // Play it
+    music.play();
+
+    // Loop while the music is playing
+    while (music.getStatus() == sf::Music::Status::Playing)
+    {
+        // Leave some CPU time for other processes
+        sf::sleep(sf::milliseconds(100));
+
+        // Display the playing position
+        std::cout << "\rPlaying... " << music.getPlayingOffset().asSeconds() << " sec        " << std::flush;
     }
-                std::string audioPath = audioPaths[0];
-                rootPath=audioPath;
-    std::vector<Component> list_items;
-    for (std::string item : getAudioFiles(audioPath)) {
-        auto list_item = Renderer([item]{ return text(item);});
-                                list_items.push_back(list_item);
-                                audioNames.push_back(item);
-    }
-    return list_items;
+
+    std::cout << '\n' << std::endl;
 }
+} // namespace
 
-Component MusicList() {
-    class Impl : public ComponentBase {
-                Component scroll;
-    public:
-        Impl() {
-            scroll = Scroller(Container::Vertical(GenerateList()));
-            Add(
-#ifdef SCROLLER_INSIDE_WINDOW
-                Renderer(scroll, [&] { return window(text(" Test Log: "), vbox(scroll)); })
-#else
-                scroll
-#endif
-            );
-        }
-    };
-    return Make<Impl>();
+
+////////////////////////////////////////////////////////////
+/// Entry point of application
+///
+/// \return Application exit code
+///
+////////////////////////////////////////////////////////////
+int main()
+{
+    // Play a sound
+    playSound();
+
+    // Play music from an ogg file
+    playMusic("/storage/3461-6461/Music/Radio 001_sd.mp3");
+
+    // Wait until the user presses 'enter' key
+    std::cout << "Press enter to exit..." << std::endl;
+    std::cin.ignore(10000, '\n');
 }
-
-void play() {
-        std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
-        musicListWindow->TakeFocus();
-        if(isPlaying==false){
-                addLog(audio_playing);
-                audio_player.play(audio_playing.c_str());
-                isPlaying=true;
-        }
-        if(isPlaying==true){
-                isPlaying=false;
-        }
-}
-
-void prev(){
-        musicListWindow->TakeFocus();
-        screen.PostEvent(Event::ArrowUp);
-}
-void next() {
-        musicListWindow->TakeFocus();
-        screen.PostEvent(Event::ArrowDown);
-}
-
-Component PlayerWidget() {
-    class Impl : public ComponentBase {
-    public:
-        Impl() {
-            auto play_button_text = std::make_shared<std::wstring>(L"Play");
-            auto play_button = Button(play_button_text->c_str(), [play_button_text] {
-                if (*play_button_text == L"Play") {
-                    play();
-                    *play_button_text = L"Pause";
-                } else {
-                    play();
-                    *play_button_text = L"Play";
-                }
-            },Style());
-
-            auto prev_button = Button("Back", prev,Style());
-            auto next_button = Button("Next", next,Style());
-            Component button_container = Container::Horizontal({
-                                               Renderer(prev_button, [prev_button] { return prev_button->Render();}),
-                Renderer(play_button, [play_button] { return play_button->Render() | flex; }),
-                Renderer(next_button, [next_button]{ return next_button->Render();}),
-            });
-      Add(button_container);
-        }
-    };
-    return Make<Impl>();
-}
-
-Component logsWindow(){
-        class Impl : public ComponentBase{
-                public:
-                        Impl(){
-                                auto textarea_log = Input(&textarea_txt);
-                                Component txtlogs = Container::Vertical({Renderer(textarea_log,[textarea_log]{
-                                               return vbox({
-                                               text("Input"),
-                                               separator(),
-                                               textarea_log->Render() | flex|size(HEIGHT,EQUAL,50)
-                                               }) | border;
-                                               })
-                                               });
-                                Add(txtlogs);
-                        }
-        };
-        return Make<Impl>();
-}
-
-int main() {
-	audio_player.setStreamType(SL_ANDROID_STREAM_MEDIA);
-	auto label = Button("Exit", screen.ExitLoopClosure());
-        musicListWindow = Window({
-                        .inner=MusicList(),
-                        .title="My Music",
-                        .left=0,
-                        .top=0,
-                        .width=Terminal::Size().dimx,
-                        .height=Terminal::Size().dimy/2,
-                        });
-
-        auto audioPlayerWindow = Window({
-                        .inner=PlayerWidget(),
-                        .left=0,
-                        .top=15,
-                        .width=Terminal::Size().dimx,
-                        .height=Terminal::Size().dimy/3,
-                        });
-auto logout = Window({
-                        .inner=logsWindow(),
-                        .title="my logs",
-                        .left=0,
-                        .top=20,
-                        .width=Terminal::Size().dimx,
-                        .height=Terminal::Size().dimy/1.5,
-                        });
-
-        auto windowContainer = Container::Stacked({
-                        musicListWindow,
-                        audioPlayerWindow,
-                        logout
-                        });
-
-screen.Loop(windowContainer);
-return 0;
-}
-
-/**
- * #include "audio_player.h"
-
-// Create an instance of AudioPlayer
-AudioPlayer Aplayer;
-
-// Play an audio file
-Aplayer.play("path/to/audio/file.mp3");
-if (!Aplayer.getError().empty()) {
-    std::string error = Aplayer.getError();
-    // Handle the error accordingly
-}
-
-// Set audio stream type
-Aplayer.setStreamType(SL_ANDROID_STREAM_MEDIA);
-
-// Get current stream type
-SLint32 currentStream = Aplayer.getCurrentStream();
-
-// Pause or resume playback
-Aplayer.pause();
-
-// Get current progress
-float progress = Aplayer.getProgress();
-
-// Destroy the player when closing the TUI
-Aplayer.destroy();
-**/
