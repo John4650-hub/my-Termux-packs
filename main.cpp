@@ -276,8 +276,7 @@ int main() {
       .left = 0,
       .top = 20,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy / 1.5,
-  });
+      .height = Terminal::Size().dimy / 1.5});
 
   auto windowContainer =
       Container::Stacked({musicListWindow, audioPlayerWindow, logout});
