@@ -140,6 +140,7 @@ void play() {
   result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
+	addLog(std::to_string(total_frames));
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
