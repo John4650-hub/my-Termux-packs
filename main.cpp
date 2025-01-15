@@ -31,6 +31,7 @@ ma_result result;
 ma_decoder decoder;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
+ma_uint64 lengthInFrames;
 
 void seek_audio(int position){
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
@@ -137,7 +138,8 @@ void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
   result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
-	total_frames = (int)ma_decoder_get_length_in_pcm_frames(&decoder);
+	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
+	total_frames = (int)lengthInFrames;
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
@@ -258,8 +260,8 @@ int main() {
 
   auto audioPlayerWindow = Window({
       .inner = Container::Vertical({
-					Renderer(slider,[slider]{
-							slider|CatchEvent([&](Event event){
+					Renderer(slider,[&]{
+							return slider->Render()|CatchEvent(slider,[&](Event event){
 									if(event.is(Event::ArrowLeft) || event.is(Event::ArrowRight)){
 									seek_audio(slider_position);
 									}
