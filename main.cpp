@@ -82,6 +82,11 @@ ButtonOption Style() {
 std::vector<Component> GenerateList() {
     std::vector<std::string> audioPaths;
     std::ifstream file("/data/data/com.termux/files/home/.audioPath.txt");
+		if(!file){
+			msg=".audioPath.txt file not found!!";
+			addLog(msg);
+			return;
+		}
     std::string line;
     while (std::getline(file, line)) {
         audioPaths.push_back(line);
