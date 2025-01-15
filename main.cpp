@@ -34,7 +34,7 @@ ma_device device;
 ma_uint64 lengthInFrames;
 
 void seek_audio(int position){
-	ma_decoder_seek_to_pcm_frame(&decoder,position);
+	ma_data_source_seek_to_pcm_frame(&decoder, position);
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -137,7 +137,18 @@ Component MusicList() {
 void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
-  result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
+	
+	if(isPlaying){
+    msg = "stoping current audio ...";
+		ma_decoder_uninit(&decoder);
+    addLog(msg);
+		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
+	}
+	else if(!isPlaying){
+		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
+		isPlaying=true;
+	}
+
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
 	addLog(std::to_string(total_frames));
@@ -147,12 +158,13 @@ void play() {
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
 
-  if (isPlaying == false) {
+
     if (result != MA_SUCCESS) {
       msg = "could not play the audio file";
       addLog(msg);
       return;
     }
+
     if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
       msg = "Failed to open playback device.\n";
       addLog(msg);
@@ -167,14 +179,10 @@ void play() {
       ma_decoder_uninit(&decoder);
       return;
     }
-    msg = "wait ...";
-    addLog(msg);
-    isPlaying = true;
+
     msg = "audio file loaded, starting... ";
     addLog(msg);
-  } else if (isPlaying == true) {
-    isPlaying = false;
-  }
+  
 }
 
 void prev() {
