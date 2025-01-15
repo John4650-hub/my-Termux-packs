@@ -15,7 +15,7 @@
 
 using namespace ftxui;
 extern int selected_item_index;
-std::string textarea_txt="Hello";
+std::string textarea_txt="message ...";
 std::string rootPath="";
 std::string msg{};
 std::vector<std::string> audioNames;
