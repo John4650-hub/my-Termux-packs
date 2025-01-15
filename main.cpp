@@ -39,7 +39,7 @@ void seek_audio(int posit){
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
 	const size_t framesToRead = 256;
     float outputBuffer[framesToRead * decoder.outputChannels];
-    size_t framesDecoded = ma_decoder_read_pcm_frames(&decoder, NULL,outputBuffer, framesToRead);
+    size_t framesDecoded = ma_decoder_read_pcm_frames(&decoder, NULL,static_cast<ma_uint64>(outputBuffer), framesToRead);
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
