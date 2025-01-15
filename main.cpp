@@ -262,7 +262,7 @@ auto audioPlayerWindow = Window({
         CatchEvent(Renderer(slider, [&] {
             return slider->Render();
         }), [&](Event event) {
-            if (event.is(Event::ArrowLeft) || event.is(Event::ArrowRight)) {
+            if (event == Event::ArrowLeft || event == Event::ArrowRight) {
                 seek_audio(slider_position);
                 return true;
             }
