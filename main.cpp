@@ -28,6 +28,7 @@ int slider_position{};
 
 ma_result result;
 ma_decoder decoder;
+ma_decoder_config decoderConfig;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
@@ -157,11 +158,13 @@ void play() {
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
 	addLog(std::to_string(total_frames));
+
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
+	decoderConfig=deviceConfig;
 	sampleRate=decoder.outputSampleRate;
 
 
