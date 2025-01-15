@@ -272,7 +272,6 @@ auto audioPlayerWindow = Window({
                 seek_audio(slider_position);
 					return true;
 								}
-            }
             return false;
         }),
         PlayerWidget()
