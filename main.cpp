@@ -81,11 +81,12 @@ ButtonOption Style() {
 
 std::vector<Component> GenerateList() {
     std::vector<std::string> audioPaths;
+    std::vector<Component> list_items;
     std::ifstream file("/data/data/com.termux/files/home/.audioPath.txt");
 		if(!file){
 			msg=".audioPath.txt file not found!!";
 			addLog(msg);
-			return;
+			return list_items;
 		}
     std::string line;
     while (std::getline(file, line)) {
@@ -93,7 +94,6 @@ std::vector<Component> GenerateList() {
     }
 		std::string audioPath = audioPaths[0];
 		rootPath=audioPath;
-    std::vector<Component> list_items;
     for (std::string item : getAudioFiles(audioPath)) {
         auto list_item = Renderer([item]{ return text(item);});
 				list_items.push_back(list_item);
