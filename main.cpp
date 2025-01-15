@@ -111,7 +111,8 @@ void play() {
 	std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
 	musicListWindow->TakeFocus();
 	if(isPlaying==false){
-		if(selected_item_index != prev_selected_item_index){
+		result = ma_sound_init_from_file(&engine, audio_playing.c_str(), 0, NULL, NULL, &sound);
+		if(selected_item_index == prev_selected_item_index*2){
 			if(playedBefore)
 				ma_sound_uninit(&sound);
 			result = ma_sound_init_from_file(&engine, audio_playing.c_str(), 0, NULL, NULL, &sound);
