@@ -26,15 +26,20 @@ bool isPlaying = false;
 int total_frames{};
 int slider_position{};
 
-
 ma_result result;
 ma_decoder decoder;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
+int sampleRate{};
+double seekTimeInSeconds{180.0};
 
-void seek_audio(int position){
-	ma_data_source_seek_to_pcm_frame(&decoder, position);
+void seek_audio(int posit){
+	ma_uint64 position = static_cast<ma_uint64>(seekTimeInSeconds * sampleRate);
+	ma_decoder_seek_to_frame(&decode,position);
+	const size_t framesToRead = 256;
+    float outputBuffer[framesToRead * decoder.outputChannels];
+    size_t framesDecoded = ma_decoder_read_pcm_frames(&decoder, outputBuffer, framesToRead);
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -157,6 +162,7 @@ void play() {
   deviceConfig.sampleRate = decoder.outputSampleRate;
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
+	sampleRate=decoder;
 
 
     if (result != MA_SUCCESS) {
@@ -302,7 +308,8 @@ auto audioPlayerWindow = Window({
 
   auto windowContainer =
       Container::Stacked({musicListWindow, audioPlayerWindow, logout});
-
   screen.Loop(windowContainer);
+	ma_decoder_uninit(&decoder);
+  ma_device_uninit(&device);
   return 0;
 }
