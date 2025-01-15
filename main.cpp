@@ -36,7 +36,7 @@ double seekTimeInSeconds{180.0};
 
 void seek_audio(int posit){
 	ma_uint64 position = static_cast<ma_uint64>(seekTimeInSeconds * sampleRate);
-	ma_decoder_seek_to_frame(&decoder,position);
+	ma_decoder_seek_to_pcm_frame(&decoder,position);
 	const size_t framesToRead = 256;
     float outputBuffer[framesToRead * decoder.outputChannels];
     size_t framesDecoded = ma_decoder_read_pcm_frames(&decoder, NULL,outputBuffer, framesToRead);
