@@ -15,32 +15,19 @@
 
 using namespace ftxui;
 extern int selected_item_index;
-std::string textarea_txt="Hello";
+std::string textarea_txt="Welcome ...";
 std::string rootPath="";
+int prev_selected_item_index{-1};
 std::string msg{};
 std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
+bool playedBefore=false;
 
 ma_result result;
-ma_decoder decoder;
-ma_device_config deviceConfig;
-ma_device device;
-
-
-void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
-{
-    ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
-    if (pDecoder == NULL) {
-        return;
-    }
-
-		ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount, NULL);
-
-    (void)pInput;
-}
-
+ma_sound sound;
+ma_engine engine;
 
 void addLog(std::string log){
 	textarea_txt=textarea_txt+"\n";
@@ -123,35 +110,28 @@ Component MusicList() {
 void play() {
 	std::string audio_playing = rootPath+"/"+audioNames[selected_item_index];
 	musicListWindow->TakeFocus();
-
-	result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	if(isPlaying==false){
-			if (result != MA_SUCCESS) {
+		if(selected_item_index != prev_selected_item_index){
+			if(playedBefore)
+				ma_sound_uninit();
+			result = ma_sound_init_from_file(&engine, audio_playing.c_str(), 0, NULL, NULL, &sound);
+			prev_selected_item_index=selected_item_index;
+		}
+		if (result != MA_SUCCESS) {
 				msg="could not play the audio file";
 				addLog(msg);
 				return;
 				}
-			if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
-        msg="Failed to open playback device.\n";
-				addLog(msg);
-        ma_decoder_uninit(&decoder);
-        return;
-    }
-
-    if (ma_device_start(&device) != MA_SUCCESS) {
-        msg="Failed to start playback device.\n";
-				addLog(msg);
-        ma_device_uninit(&device);
-        ma_decoder_uninit(&decoder);
-        return;
-    }
 		msg="wait ...";
 		addLog(msg);
 		isPlaying=true;
+		playedBefore=true;
+		ma_sound_start(&sound);
 		msg="audio file loaded, starting... ";
 		addLog(msg);
 	}
 	else if(isPlaying==true){
+		ma_sound_stop();
 		isPlaying=false;
 	}
 }
@@ -213,22 +193,12 @@ Component logsWindow(){
 }
 
 int main() {
-	deviceConfig = ma_device_config_init(ma_device_type_playback);
-	deviceConfig.playback.format   = decoder.outputFormat;
-	deviceConfig.playback.channels = decoder.outputChannels;
-	deviceConfig.sampleRate        = decoder.outputSampleRate;
-	deviceConfig.dataCallback      = data_callback;
-	deviceConfig.pUserData         = &decoder;
-
-
 	if (result != MA_SUCCESS) {
 		msg = "Failed to initialize the engine.";
 		addLog(msg);
 	}
 	auto label = Button("Exit", [&]{
 			screen.ExitLoopClosure();
-			ma_device_uninit(&device);
-			ma_decoder_uninit(&decoder);
 			});
 
 	musicListWindow = Window({
