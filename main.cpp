@@ -23,11 +23,18 @@ std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
+int total_frames{};
+int slider_position{};
+
 
 ma_result result;
 ma_decoder decoder;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
+
+void seek_audio(int position){
+	ma_decoder_seek_to_pcm_frame(&decoder,position);
+}
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
                    ma_uint32 frameCount) {
@@ -130,6 +137,7 @@ void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
   result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
+	total_frames = (int)ma_decoder_get_length_in_pcm_frames(&decoder);
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
@@ -238,6 +246,7 @@ int main() {
     ma_decoder_uninit(&decoder);
   });
 
+	auto slider = Slider("Seek",&slider_position,0,total_frames,1);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
@@ -248,7 +257,14 @@ int main() {
   });
 
   auto audioPlayerWindow = Window({
-      .inner = PlayerWidget(),
+      .inner = Container::Vertical({
+					Renderer(slider,[slider]{
+							slider|CatchEvent([&](Event event){
+									if(event.is(Event::ArrowLeft) || event.is(Event::ArrowRight)){
+									seek_audio(slider_position);
+									}
+									});
+							}),PlayerWidget()}),
       .left = 0,
       .top = 15,
       .width = Terminal::Size().dimx,
