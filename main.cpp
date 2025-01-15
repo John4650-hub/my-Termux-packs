@@ -257,22 +257,25 @@ int main() {
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy / 2,
   });
-
-  auto audioPlayerWindow = Window({
-      .inner = Container::Vertical({
-					Renderer(slider,[&]{
-							return slider->Render()|CatchEvent(slider,[&](Event event){
-									if(event.is(Event::ArrowLeft) || event.is(Event::ArrowRight)){
-									seek_audio(slider_position);
-									}
-									});
-							}),PlayerWidget()}),
-      .left = 0,
-      .top = 15,
-      .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy / 3,
-  });
-  auto logout = Window({
+auto audioPlayerWindow = Window({
+    .inner = Container::Vertical({
+        CatchEvent(Renderer(slider, [&] {
+            return slider->Render();
+        }), [&](Event event) {
+            if (event.is(Event::ArrowLeft) || event.is(Event::ArrowRight)) {
+                seek_audio(slider_position);
+                return true;
+            }
+            return false;
+        }),
+        PlayerWidget()
+    }),
+    .left = 0,
+    .top = 15,
+    .width = Terminal::Size().dimx,
+    .height = Terminal::Size().dimy / 3,
+});
+   auto logout = Window({
       .inner = logsWindow(),
       .title = "my logs",
       .left = 0,
