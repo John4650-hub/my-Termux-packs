@@ -126,6 +126,14 @@ Component MusicList() {
   return Make<Impl>();
 }
 
+void update_gauge(Component& gauge, float value){
+	guage->Set(value);
+}
+
+ma_result seek_audio(ma_audio *pDecoder, ma_uint64 frameIndex){
+	return ma_decoder_seek_to_pcm_frame(pDecoder,frameIndex)
+}
+
 void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
