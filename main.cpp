@@ -113,7 +113,7 @@ void play() {
 	if(isPlaying==false){
 		if(selected_item_index != prev_selected_item_index){
 			if(playedBefore)
-				ma_sound_uninit();
+				ma_sound_uninit(&sound);
 			result = ma_sound_init_from_file(&engine, audio_playing.c_str(), 0, NULL, NULL, &sound);
 			prev_selected_item_index=selected_item_index;
 		}
@@ -131,7 +131,7 @@ void play() {
 		addLog(msg);
 	}
 	else if(isPlaying==true){
-		ma_sound_stop();
+		ma_sound_stop(&sound);
 		isPlaying=false;
 	}
 }
