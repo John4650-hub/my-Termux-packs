@@ -263,12 +263,12 @@ auto audioPlayerWindow = Window({
             return slider->Render();
         }), [&](Event event) {
 						if (slider_position>=0 && slider_position<total_frames){
-            if (event == Event::ArrowLeft)
+            if (event == Event::Character('j'))
 						{
 						slider_position-=1;
 						seek_audio(slider_position);
 						return true;
-						}else if (event == Event::ArrowRight) {
+						}else if (event == Event::Character('k')) {
 								slider_position+=1;
 								seek_audio(slider_position);
 								return true;
