@@ -67,11 +67,10 @@ void startSlider(){
 				},1000);
 }
 
-void seek_audio(int posit){
+void seek_audio(ma_uint64 position){
 	clearInterval();
 	ma_device_stop(&device);
-	num_frames = ma_calculate_buffer_size_in_frames_from_milliseconds(posit * 1000, decoder.outputSampleRate);
-	ma_decoder_seek_to_pcm_frame(&decoder,num_frames);
+	ma_decoder_seek_to_pcm_frame(&decoder,position);
 	ma_device_start(&device);
 	startSlider();
 }
@@ -321,15 +320,19 @@ auto audioPlayerWindow = Window({
         CatchEvent(Renderer(slider, [&] {
             return slider->Render();
         }), [&](Event event) {
-						if (slider_position>=0 && slider_position<total_frames){
+						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
 						{
-						slider_position-=1;
-						seek_audio(slider_position);
+						ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+						currentFrame-=1;
+						seek_audio(currentFrame);
+						slider_position=(currentFrame/total_frames)*100;
 						return true;
 						}else if (event == Event::ArrowRight) {
-								slider_position+=1;
-								seek_audio(slider_position);
+								ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+								currentFrame+=1;
+								seek_audio(currentFrame);
+								slider_position=(currentFrame/total_frames)*100;
 								return true;
 						}
 								}
