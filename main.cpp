@@ -25,7 +25,7 @@ std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
-std::string Seek="0";
+char* Seek= new char[7];
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
@@ -67,7 +67,7 @@ void startSlider(){
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 			slider_position = (currentFrame/total_frames)*100;
-			Seek = std::to_string(slider_position);
+			snprintf(Seek,sizeof(Seek),"%.1f%",slider_position);
 				},1000);
 }
 
@@ -314,7 +314,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	auto slider = Slider(&Seek->c_str(),&slider_position,0.f,100.f);
+	auto slider = Slider(&Seek,&slider_position,0.f,100.f);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
