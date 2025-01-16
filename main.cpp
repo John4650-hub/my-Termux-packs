@@ -33,7 +33,7 @@ auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
 bool isPaused=false;
 int total_frames{};
-float slider_position{};
+int slider_position{};
 int prev_selected_item_index{};
 
 
@@ -54,11 +54,8 @@ void setInterval(std::function<void()> func, int interval) {
     std::thread([func, interval]() {
         while (!stopFlag) {
 				slider->TakeFocus();
-				slider_position = (currentFrame/total_frames)*100;
-			std::ostringstream oss;
-			oss.precision(1);
-			oss<< std::fixed << slider_position;
-			Seek = oss.str();
+				slider_position = static_cast<int>((currentFrame/total_frames)*100);
+			Seek = std::to_string(slider_position);
 			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
@@ -326,7 +323,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	slider = Slider(&Seek,&slider_position,0.0f,100.0f);
+	slider = Slider(&Seek,&slider_position,0,100);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
