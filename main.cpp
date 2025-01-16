@@ -51,11 +51,15 @@ std::atomic<bool> stopFlag(false);
 
 void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
+	
+			screen.PostEvent(Event::Custom);
     std::thread([func, interval]() {
+
+			screen.PostEvent(Event::Custom);
         while (!stopFlag) {
 				slider->TakeFocus();
 				slider_position = static_cast<int>((currentFrame/total_frames)*100);
-			Seek = std::to_string(slider_position);
+			Seek = std::to_string(slider_position+" %");
 			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
@@ -72,11 +76,13 @@ void clearInterval() {
 }
 void startSlider(){
 	setInterval([](){
+			screen.PostEvent(Event::Custom);
 			if (currentFrame==total_frames){
 			clearInterval();
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 							},1000);
+	screen.PostEvent(Event::Custom);
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
