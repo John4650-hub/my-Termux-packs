@@ -82,12 +82,13 @@ void startSlider(){
 			if (currentFrame==total_frames){
 			clearInterval();
 			}
-
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			addLog(std::to_string(currentFrame));
-							},1000);
 			slider_position = (currentFrame/total_frames)*100;
 			addLog(std::to_string(currentFrame)+" / "+std::to_string(total_frames)+" = "+std::to_string(slider_position));
+							},1000);
+			
 
 }
 
