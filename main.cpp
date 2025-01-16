@@ -182,7 +182,6 @@ void play() {
 		if(prev_selected_item_index==selected_item_index){
 			if(isPaused){
 				isPaused=false;
-				*play_button_text=L"resume";
 				ma_device_start(&device);
 				clearInterval();
 				startSlider();
@@ -190,8 +189,6 @@ void play() {
 			}else{
 				isPaused = true;
 				clearInterval();
-				sliderMove=true
-				*play_button_text=L"Play";
 				ma_device_stop(&device);
 				return;
 			}
