@@ -19,7 +19,7 @@ extern int selected_item_index;
 std::string textarea_txt = ".....welcome.....";
 std::string rootPath = "";
 std::string msg{};
-auto play_button_text;
+std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
