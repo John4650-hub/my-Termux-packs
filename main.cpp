@@ -86,8 +86,8 @@ void startSlider(){
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 			//addLog(std::to_string(currentFrame));
 							},1000);
-			slider_position = currentFrame/total_frames*100;
-			addLog(std::to_string(slider_position));
+			slider_position = (currentFrame/total_frames)*100;
+			addLog(std::to_string(currentFrame)+" / "+std::to_string(total_frames)+" = "+std::to_string(slider_position));
 
 }
 
