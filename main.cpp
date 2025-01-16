@@ -48,6 +48,7 @@ ma_uint64 lengthInFrames;
 std::atomic<bool> stopFlag(false);
 
 void setInterval(std::function<void()> func, int interval) {
+	stopFlag=false;
     std::thread([func, interval]() {
         while (!stopFlag) {
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
@@ -339,6 +340,7 @@ auto audioPlayerWindow = Window({
 						currentFrame-=1;
 						seek_audio(currentFrame);
 						slider_position=(currentFrame/total_frames)*100;
+						Se
 						return true;
 						}else if (event == Event::ArrowRight) {
 								moveSlider();
