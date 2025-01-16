@@ -45,6 +45,7 @@ ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
 
+Event updateSlider = Event::Special("update_slider");
 
 std::atomic<bool> stopFlag(false);
 
@@ -52,6 +53,8 @@ void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
     std::thread([func, interval]() {
         while (!stopFlag) {
+				slider->TakeFocus();
+				screen.PostEvent(updateSlider);
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
             if (!stopFlag) {
                 func();
@@ -80,7 +83,7 @@ void startSlider(){
 
 void seek_audio(ma_uint64 position){
 	if(isPaused==false){
-		clearInterval();
+		clearInterval();,
 		ma_device_stop(&device);
 		isPaused=true;
 	}
