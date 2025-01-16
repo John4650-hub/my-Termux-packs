@@ -269,7 +269,7 @@ int main() {
     msg = "Failed to initialize the engine.";
     addLog(msg);
   }
-  auto label = Button("Exit", [&] {
+  auto exit_button = Button("Exit", [&] {
     screen.ExitLoopClosure();
     ma_device_uninit(&device);
     ma_decoder_uninit(&decoder);
@@ -317,9 +317,9 @@ auto audioPlayerWindow = Window({
       .top = 20,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy / 1.5});
-
+	auto exitBtn = Renderer(exit_button,[exit_button]{return exit_button->Render();});
   auto windowContainer =
-      Container::Stacked({musicListWindow, audioPlayerWindow, logout});
+      Container::Stacked({musicListWindow, audioPlayerWindow, logout,exitBtn});
   screen.Loop(windowContainer);
 	ma_decoder_uninit(&decoder);
   ma_device_uninit(&device);
