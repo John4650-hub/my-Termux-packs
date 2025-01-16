@@ -36,11 +36,11 @@ ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
 int sampleRate{};
-ma_uint32 num_frames
+ma_uint32 num_frames;
 
 void seek_audio(int posit){
 	ma_device_stop(&device);
-	num_frames = ma_calculate_buffer_size_in_frames_from_milliseconds(posit * 1000, decoder.internalSampleRate);
+	num_frames = ma_calculate_buffer_size_in_frames_from_milliseconds(posit * 1000, decoder.outputSampleRate);
 	ma_decoder_seek_to_pcm_frame(&decoder,num_frames);
 	ma_device_start(&device);
 }
