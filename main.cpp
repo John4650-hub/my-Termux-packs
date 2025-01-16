@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <string>
-#include <sstring>
+#include <sstream>
 #include <vector>
 #include <chrono>
 #include <thread>
