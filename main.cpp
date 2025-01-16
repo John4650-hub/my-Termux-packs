@@ -19,7 +19,7 @@ extern int selected_item_index;
 std::string textarea_txt = ".....welcome.....";
 std::string rootPath = "";
 std::string msg{};
-std::string play_button_text = "Play";
+auto play_button_text;
 std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
@@ -223,6 +223,7 @@ Component PlayerWidget() {
   class Impl : public ComponentBase {
    public:
     Impl() {
+      play_button_text = std::make_shared<std::wstring>(L"Play");
       auto play_button = Button(
           play_button_text->c_str(),
           [play_button_text] {
