@@ -152,12 +152,12 @@ void play() {
 			if(isPaused){
 				isPaused=false;
 				*play_button_text=L"resume";
-				ma_device_start();
+				ma_device_start(&device);
 				return;
 			}else{
 				isPaused = true;
 				*play_button_text=L"Play";
-				ma_device_stop();
+				ma_device_stop(&device);
 				return;
 			}
 		}
