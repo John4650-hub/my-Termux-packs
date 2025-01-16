@@ -340,7 +340,6 @@ auto audioPlayerWindow = Window({
 						currentFrame-=1;
 						seek_audio(currentFrame);
 						slider_position=(currentFrame/total_frames)*100;
-						Se
 						return true;
 						}else if (event == Event::ArrowRight) {
 								moveSlider();
