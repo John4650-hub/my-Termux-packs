@@ -59,7 +59,7 @@ void setInterval(std::function<void()> func, int interval) {
 			oss.precision(1);
 			oss<< std::fixed << slider_position;
 			Seek = oss.str();
-			screen.Post(Event::Custom);
+			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
