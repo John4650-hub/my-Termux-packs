@@ -317,7 +317,7 @@ int main() {
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
         CatchEvent(Renderer(slider, [&] {
-            return slider->Render();
+            return slider->Render() | border| flex;
         }), [&](Event event) {
 						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
