@@ -59,7 +59,7 @@ void setInterval(std::function<void()> func, int interval) {
         while (!stopFlag) {
 				slider->TakeFocus();
 				slider_position = static_cast<int>((currentFrame/total_frames)*100);
-			Seek = std::to_string(slider_position+" %");
+			Seek = std::to_string(slider_position) + " %";
 			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
