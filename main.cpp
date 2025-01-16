@@ -226,7 +226,7 @@ Component PlayerWidget() {
       play_button_text = std::make_shared<std::wstring>(L"Play");
       auto play_button = Button(
           play_button_text->c_str(),
-          [play_button_text] {
+          [&] {
 play();},
           Style());
 
