@@ -62,7 +62,7 @@ void setInterval(std::function<void()> func, int interval) {
 				slider->TakeFocus();
 				slider_position = static_cast<int>((currentFrame/total_frames)*100);
 			Seek = std::to_string(slider_position) + " %";
-			addLog(Seek);
+			//addLog(Seek);
 			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
@@ -82,7 +82,9 @@ void startSlider(){
 			if (currentFrame==total_frames){
 			clearInterval();
 			}
+
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+			addLog(std::to_string(currentFrame));
 							},1000);
 }
 
