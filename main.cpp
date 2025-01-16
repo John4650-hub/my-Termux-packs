@@ -12,6 +12,8 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <mutex>
+#include <functional>
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/dom/canvas.hpp"
@@ -20,6 +22,8 @@
 #include <cmath>
 
 using namespace ftxui;
+
+std::mutex frameMutex;
 extern int selected_item_index;
 std::string textarea_txt = ".....welcome.....";
 std::string rootPath = "";
@@ -54,11 +58,12 @@ void addLog(std::string a);
 
 void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
-	
-			screen.PostEvent(Event::Custom);
     std::thread([func, interval]() {
-			screen.PostEvent(Event::Custom);
         while (!stopFlag) {
+				{
+                std::lock_guard<std::mutex> lock(frameMutex);
+                ma_decoder_get_cursor_in_pcm(&decoder, &currentFrame);
+            }
 
 				slider->TakeFocus();
 				slider_position = static_cast<int>((currentFrame/total_frames)*100);
