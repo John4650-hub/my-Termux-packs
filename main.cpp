@@ -79,15 +79,11 @@ void clearInterval() {
 }
 void startSlider(){
 	setInterval([](){
-			screen.PostEvent(Event::Custom);
 			if (currentFrame==total_frames){
 			clearInterval();
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 							},1000);
-	screen.PostEvent(Event::Custom);
-	ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void seek_audio(ma_uint64 position){
