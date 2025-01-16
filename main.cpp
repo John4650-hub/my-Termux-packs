@@ -25,6 +25,7 @@ std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
+std::string Seek="0";
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
@@ -66,15 +67,17 @@ void startSlider(){
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 			slider_position = (currentFrame/total_frames)*100;
+			Seek = std::to_string(slider_position);
 				},1000);
 }
 
 void seek_audio(ma_uint64 position){
-	clearInterval();
-	ma_device_stop(&device);
+	if(isPaused==false){
+		clearInterval();
+		ma_device_stop(&device);
+		isPaused=true;
+	}
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
-	ma_device_start(&device);
-	startSlider();
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -311,7 +314,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	auto slider = Slider("Seek",&slider_position,0.f,100.f);
+	auto slider = Slider(&Seek->c_str(),&slider_position,0.f,100.f);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
@@ -323,7 +326,7 @@ int main() {
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
         CatchEvent(Renderer(slider, [&] {
-            return slider->Render() | border| flex;
+            return slider->Render();
         }), [&](Event event) {
 						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
