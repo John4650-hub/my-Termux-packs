@@ -4,15 +4,19 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
+
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <chrono>
+#include <thread>
+#include <atomic>
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/dom/canvas.hpp"
 #include "miniaudio.h"
 #include "scroller.hpp"
+#include <cmath>
 
 using namespace ftxui;
 extern int selected_item_index;
@@ -26,23 +30,50 @@ auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
 bool isPaused=false;
 int total_frames{};
-int slider_position{};
+float slider_position{};
 int prev_selected_item_index{};
 
+
+ma_uint64 currentFrame;
 ma_result result;
 ma_decoder decoder;
 ma_decoder_config decoderConfig;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
-int sampleRate{};
 ma_uint32 num_frames;
 
+
+std::atomic<bool> stopFlag(false);
+
+void setInterval(std::function<void()> func, int interval) {
+    std::thread([func, interval]() {
+        while (!stopFlag) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(interval));
+            if (!stopFlag) {
+                func();
+            }
+        }
+    }).detach();
+}
+
+void clearInterval() {
+    stopFlag = true;
+}
+void startSlider(){
+	setInterval([](){
+			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+			slider_position = (currentFrame/total_frames)*100;
+				},1000);
+}
+
 void seek_audio(int posit){
+	clearInterval();
 	ma_device_stop(&device);
 	num_frames = ma_calculate_buffer_size_in_frames_from_milliseconds(posit * 1000, decoder.outputSampleRate);
 	ma_decoder_seek_to_pcm_frame(&decoder,num_frames);
 	ma_device_start(&device);
+	startSlider();
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -87,7 +118,7 @@ std::vector<std::string> getAudioFiles(const std::string& folderPath) {
   return audioFiles;  // Return the vector of valid audio file names
 }
 
-ButtonOption Style() {
+	ButtonOption Style() {
   auto option = ButtonOption::Animated();
   option.transform = [](const EntryState& s) {
     auto element = text(s.label);
@@ -142,6 +173,7 @@ Component MusicList() {
   return Make<Impl>();
 }
 
+	
 void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
@@ -152,14 +184,19 @@ void play() {
 				isPaused=false;
 				*play_button_text=L"resume";
 				ma_device_start(&device);
+				clearInterval();
+				startSlider();
 				return;
 			}else{
 				isPaused = true;
+				clearInterval();
+				sliderMove=true
 				*play_button_text=L"Play";
 				ma_device_stop(&device);
 				return;
 			}
 		}
+		clearInterval();
     msg = "stopping current audio ...";
 		ma_decoder_uninit(&decoder);
     addLog(msg);
@@ -168,25 +205,23 @@ void play() {
 	else if(!isPlaying){
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 		isPlaying=true;
+		
 	}
 
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
-	addLog(std::to_string(total_frames));
-
+	addLog("totalFrames: " + std::to_string(total_frames));
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
 	
-	sampleRate=decoder.outputSampleRate;
-
 
     if (result != MA_SUCCESS) {
       msg = "could not play the audio file";
-      addLog(msg);
-      return;
+				addLog(msg);
+				return;
     }
 
     if (ma_device_init(NULL, &deviceConfig, &device) != MA_SUCCESS) {
@@ -205,7 +240,8 @@ void play() {
     }
 
     msg = "audio file loaded, starting... ";
-    addLog(msg);
+		addLog(msg);
+		startSlider();
 		prev_selected_item_index=selected_item_index;
 }
 
@@ -274,7 +310,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	auto slider = Slider("Seek",&slider_position,0,total_frames,1);
+	auto slider = Slider("Seek",&slider_position,0.f,100.f);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
@@ -289,12 +325,12 @@ auto audioPlayerWindow = Window({
             return slider->Render();
         }), [&](Event event) {
 						if (slider_position>=0 && slider_position<total_frames){
-            if (event == Event::Character('j'))
+            if (event == Event::ArrowLeft)
 						{
 						slider_position-=1;
 						seek_audio(slider_position);
 						return true;
-						}else if (event == Event::Character('k')) {
+						}else if (event == Event::ArrowRight) {
 								slider_position+=1;
 								seek_audio(slider_position);
 								return true;
