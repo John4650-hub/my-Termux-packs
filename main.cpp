@@ -28,6 +28,7 @@ std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
 std::string  Seek= "0%";
 Component musicListWindow;
+Component slider;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
 bool isPaused=false;
@@ -74,6 +75,7 @@ void startSlider(){
 			oss<< std::fixed << slider_position;
 			Seek = oss.str();
 				},1000);
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 void seek_audio(ma_uint64 position){
@@ -319,7 +321,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	auto slider = Slider(&Seek,&slider_position,0.0f,100.0f,1);
+	slider = Slider(&Seek,&slider_position,0.0f,100.0f,1);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
