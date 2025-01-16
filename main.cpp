@@ -16,15 +16,18 @@
 
 using namespace ftxui;
 extern int selected_item_index;
-std::string textarea_txt = "message ...";
+std::string textarea_txt = ".....welcome.....";
 std::string rootPath = "";
 std::string msg{};
+auto play_button_text = std::make_shared<std::wstring>(L"Play");
 std::vector<std::string> audioNames;
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
+bool isPaused=false;
 int total_frames{};
 int slider_position{};
+int prev_selected_item_index{};
 
 ma_result result;
 ma_decoder decoder;
@@ -145,7 +148,20 @@ void play() {
   musicListWindow->TakeFocus();
 	
 	if(isPlaying){
-    msg = "stoping current audio ...";
+		if(prev_selected_item_index==selected_item_index){
+			if(isPaused){
+				isPaused=false;
+				*play_button_text=L"resume";
+				ma_device_start();
+				return;
+			}else{
+				isPaused = true;
+				*play_button_text=L"Play";
+				ma_device_stop();
+				return;
+			}
+		}
+    msg = "stopping current audio ...";
 		ma_decoder_uninit(&decoder);
     addLog(msg);
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
@@ -164,7 +180,7 @@ void play() {
   deviceConfig.sampleRate = decoder.outputSampleRate;
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
-	decoderConfig=deviceConfig;
+	
 	sampleRate=decoder.outputSampleRate;
 
 
@@ -191,7 +207,7 @@ void play() {
 
     msg = "audio file loaded, starting... ";
     addLog(msg);
-  
+		prev_selected_item_index=selected_item_index;
 }
 
 void prev() {
@@ -207,18 +223,9 @@ Component PlayerWidget() {
   class Impl : public ComponentBase {
    public:
     Impl() {
-      auto play_button_text = std::make_shared<std::wstring>(L"Play");
       auto play_button = Button(
           play_button_text->c_str(),
-          [play_button_text] {
-            if (*play_button_text == L"Play") {
-              play();
-              *play_button_text = L"Pause";
-            } else {
-              play();
-              *play_button_text = L"Play";
-            }
-          },
+          play(),
           Style());
 
       auto prev_button = Button("Back", prev, Style());
@@ -244,10 +251,10 @@ Component logsWindow() {
       auto textarea_log = Input(&textarea_txt);
       Component txtlogs =
           Container::Vertical({Renderer(textarea_log, [textarea_log] {
-            return vbox({text("Input"), separator(),
+            return vbox({text("Audio logs"), separator(),
                          textarea_log->Render() | flex |
                              size(HEIGHT, EQUAL, 50)}) |
-                   border;
+                   border | bgcolor(Color::Black);
           })});
       Add(txtlogs);
     }
