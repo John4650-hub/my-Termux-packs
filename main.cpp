@@ -326,7 +326,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	slider = Slider(&Seek,&slider_position,0.0f,100.0f,1);
+	slider = Slider(&Seek,&slider_position,0.0f,100.0f);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
