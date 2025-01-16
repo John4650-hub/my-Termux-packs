@@ -83,7 +83,7 @@ void startSlider(){
 
 void seek_audio(ma_uint64 position){
 	if(isPaused==false){
-		clearInterval();,
+		clearInterval();
 		ma_device_stop(&device);
 		isPaused=true;
 	}
