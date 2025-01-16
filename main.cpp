@@ -62,7 +62,7 @@ void setInterval(std::function<void()> func, int interval) {
         while (!stopFlag) {
 				{
                 std::lock_guard<std::mutex> lock(frameMutex);
-                ma_decoder_get_cursor_in_pcm(&decoder, &currentFrame);
+                ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
             }
 
 				slider->TakeFocus();
