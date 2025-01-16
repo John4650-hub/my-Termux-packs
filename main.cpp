@@ -36,14 +36,13 @@ ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
 int sampleRate{};
-double seekTimeInSeconds{180.0};
+ma_uint32 num_frames
 
 void seek_audio(int posit){
-	ma_uint64 position = static_cast<ma_uint64>(seekTimeInSeconds * sampleRate);
-	ma_decoder_seek_to_pcm_frame(&decoder,position);
-	ma_uint64 framesToRead = 256;
-    ma_uint64 outputBuffer[framesToRead * decoder.outputChannels];
-    size_t framesDecoded = ma_decoder_read_pcm_frames(&decoder, NULL,*outputBuffer, &framesToRead);
+	ma_device_stop(&device);
+	num_frames = ma_calculate_buffer_size_in_frames_from_milliseconds(posit * 1000, decoder.internalSampleRate);
+	ma_decoder_seek_to_pcm_frame(&decoder,num_frames);
+	ma_device_start(&device);
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -272,7 +271,7 @@ int main() {
   auto exit_button = Button("Exit", [&] {
     ma_decoder_uninit(&decoder);
     ma_device_uninit(&device);
-    screen.ExitLoopClosure();
+    screen.Exit();
   },Style());
 
 	auto slider = Slider("Seek",&slider_position,0,total_frames,1);
