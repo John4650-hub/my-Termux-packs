@@ -41,7 +41,6 @@ ma_decoder_config decoderConfig;
 ma_device_config deviceConfig = ma_device_config_init(ma_device_type_playback);
 ma_device device;
 ma_uint64 lengthInFrames;
-ma_uint32 num_frames;
 
 
 std::atomic<bool> stopFlag(false);
@@ -63,7 +62,7 @@ void clearInterval() {
 void startSlider(){
 	setInterval([](){
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-			slider_position = (currentFrame/total_frames)*100;
+			slider_position += (currentFrame/total_frames)*100;
 				},1000);
 }
 
@@ -326,13 +325,13 @@ auto audioPlayerWindow = Window({
 						ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 						currentFrame-=1;
 						seek_audio(currentFrame);
-						slider_position=(currentFrame/total_frames)*100;
+						slider_position+=(currentFrame/total_frames)*100;
 						return true;
 						}else if (event == Event::ArrowRight) {
 								ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 								currentFrame+=1;
 								seek_audio(currentFrame);
-								slider_position=(currentFrame/total_frames)*100;
+								slider_position+=(currentFrame/total_frames)*100;
 								return true;
 						}
 								}
