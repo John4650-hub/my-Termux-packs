@@ -225,7 +225,8 @@ Component PlayerWidget() {
     Impl() {
       auto play_button = Button(
           play_button_text->c_str(),
-          play(),
+          [play_button_text] {
+play();},
           Style());
 
       auto prev_button = Button("Back", prev, Style());
