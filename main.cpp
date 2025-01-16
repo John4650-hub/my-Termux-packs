@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstring>
 #include <vector>
 #include <chrono>
 #include <thread>
@@ -25,7 +26,7 @@ std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
-char* Seek= new char[7];
+std::string  Seek= "0%";
 Component musicListWindow;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
@@ -67,7 +68,10 @@ void startSlider(){
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 			slider_position = (currentFrame/total_frames)*100;
-			snprintf(Seek,sizeof(Seek),"%.1f%",slider_position);
+			std::ostringstream oss;
+			oss.precision(1);
+			oss<< std::fixed << slider_position;
+			Seek = oss.str();
 				},1000);
 }
 
