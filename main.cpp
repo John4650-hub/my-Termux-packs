@@ -270,10 +270,10 @@ int main() {
     addLog(msg);
   }
   auto exit_button = Button("Exit", [&] {
-    screen.ExitLoopClosure();
-    ma_device_uninit(&device);
     ma_decoder_uninit(&decoder);
-  });
+    ma_device_uninit(&device);
+    screen.ExitLoopClosure();
+  },Style());
 
 	auto slider = Slider("Seek",&slider_position,0,total_frames,1);
   musicListWindow = Window({
@@ -317,7 +317,13 @@ auto audioPlayerWindow = Window({
       .top = 20,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy / 1.5});
-	auto exitBtn = Renderer(exit_button,[exit_button]{return exit_button->Render();});
+	auto exitBtn = Window({
+			.inner = Renderer(exit_button,[exit_button]{return exit_button->Render();}),
+			.left=50,
+			.top=50,
+			.width=Terminal::Size().dimx,
+			.height = Terminal::Size().dimy/2,
+			});
   auto windowContainer =
       Container::Stacked({musicListWindow, audioPlayerWindow, logout,exitBtn});
   screen.Loop(windowContainer);
