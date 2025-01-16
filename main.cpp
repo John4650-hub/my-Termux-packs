@@ -61,8 +61,11 @@ void clearInterval() {
 }
 void startSlider(){
 	setInterval([](){
+			if (currentFrame==total_frames){
+			clearInterval();
+			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-			slider_position += (currentFrame/total_frames)*100;
+			slider_position = (currentFrame/total_frames)*100;
 				},1000);
 }
 
@@ -294,6 +297,9 @@ Component logsWindow() {
   return Make<Impl>();
 }
 
+void moveSlider(){
+	ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+}
 int main() {
   if (result != MA_SUCCESS) {
     msg = "Failed to initialize the engine.";
@@ -322,16 +328,16 @@ auto audioPlayerWindow = Window({
 						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
 						{
-						ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+						moveSlider();
 						currentFrame-=1;
 						seek_audio(currentFrame);
-						slider_position+=(currentFrame/total_frames)*100;
+						slider_position=(currentFrame/total_frames)*100;
 						return true;
 						}else if (event == Event::ArrowRight) {
-								ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+								moveSlider();
 								currentFrame+=1;
 								seek_audio(currentFrame);
-								slider_position+=(currentFrame/total_frames)*100;
+								slider_position=(currentFrame/total_frames)*100;
 								return true;
 						}
 								}
