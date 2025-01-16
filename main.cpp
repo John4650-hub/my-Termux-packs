@@ -54,7 +54,13 @@ void setInterval(std::function<void()> func, int interval) {
     std::thread([func, interval]() {
         while (!stopFlag) {
 				slider->TakeFocus();
+				slider_position = (currentFrame/total_frames)*100;
+			std::ostringstream oss;
+			oss.precision(1);
+			oss<< std::fixed << slider_position;
+			Seek = oss.str();
 				screen.PostEvent(updateSlider);
+				
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
             if (!stopFlag) {
                 func();
@@ -72,12 +78,7 @@ void startSlider(){
 			clearInterval();
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-			slider_position = (currentFrame/total_frames)*100;
-			std::ostringstream oss;
-			oss.precision(1);
-			oss<< std::fixed << slider_position;
-			Seek = oss.str();
-				},1000);
+							},1000);
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
