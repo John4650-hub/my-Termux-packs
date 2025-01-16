@@ -26,7 +26,7 @@ std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
-std::string  Seek= "0%";
+std::string  Seek= "0 %";
 Component musicListWindow;
 Component slider;
 auto screen = ScreenInteractive::Fullscreen();
@@ -49,17 +49,21 @@ Event updateSlider = Event::Special("update_slider");
 
 std::atomic<bool> stopFlag(false);
 
+void addLog(std::string a);
+
+
 void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
 	
 			screen.PostEvent(Event::Custom);
     std::thread([func, interval]() {
-
 			screen.PostEvent(Event::Custom);
         while (!stopFlag) {
+
 				slider->TakeFocus();
 				slider_position = static_cast<int>((currentFrame/total_frames)*100);
 			Seek = std::to_string(slider_position) + " %";
+			addLog(Seek);
 			screen.PostEvent(Event::Custom);
 				//screen.PostEvent(updateSlider);
 				
@@ -329,7 +333,7 @@ int main() {
     screen.Exit();
   },Style());
 
-	slider = Slider(&Seek,&slider_position,0,100);
+	slider = Slider(&Seek,&slider_position,0,100,1);
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
