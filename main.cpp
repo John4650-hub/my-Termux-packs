@@ -79,7 +79,7 @@ void startSlider(){
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
 			addLog(std::to_string(currentFrame));
 			slider_position = (static_cast<double>(currentFrame)/total_frames)*100;
-			Seek=std::to_string(slider_position);
+			Seek=std::to_string(slider_position)+" %";
 			addLog(std::to_string(currentFrame)+" / "+std::to_string(total_frames)+" = "+std::to_string(slider_position));
 							},1000);
 			
@@ -349,8 +349,8 @@ auto audioPlayerWindow = Window({
 						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
 						{
-						currentFrame-=interval;
-						seek_audio(currentFrame);
+						currentFrame=FirstFrame;
+						seek_audio(0);
 						return true;
 						}else if (event == Event::ArrowRight) {
 								currentFrame+=interval;
