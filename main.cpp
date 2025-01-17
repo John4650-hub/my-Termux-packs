@@ -39,8 +39,8 @@ int total_frames{};
 int slider_position{};
 int prev_selected_item_index{};
 int interval;
-int FirstFrame;
 
+ma_uint64 FirstFrame;
 ma_uint64 currentFrame;
 ma_result result;
 ma_decoder decoder;
