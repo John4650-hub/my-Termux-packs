@@ -60,13 +60,15 @@ void getAllFramesFromDecoder(int outputChannels, ma_uint64 totalFrames) {
     allFrames.reserve(totalFrames * outputChannels); // Reserve memory for all frames
 
     std::vector<float> tempBuffer(4096); // Temporary buffer
-
+		ma_uint64 framesRead;
+		ma_uint64 framesToRead = tempBuffer.size() / outputChannels;
+		ma_result res;
     while (true) {
-        ma_uint64 framesRead = ma_decoder_read_pcm_frames(&decoder, tempBuffer.data(), tempBuffer.size() / outputChannels);
+        res = ma_decoder_read_pcm_frames(&decoder,tempBuffer.data(), framesToRead, &framesRead);
         if (framesRead == 0) {
             break; // No more frames to read
         }
-        allFrames.insert(allFrames.end(), tempBuffer.begin(), tempBuffer.begin() + framesRead * outputChannels);
+				allFrames.insert(allFrames.end(), tempBuffer.begin(), tempBuffer.begin() + framesRead * pDecoder->outputChannels);
     }
 
 		addLog("[ ");
