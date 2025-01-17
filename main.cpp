@@ -338,7 +338,7 @@ int main() {
       .inner = MusicList(),
       .title = "My Music",
       .left = 0,
-      .top = 20,
+      .top = 15,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy*0.6,
   });
@@ -374,7 +374,7 @@ auto audioPlayerWindow = Window({
       .left = 0,
       .top = 5,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy*0.45});
+      .height = Terminal::Size().dimy*0.5});
 	auto exitBtn = Window({
 			.inner = Renderer(exit_button,[exit_button]{return exit_button->Render();}),
 			.left=0,
