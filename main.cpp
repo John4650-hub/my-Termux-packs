@@ -232,6 +232,7 @@ void play() {
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
 	addLog("totalFrames: " + std::to_string(total_frames));
+	addLog("frameCount: "+std::to_string(decoder.frame_count));
 	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
 	addLog("Format: "+std::to_string(decoder.outputFormat));
 	addLog("outputChannels: "+ std::to_string(decoder.outputChannels));
