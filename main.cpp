@@ -174,7 +174,7 @@ Component MusicList() {
   public:
     Impl() {
       scroll = Scroller(Container::Vertical(GenerateList()));
-      Add(Renderer(scroll, [&] { return window(text(" Test Log: "), vbox(scroll)); }));
+      Add(scroll);
     }
   };
   return Make<Impl>();
