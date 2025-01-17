@@ -340,7 +340,7 @@ int main() {
       .left = 0,
       .top = 20,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy*0.5,
+      .height = Terminal::Size().dimy*0.4,
   });
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
@@ -366,7 +366,7 @@ auto audioPlayerWindow = Window({
     .left = 0,
     .top = 60,
     .width = Terminal::Size().dimx,
-    .height = Terminal::Size().dimy * 0.8,
+    .height = Terminal::Size().dimy * 0.7,
 });
    auto logout = Window({
       .inner = logsWindow(),
