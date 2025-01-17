@@ -258,7 +258,7 @@ void play() {
       ma_decoder_uninit(&decoder);
       return;
     }
-    msg = "audio file loaded, starting... ";
+    msg = "audio file loaded, starting.... ";
 		addLog(msg);
 		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
 		interval = (total_frames - FirstFrame)/99;
