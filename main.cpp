@@ -338,9 +338,9 @@ int main() {
       .inner = MusicList(),
       .title = "My Music",
       .left = 0,
-      .top = 70,
+      .top = 20,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy / 2,
+      .height = Terminal::Size().dimy*0.5,
   });
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
@@ -364,23 +364,23 @@ auto audioPlayerWindow = Window({
         PlayerWidget()
     }),
     .left = 0,
-    .top = 100,
+    .top = 60,
     .width = Terminal::Size().dimx,
-    .height = Terminal::Size().dimy / 3,
+    .height = Terminal::Size().dimy * 0.2,
 });
    auto logout = Window({
       .inner = logsWindow(),
       .title = "Audio logs",
       .left = 0,
-      .top = 20,
+      .top = 5,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy / 1.5});
+      .height = Terminal::Size().dimy*0.35});
 	auto exitBtn = Window({
 			.inner = Renderer(exit_button,[exit_button]{return exit_button->Render();}),
-			.left=100,
+			.left=0,
 			.top=0,
 			.width=Terminal::Size().dimx,
-			.height = Terminal::Size().dimy/2,
+			.height = Terminal::Size().dimy*0.05,
 			});
   auto windowContainer =
       Container::Stacked({exitBtn,logout,musicListWindow,audioPlayerWindow});
