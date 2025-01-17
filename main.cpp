@@ -364,7 +364,7 @@ auto audioPlayerWindow = Window({
         PlayerWidget()
     }),
     .left = 0,
-    .top = 60,
+    .top = 80,
     .width = Terminal::Size().dimx,
     .height = Terminal::Size().dimy * 0.65,
 });
