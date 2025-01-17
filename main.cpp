@@ -64,6 +64,7 @@ void setInterval(std::function<void()> func, int interval) {
     stopFlag = false;
     std::thread([func, interval]() {
         while (!stopFlag) {
+						screen.PostEvent(Event::Custom);
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
             if (!stopFlag) {
                 func();
