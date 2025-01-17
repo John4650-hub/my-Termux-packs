@@ -58,13 +58,7 @@ void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
     std::thread([func, interval]() {
         while (!stopFlag) {
-				slider->TakeFocus();
-				slider_position = static_cast<int>((currentFrame/total_frames)*100);
-			Seek = std::to_string(slider_position) + " %";
-			//addLog(Seek);
-			screen.PostEvent(Event::Custom);
-				//screen.PostEvent(updateSlider);
-				
+						screen.PostEvent(Event::Custom);
             std::this_thread::sleep_for(std::chrono::milliseconds(interval));
             if (!stopFlag) {
                 func();
@@ -82,9 +76,8 @@ void startSlider(){
 			clearInterval();
 			}
 			ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			addLog(std::to_string(currentFrame));
-			slider_position = (currentFrame/total_frames)*100;
+			slider_position = (static_cast<double>(currentFrame)/total_frames)*100;
 			addLog(std::to_string(currentFrame)+" / "+std::to_string(total_frames)+" = "+std::to_string(slider_position));
 							},1000);
 			
@@ -232,7 +225,6 @@ void play() {
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
 	addLog("totalFrames: " + std::to_string(total_frames));
-	addLog("frameCount: "+std::to_string(decoder.frame_count));
 	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
 	addLog("Format: "+std::to_string(decoder.outputFormat));
 	addLog("outputChannels: "+ std::to_string(decoder.outputChannels));
