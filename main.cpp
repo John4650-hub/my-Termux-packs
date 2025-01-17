@@ -68,7 +68,7 @@ void getAllFramesFromDecoder(int outputChannels, ma_uint64 totalFrames) {
         if (framesRead == 0) {
             break; // No more frames to read
         }
-				allFrames.insert(allFrames.end(), tempBuffer.begin(), tempBuffer.begin() + framesRead * pDecoder->outputChannels);
+				allFrames.insert(allFrames.end(), tempBuffer.begin(), tempBuffer.begin() + framesRead * outputChannels);
     }
 
 		addLog("[ ");
