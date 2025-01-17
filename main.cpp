@@ -81,7 +81,9 @@ void clearInterval() {
 void startSlider() {
     setInterval([]() {
         if (currentFrame == total_frames) {
+						isPlaying=false;
             clearInterval();
+						return;
         }
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
