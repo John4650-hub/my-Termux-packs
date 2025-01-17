@@ -233,12 +233,13 @@ void play() {
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
 	total_frames = (int)lengthInFrames;
 	addLog("totalFrames: " + std::to_string(total_frames));
+	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
+	addLog("Format: "+std::to_string(decoder.outputFormat));
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
   deviceConfig.dataCallback = data_callback;
   deviceConfig.pUserData = &decoder;
-	
 
     if (result != MA_SUCCESS) {
       msg = "could not play the audio file";
