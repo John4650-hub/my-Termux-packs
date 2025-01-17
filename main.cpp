@@ -366,7 +366,7 @@ auto audioPlayerWindow = Window({
     .left = 0,
     .top = 60,
     .width = Terminal::Size().dimx,
-    .height = Terminal::Size().dimy * 0.5,
+    .height = Terminal::Size().dimy * 0.8,
 });
    auto logout = Window({
       .inner = logsWindow(),
