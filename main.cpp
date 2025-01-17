@@ -38,7 +38,8 @@ bool isPaused=false;
 int total_frames{};
 int slider_position{};
 int prev_selected_item_index{};
-
+int interval;
+int FirstFrame;
 
 ma_uint64 currentFrame;
 ma_result result;
@@ -86,6 +87,8 @@ void startSlider(){
 }
 
 void seek_audio(ma_uint64 position){
+	slider_position=(static_cast<double>(currentFrame)/total_frames)*100;
+	Seek=std::to_string(slider_position)+" %";
 	if(isPaused==false){
 		clearInterval();
 		ma_device_stop(&device);
@@ -255,9 +258,10 @@ void play() {
       ma_decoder_uninit(&decoder);
       return;
     }
-
     msg = "audio file loaded, starting... ";
 		addLog(msg);
+		ma_decoder_get_cursor_in_pcm_frames(&decoder,&₣irstFrame);
+		interval = (total_frames - FirstFrame)/99;
 		startSlider();
 		prev_selected_item_index=selected_item_index;
 }
@@ -316,9 +320,7 @@ Component logsWindow() {
   return Make<Impl>();
 }
 
-void moveSlider(){
-	ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
-}
+
 int main() {
   if (result != MA_SUCCESS) {
     msg = "Failed to initialize the engine.";
@@ -347,16 +349,12 @@ auto audioPlayerWindow = Window({
 						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position)<total_frames){
             if (event == Event::ArrowLeft)
 						{
-						moveSlider();
-						currentFrame-=1;
+						currentFrame-=interval;
 						seek_audio(currentFrame);
-						slider_position=(currentFrame/total_frames)*100;
 						return true;
 						}else if (event == Event::ArrowRight) {
-								moveSlider();
-								currentFrame+=1;
+								currentFrame+=interval;
 								seek_audio(currentFrame);
-								slider_position=(currentFrame/total_frames)*100;
 								return true;
 						}
 								}
