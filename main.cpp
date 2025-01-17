@@ -338,7 +338,7 @@ int main() {
       .inner = MusicList(),
       .title = "My Music",
       .left = 0,
-      .top = 15,
+      .top = 18,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy*0.6,
   });
