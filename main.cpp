@@ -340,7 +340,7 @@ int main() {
       .left = 0,
       .top = 20,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy*0.4,
+      .height = Terminal::Size().dimy*0.65,
   });
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
@@ -364,7 +364,7 @@ auto audioPlayerWindow = Window({
         PlayerWidget()
     }),
     .left = 0,
-    .top = 80,
+    .top = 60,
     .width = Terminal::Size().dimx,
     .height = Terminal::Size().dimy * 0.65,
 });
@@ -380,7 +380,7 @@ auto audioPlayerWindow = Window({
 			.left=0,
 			.top=0,
 			.width=Terminal::Size().dimx,
-			.height = Terminal::Size().dimy*0.15,
+			.height = Terminal::Size().dimy*0.25,
 			});
   auto windowContainer =
       Container::Stacked({exitBtn,logout,musicListWindow,audioPlayerWindow});
