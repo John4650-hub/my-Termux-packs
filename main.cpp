@@ -366,7 +366,7 @@ auto audioPlayerWindow = Window({
     .left = 0,
     .top = 60,
     .width = Terminal::Size().dimx,
-    .height = Terminal::Size().dimy * 0.2,
+    .height = Terminal::Size().dimy * 0.5,
 });
    auto logout = Window({
       .inner = logsWindow(),
@@ -380,7 +380,7 @@ auto audioPlayerWindow = Window({
 			.left=0,
 			.top=0,
 			.width=Terminal::Size().dimx,
-			.height = Terminal::Size().dimy*0.05,
+			.height = Terminal::Size().dimy*0.15,
 			});
   auto windowContainer =
       Container::Stacked({exitBtn,logout,musicListWindow,audioPlayerWindow});
