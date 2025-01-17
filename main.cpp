@@ -54,29 +54,6 @@ std::atomic<bool> stopFlag(false);
 
 void addLog(std::string a);
 
-
-void getAllFramesFromDecoder(int outputChannels, ma_uint64 totalFrames) {
-    std::vector<float> allFrames;
-    allFrames.reserve(totalFrames * outputChannels); // Reserve memory for all frames
-
-    std::vector<float> tempBuffer(4096); // Temporary buffer
-		ma_uint64 framesRead;
-		ma_uint64 framesToRead = tempBuffer.size() / outputChannels;
-		ma_result res;
-    while (true) {
-        res = ma_decoder_read_pcm_frames(&decoder,tempBuffer.data(), framesToRead, &framesRead);
-        if (framesRead == 0) {
-            break; // No more frames to read
-        }
-				allFrames.insert(allFrames.end(), tempBuffer.begin(), tempBuffer.begin() + framesRead * outputChannels);
-    }
-
-		addLog("[ ");
-    for(float i:allFrames){
-			addLog(std::to_string(i));
-		}
-		addLog("]");
-}
 void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
     std::thread([func, interval]() {
@@ -257,7 +234,7 @@ void play() {
 	addLog("totalFrames: " + std::to_string(total_frames));
 	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
 	addLog("Format: "+std::to_string(decoder.outputFormat));
-	getAllFramesFromDecoder(decoder.outputChannels,total_frames);
+	addLog("outputChannels: "+ std::to_string(decoder.outputChannels));
   deviceConfig.playback.format = decoder.outputFormat;
   deviceConfig.playback.channels = decoder.outputChannels;
   deviceConfig.sampleRate = decoder.outputSampleRate;
