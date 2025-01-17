@@ -55,6 +55,9 @@ std::atomic<bool> stopFlag(false);
 
 void addLog(std::string a);
 
+void init_vars(){
+	currentFrame=total_frames=slider_position=0;
+}
 void setInterval(std::function<void()> func, int interval) {
 	stopFlag=false;
     std::thread([func, interval]() {
@@ -222,9 +225,9 @@ void play() {
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	}
 	else if(!isPlaying){
+		init_vars();
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
-		isPlaying=true;
-		
+		isPlaying=true;	
 	}
 
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
