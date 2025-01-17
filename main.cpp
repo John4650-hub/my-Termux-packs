@@ -260,7 +260,7 @@ void play() {
     }
     msg = "audio file loaded, starting... ";
 		addLog(msg);
-		ma_decoder_get_cursor_in_pcm_frames(&decoder,&₣irstFrame);
+		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
 		interval = (total_frames - FirstFrame)/99;
 		startSlider();
 		prev_selected_item_index=selected_item_index;
