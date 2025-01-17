@@ -58,7 +58,6 @@ std::atomic<bool> stopFlag(false);
 void addLog(std::string a);
 
 void init_vars(){
-	std::lock_guard<std::mutex> lock(mtx);
 	currentFrame=total_frames=slider_position=0;
 }
 void setInterval(std::function<void()> func, int interval) {
@@ -81,7 +80,6 @@ void clearInterval() {
 
 void startSlider() {
     setInterval([]() {
-        std::lock_guard<std::mutex> lock(mtx); // Lock the mutex
         if (currentFrame == total_frames) {
             clearInterval();
         }
@@ -94,7 +92,6 @@ void startSlider() {
 }
 
 void seek_audio(ma_uint64 position){
-	std::lock_guard<std::mutex> lock(mtx);
 	screen.PostEvent(Event::Custom);
 	slider_position=(static_cast<double>(currentFrame)/total_frames)*100;
 	Seek=std::to_string(slider_position)+" %";
@@ -205,7 +202,6 @@ Component MusicList() {
 
 	
 void play() {
-	std::lock_guard<std::mutex> lock(mtx);
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
 	
