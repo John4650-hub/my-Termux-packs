@@ -340,7 +340,7 @@ int main() {
       .left = 0,
       .top = 20,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy*0.65,
+      .height = Terminal::Size().dimy*0.6,
   });
 auto audioPlayerWindow = Window({
     .inner = Container::Vertical({
@@ -374,7 +374,7 @@ auto audioPlayerWindow = Window({
       .left = 0,
       .top = 5,
       .width = Terminal::Size().dimx,
-      .height = Terminal::Size().dimy*0.35});
+      .height = Terminal::Size().dimy*0.45});
 	auto exitBtn = Window({
 			.inner = Renderer(exit_button,[exit_button]{return exit_button->Render();}),
 			.left=0,
