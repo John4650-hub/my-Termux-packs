@@ -1,7 +1,6 @@
 name: Makefile CI
 
 permissions:
-  contents: read
   contents: write
 on:
   push:
