@@ -23,7 +23,7 @@ jobs:
         git config --global user.name "john4650-hub"
         git commit -a -m "Downloaded oboe"
       env:
-        GH_TOKEN: ${{ secret.TK }}
+        GH_TOKEN: ${{ secrets.TK }}
 
     - name: push
       uses: ad-m/github-push-action@master
