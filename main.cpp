@@ -82,6 +82,7 @@ void startSlider() {
     setInterval([]() {
         if (currentFrame == total_frames) {
 						isPlaying=false;
+						ma_device_stop(&device);
             clearInterval();
 						return;
         }
