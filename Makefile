@@ -1,7 +1,7 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
-LDFLAGS = -lftxui-screen -lftxui-dom -lftxui-component -pthread
+LDFLAGS = -lOpenSLES -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm -ldl
 
 liblisdir.so: $(FILENAME)
 	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib main.cpp -o liblisdir.so $(LDFLAGS)
