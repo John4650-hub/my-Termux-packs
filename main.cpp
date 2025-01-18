@@ -4,7 +4,6 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
-
 #include <iostream>
 #include <string>
 #include <sstream>
