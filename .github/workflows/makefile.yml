@@ -4,6 +4,9 @@ permissions:
 on:
   push:
     branches: [ "music" ]
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   build:
 
@@ -11,7 +14,23 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: configure
+      run: |
+        gh repo clone google/oboe
+        mv oboe/include .
+        rm -rf oboe
+        git config --global user.email "johndelvin51@gmail.com"
+        git config --global user.name "john4650-hub"
+        git commit -a -m "Downloaded oboe"
+
+    - name: push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.TK }}
+        branch: music
+
+    - name: create releases
       run: |
         echo done
         (echo ${{ github.sha }}) > sha.txt
