@@ -58,7 +58,7 @@ void playAudio(const std::string& filePath) {
     }
 
     // Sleep for the duration of the audio file
-    std::this_thread::sleep_for(std::chrono::seconds(10)); // Adjust the duration as needed
+    std::this_thread::sleep_for(std::chrono::seconds(180)); // Adjust the duration as needed
 
     stream->stop();
     stream->close();
