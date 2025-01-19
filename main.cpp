@@ -1,4 +1,4 @@
-#include <Oboe.h>
+#include "oboe/Oboe.h"
 #include <iostream>
 #include <fstream>
 
@@ -31,14 +31,8 @@ private:
     std::ifstream mFile;
 };
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <audio_file>" << std::endl;
-        return 1;
-    }
-
-    std::string audioFilePath = argv[1];
-    MyAudioCallback myCallback(audioFilePath);
+void playAudio(const std::string& filePath) {
+    MyAudioCallback myCallback(filePath);
 
     oboe::AudioStreamBuilder builder;
     builder.setCallback(&myCallback);
@@ -51,20 +45,31 @@ int main(int argc, char **argv) {
 
     if (result != oboe::Result::OK) {
         std::cerr << "Failed to create stream. Error: " << oboe::convertToText(result) << std::endl;
-        return 1;
+        return;
     }
 
     result = stream->start();
     if (result != oboe::Result::OK) {
         std::cerr << "Failed to start stream. Error: " << oboe::convertToText(result) << std::endl;
-        return 1;
+        stream->close();
+        return;
     }
 
-    std::cout << "Playing audio file: " << audioFilePath << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    // Sleep for the duration of the audio file
+    std::this_thread::sleep_for(std::chrono::seconds(10)); // Adjust the duration as needed
 
     stream->stop();
     stream->close();
+}
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <audio_file>" << std::endl;
+        return 1;
+    }
+
+    std::string audioFilePath = argv[1];
+    playAudio(audioFilePath);
 
     return 0;
 }
