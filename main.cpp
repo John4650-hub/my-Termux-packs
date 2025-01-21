@@ -12,19 +12,21 @@ public:
         : mPcmData(pcmData), mDataSize(dataSize), mReadIndex(0) {}
 
     void start() {
-        oboe::AudioStreamBuilder builder;
-        builder.setFormat(oboe::AudioFormat::I16)
-               .setChannelCount(oboe::ChannelCount::Stereo)
-               .setSampleRate(48000)
-               .setCallback(this);
+        oboe::AudioStreamBuilder* builder = new oboe::AudioStreamBuilder();
+        builder->setFormat(oboe::AudioFormat::I16)
+               ->setChannelCount(oboe::ChannelCount::Stereo)
+               ->setSampleRate(48000)
+               ->setCallback(this);
 
-        oboe::Result result = builder.openStream(&mStream);
+        oboe::Result result = builder->openStream(&mStream);
         if (result != oboe::Result::OK) {
             // Handle error
+            delete builder;
             return;
         }
 
         mStream->requestStart();
+        delete builder;
     }
 
     void stop() {
