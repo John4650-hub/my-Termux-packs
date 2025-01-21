@@ -56,7 +56,9 @@ std::atomic<bool> stopFlag(false);
 void addLog(std::string a);
 
 void init_vars(){
-	currentFrame=total_frames=slider_position=0;
+	currentFrame=0;
+	total_frames=0;
+	slider_position=0;
 }
 void setInterval(std::function<void()> func, int interval) {
     std::thread([func, interval]() {
