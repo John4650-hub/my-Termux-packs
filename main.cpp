@@ -83,7 +83,7 @@ void startSlider() {
 						ma_device_stop(&device);
             clearInterval();
 						init_vars();
-						addLog("It is done")
+						addLog("It is done");
 						return;
         }
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
