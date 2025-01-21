@@ -16,7 +16,7 @@ uint8_t* decode_mp3_to_pcm(const char *input_filename, int64_t start_time_ms, in
     *pcm_data_size = 0;
 
     // Initialize libavformat and register all codecs
-    av_register_all();
+    //av_register_all();
 
     // Open the input file
     if (avformat_open_input(&formatContext, input_filename, NULL, NULL) != 0) {
@@ -90,7 +90,8 @@ uint8_t* decode_mp3_to_pcm(const char *input_filename, int64_t start_time_ms, in
                 int new_size = *pcm_data_size + samplesConverted * 2 * av_get_bytes_per_sample(AV_SAMPLE_FMT_FLT);
                 if (new_size > pcm_data_capacity) {
                     pcm_data_capacity = new_size * 2;
-                    pcm_data = realloc(pcm_data, pcm_data_capacity);
+										pcm_data = static_cast<uint8_t*>(realloc(pcm_data, pcm_data_capacity));
+
                 }
 
                 // Copy the PCM data to the buffer
