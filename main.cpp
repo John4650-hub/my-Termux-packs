@@ -82,6 +82,8 @@ void startSlider() {
 						isPlaying=false;
 						ma_device_stop(&device);
             clearInterval();
+						init_vars();
+						addLog("It is done")
 						return;
         }
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
@@ -99,6 +101,7 @@ void seek_audio(ma_uint64 position){
 	if(isPaused==false){
 		clearInterval();
 		ma_device_stop(&device);
+		
 		isPaused=true;
 	}
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
