@@ -82,7 +82,7 @@ void startSlider() {
             clearInterval();
 						return;
         }
-        ma_decoder_get_cursor_in_pcm_frames(decoder, currentFrame);
+        ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
         slider_position = (static_cast<double>(currentFrame) / total_frames) * 100;
         Seek = std::to_string(slider_position) + " %";
