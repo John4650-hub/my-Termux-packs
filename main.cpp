@@ -33,7 +33,7 @@ private:
     std::ifstream mFile;
 };
 
-void playAudio(const std::string& filePath) {
+void playAudio(const std::string& filePath,int ptime) {
     MyAudioCallback myCallback(filePath);
 
     oboe::AudioStreamBuilder builder;
@@ -58,20 +58,21 @@ void playAudio(const std::string& filePath) {
     }
 
     // Sleep for the duration of the audio file
-    std::this_thread::sleep_for(std::chrono::seconds(180)); // Adjust the duration as needed
+    std::this_thread::sleep_for(std::chrono::seconds(ptime*60)); // Adjust the duration as needed
 
     stream->stop();
     stream->close();
 }
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
+    if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " <audio_file>" << std::endl;
         return 1;
     }
 
     std::string audioFilePath = argv[1];
-    playAudio(audioFilePath);
+		int ptime = std::stoi(argv[2].c_str());
+    playAudio(audioFilePath,ptime);
 
     return 0;
 }
