@@ -13,12 +13,12 @@ public:
 
     void start() {
         oboe::AudioStreamBuilder builder;
-        builder->setFormat(oboe::AudioFormat::I16)
-               ->setChannelCount(oboe::ChannelCount::Stereo)
-               ->setSampleRate(48000)
-               ->setCallback(this);
+        builder.setFormat(oboe::AudioFormat::I16)
+               .setChannelCount(oboe::ChannelCount::Stereo)
+               .setSampleRate(48000)
+               .setCallback(this);
 
-        oboe::Result result = builder->openStream(&mStream);
+        oboe::Result result = builder.openStream(&mStream);
         if (result != oboe::Result::OK) {
             // Handle error
             return;
