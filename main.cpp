@@ -221,6 +221,7 @@ void play() {
 		}
 		clearInterval();
     msg = "stopping current audio ...";
+		init_vars();
 		ma_decoder_uninit(&decoder);
     addLog(msg);
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
