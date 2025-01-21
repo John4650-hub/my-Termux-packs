@@ -12,7 +12,6 @@
 #include <thread>
 #include <atomic>
 #include <functional>
-#include <mutex>
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/dom/canvas.hpp"
@@ -40,7 +39,7 @@ int slider_position{};
 int prev_selected_item_index{};
 int interval;
 
-std::mutex mtx;
+
 ma_uint64 FirstFrame;
 ma_uint64 currentFrame;
 ma_result result;
@@ -60,7 +59,6 @@ void init_vars(){
 	currentFrame=total_frames=slider_position=0;
 }
 void setInterval(std::function<void()> func, int interval) {
-    stopFlag = false;
     std::thread([func, interval]() {
         while (!stopFlag) {
 						screen.PostEvent(Event::Custom);
@@ -73,19 +71,18 @@ void setInterval(std::function<void()> func, int interval) {
 }
 
 void clearInterval() {
-
     stopFlag = true;
 }
 
 void startSlider() {
-    setInterval([]() {
+    setInterval([&]() {
         if (currentFrame == total_frames) {
 						isPlaying=false;
 						ma_device_stop(&device);
             clearInterval();
 						return;
         }
-        ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
+        ma_decoder_get_cursor_in_pcm_frames(decoder, currentFrame);
         addLog(std::to_string(currentFrame));
         slider_position = (static_cast<double>(currentFrame) / total_frames) * 100;
         Seek = std::to_string(slider_position) + " %";
