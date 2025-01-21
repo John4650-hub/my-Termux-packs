@@ -1,77 +1,79 @@
-#include "oboe/Oboe.h"
-#include <iostream>
-#include <fstream>
-#include <thread>
-#include <chrono>
+#include <oboe/Oboe.h>
+#include <vector>
+#include <cstring>
+#include "decoder.hpp"
 
-class MyAudioCallback : public oboe::AudioStreamCallback {
+class AudioPlayer : public oboe::AudioStreamCallback {
 public:
-    MyAudioCallback(const std::string& filePath) : mFilePath(filePath) {
-        mFile.open(mFilePath, std::ios::binary);
-        if (!mFile.is_open()) {
-            std::cerr << "Failed to open audio file: " << mFilePath << std::endl;
+    AudioPlayer(const uint8_t* pcmData, size_t dataSize)
+        : mPcmData(pcmData), mDataSize(dataSize), mReadIndex(0) {}
+
+    void start() {
+        oboe::AudioStreamBuilder builder;
+        builder.setFormat(oboe::AudioFormat::I16)
+               .setChannelCount(oboe::ChannelCount::Stereo)
+               .setSampleRate(48000)
+               .setCallback(this);
+
+        oboe::Result result = builder.openStream(mStream);
+        if (result != oboe::Result::OK) {
+            // Handle error
+            return;
+        }
+
+        mStream->requestStart();
+    }
+
+    void stop() {
+        if (mStream) {
+            mStream->requestStop();
+            mStream->close();
+            mStream = nullptr;
         }
     }
 
-    oboe::DataCallbackResult onAudioReady(oboe::AudioStream *stream, void *audioData, int32_t numFrames) override {
-        if (!mFile.read(static_cast<char*>(audioData), numFrames * stream->getChannelCount() * sizeof(float))) {
+    oboe::DataCallbackResult onAudioReady(oboe::AudioStream* stream, void* audioData, int32_t numFrames) override {
+        int32_t framesToCopy = std::min(numFrames, static_cast<int32_t>((mDataSize - mReadIndex) / 2));
+
+        std::memcpy(audioData, mPcmData + mReadIndex, framesToCopy * 2);
+        mReadIndex += framesToCopy * 2;
+
+        if (framesToCopy < numFrames) {
+            // If we reach the end of the PCM data, stop the stream
             return oboe::DataCallbackResult::Stop;
         }
+
         return oboe::DataCallbackResult::Continue;
     }
 
-    void onErrorBeforeClose(oboe::AudioStream *stream, oboe::Result error) override {
-        std::cerr << "Error before close: " << oboe::convertToText(error) << std::endl;
-    }
-
-    void onErrorAfterClose(oboe::AudioStream *stream, oboe::Result error) override {
-        std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
-    }
-
 private:
-    std::string mFilePath;
-    std::ifstream mFile;
+    const uint8_t* mPcmData;
+    size_t mDataSize;
+    int32_t mReadIndex;
+    oboe::AudioStream* mStream = nullptr;
 };
 
-void playAudio(const std::string& filePath) {
-    MyAudioCallback myCallback(filePath);
+void playAudio(const uint8_t* pcmData, size_t dataSize) {
+    AudioPlayer player(pcmData, dataSize);
+    player.start();
 
-    oboe::AudioStreamBuilder builder;
-    builder.setCallback(&myCallback);
-    builder.setFormat(oboe::AudioFormat::Float);
-    builder.setChannelCount(oboe::ChannelCount::Stereo);
-    builder.setSampleRate(48000);
+    // Wait for the audio to finish playing
+    std::this_thread::sleep_for(std::chrono::seconds(dataSize / 48000 / 2));
 
-    oboe::AudioStream *stream = nullptr;
-    oboe::Result result = builder.openStream(&stream);
-
-    if (result != oboe::Result::OK) {
-        std::cerr << "Failed to create stream. Error: " << oboe::convertToText(result) << std::endl;
-        return;
-    }
-
-    result = stream->start();
-    if (result != oboe::Result::OK) {
-        std::cerr << "Failed to start stream. Error: " << oboe::convertToText(result) << std::endl;
-        stream->close();
-        return;
-    }
-
-    // Sleep for the duration of the audio file
-    std::this_thread::sleep_for(std::chrono::seconds(180)); // Adjust the duration as needed
-
-    stream->stop();
-    stream->close();
+    player.stop();
 }
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <audio_file>" << std::endl;
-        return 1;
-    }
+int main(int argc, char *argv[]) {
+	if (argc < 3) {
+		fprintf(stderr, "Usage: %s <input file> <start time ms>\n", argv[0]);
+		return -1;
+	}
 
-    std::string audioFilePath = argv[1];
-    playAudio(audioFilePath);
+	const char *input_filename = argv[1];
+	int64_t start_time_ms = atoll(argv[2]);
+	int64_t pcm_data_size;
 
-    return 0;
+	uint8_t *pcm_data = decode_mp3_to_pcm(input_filename, start_time_ms, &pcm_data_size);
+	playAudio(pcm_data,pcm_data_size);
+	return 0;
 }
