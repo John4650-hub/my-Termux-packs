@@ -1,6 +1,7 @@
 #include "oboe/Oboe.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <thread>
 #include <chrono>
 
@@ -71,7 +72,8 @@ int main(int argc, char **argv) {
     }
 
     std::string audioFilePath = argv[1];
-		int ptime = std::stoi(argv[2].c_str());
+		std::string arg2 = argv[2];
+    int ptime = std::stoi(arg2);
     playAudio(audioFilePath,ptime);
 
     return 0;
