@@ -10,3 +10,4 @@ install: liblisdir.so
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+
