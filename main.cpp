@@ -60,25 +60,12 @@ void init_vars(){
 	total_frames=0;
 	slider_position=0;
 }
-void setInterval(std::function<void()> func, int interval) {
-    std::thread([func, interval]() {
+void setInterval() {
+    std::thread([&]() {
         while (!stopFlag) {
 						screen.PostEvent(Event::Custom);
-						std::this_thread::sleep_for(std::chrono::milliseconds(interval));
-            if (!stopFlag) {
-                func();
-            }
-        }
-    }).detach();
-}
-
-void clearInterval() {
-    stopFlag = true;
-}
-
-void startSlider() {
-    setInterval([&]() {
-        if (currentFrame == total_frames) {
+						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+						if (currentFrame == total_frames) {
 						isPlaying=false;
 						ma_device_stop(&device);
             clearInterval();
@@ -91,7 +78,12 @@ void startSlider() {
         slider_position = (static_cast<double>(currentFrame) / static_cast<double>(total_frames)) * 100;
         Seek = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
-    }, 1000);
+        }
+    }).detach();
+}
+
+void clearInterval() {
+    stopFlag = true;
 }
 
 void seek_audio(ma_uint64 position){
@@ -215,7 +207,7 @@ void play() {
 				isPaused=false;
 				ma_device_start(&device);
 				clearInterval();
-				startSlider();
+				setInterval();
 				return;
 			}else{
 				isPaused = true;
@@ -273,7 +265,7 @@ void play() {
 		addLog(msg);
 		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
 		interval = (total_frames - FirstFrame)/99;
-		startSlider();
+		setInterval();
 		prev_selected_item_index=selected_item_index;
 }
 
