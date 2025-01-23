@@ -54,6 +54,7 @@ Event updateSlider = Event::Special("update_slider");
 std::atomic<bool> stopFlag(false);
 
 void addLog(std::string a);
+void clearInterval();
 
 void init_vars(){
 	currentFrame=0;
