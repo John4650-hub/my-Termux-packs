@@ -95,12 +95,9 @@ void seek_audio(ma_uint64 position){
 	screen.PostEvent(Event::Custom);
 	slider_position=(static_cast<double>(currentFrame)/total_frames)*100;
 	Seek=std::to_string(slider_position)+" %";
-	if(isPaused==false){
-		clearInterval();
-		ma_device_stop(&device);
-		
-		isPaused=true;
-	}
+	clearInterval();
+	ma_device_stop(&device);
+	isPaused=true;
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
 }
 
