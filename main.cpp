@@ -351,7 +351,7 @@ auto audioPlayerWindow = Window({
         CatchEvent(Renderer(slider, [&] {
             return slider->Render() | focus;
         }), [&](Event event) {
-						if (static_cast<int>(slider_position)>=0 && && static_cast<int>(slider_position) =< 100){
+						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) =< 100){
             if (event == Event::ArrowLeft)
 						{
 						currentFrame=FirstFrame;
