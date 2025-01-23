@@ -70,13 +70,14 @@ void setInterval() {
     std::thread([&]() {
         while (!stopFlag) {
 						screen.PostEvent(Event::Custom);
-						std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 						if (currentFrame == total_frames) {
 						isPlaying=false;
 						ma_device_stop(&device);
             clearInterval();
-						init_vars();
 						addLog("It is done");
+						currentFrame=0;
+						total_frames=0;
+						slider_position=0;
 						return;
         }
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
@@ -84,6 +85,7 @@ void setInterval() {
         slider_position = (static_cast<double>(currentFrame) / static_cast<double>(total_frames)) * 100;
         Seek = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
     }).detach();
 }
