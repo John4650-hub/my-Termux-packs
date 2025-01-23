@@ -70,8 +70,8 @@ void clearInterval() {
 
 void setInterval() {
     std::thread([&]() {
-				mtx.lock();
         while (!stopFlag) {
+						mtx.lock();
 						screen.PostEvent(Event::Custom);
 						if (currentFrame == total_frames) {
 						isPlaying=false;
@@ -89,8 +89,9 @@ void setInterval() {
         Seek = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    mtx.unlock();
         }
-    mtx.unlock();}).detach();
+		}).detach();
 }
 
 
