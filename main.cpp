@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <mutex>
 #include <functional>
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component_base.hpp"
@@ -24,6 +25,7 @@ using namespace ftxui;
 
 extern int selected_item_index;
 std::string textarea_txt = ".....welcome.....";
+std::mutex mtx;
 std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
@@ -68,6 +70,7 @@ void clearInterval() {
 
 void setInterval() {
     std::thread([&]() {
+				mtx.lock();
         while (!stopFlag) {
 						screen.PostEvent(Event::Custom);
 						if (currentFrame == total_frames) {
@@ -87,7 +90,7 @@ void setInterval() {
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
-    }).detach();
+    mtx.unlock();}).detach();
 }
 
 
