@@ -61,6 +61,11 @@ void init_vars(){
 	total_frames=0;
 	slider_position=0;
 }
+
+void clearInterval() {
+    stopFlag = true;
+}
+
 void setInterval() {
     std::thread([&]() {
         while (!stopFlag) {
@@ -83,9 +88,6 @@ void setInterval() {
     }).detach();
 }
 
-void clearInterval() {
-    stopFlag = true;
-}
 
 void seek_audio(ma_uint64 position){
 	screen.PostEvent(Event::Custom);
