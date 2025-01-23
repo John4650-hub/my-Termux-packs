@@ -92,6 +92,7 @@ void setInterval() {
 
 
 void seek_audio(ma_uint64 position){
+	if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) <= 100){
 	screen.PostEvent(Event::Custom);
 	slider_position=(static_cast<double>(currentFrame)/total_frames)*100;
 	Seek=std::to_string(slider_position)+" %";
@@ -99,6 +100,7 @@ void seek_audio(ma_uint64 position){
 	ma_device_stop(&device);
 	isPaused=true;
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
+	}
 }
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput,
@@ -351,7 +353,6 @@ auto audioPlayerWindow = Window({
         CatchEvent(Renderer(slider, [&] {
             return slider->Render() | focus;
         }), [&](Event event) {
-						if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) <= 100){
             if (event == Event::ArrowLeft)
 						{
 						currentFrame=FirstFrame;
@@ -362,7 +363,6 @@ auto audioPlayerWindow = Window({
 								seek_audio(currentFrame);
 								return true;
 						}
-								}
             return false;
         }),
         PlayerWidget()
