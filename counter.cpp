@@ -7,6 +7,7 @@
 
 bool counting{true};
 int stateTime{5};
+int* ptr = &stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
@@ -16,13 +17,12 @@ void startTimer(){
 }
 // function to start timer
 void timer(int current_time){
-	int* ptr = &stateTime;
 	while(current_time>=0 && counting == true){
-		screen.PostEvent(Event::Custom);
+		screen.PostEvent(ftxui::Event::Custom);
 		current_time-=1;
 		*ptr = current_time;
 		timeCount = std::to_string(current_time);
-		std::this_thread sleep_for(std::chrono::second(1));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 
@@ -38,6 +38,6 @@ void pauseTimer(){
 
 //funtion to stop the timer
 void stopTimer(){
-	startTimer = 0;
+	*ptr = 0;
 	counting = false;
 }
