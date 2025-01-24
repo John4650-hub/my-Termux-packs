@@ -1,80 +1,45 @@
-#include "oboe/Oboe.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <thread>
-#include <chrono>
+#include <ftxui/component/componet.hpp>
+#include <ftxui/component/screen_interactive.hpp>
+#include <ftxui/dom/elements.hpp>
+#include <ftxui/component/component_options.hpp>
+#include "counter.hpp"
 
-class MyAudioCallback : public oboe::AudioStreamCallback {
-public:
-    MyAudioCallback(const std::string& filePath) : mFilePath(filePath) {
-        mFile.open(mFilePath, std::ios::binary);
-        if (!mFile.is_open()) {
-            std::cerr << "Failed to open audio file: " << mFilePath << std::endl;
-        }
-    }
+using namespace ftxui;
+extern std::string timeCount;
+extern ScreenInteractive screen screen;
 
-    oboe::DataCallbackResult onAudioReady(oboe::AudioStream *stream, void *audioData, int32_t numFrames) override {
-        if (!mFile.read(static_cast<char*>(audioData), numFrames * stream->getChannelCount() * sizeof(float))) {
-            return oboe::DataCallbackResult::Stop;
-        }
-        return oboe::DataCallbackResult::Continue;
-    }
-
-    void onErrorBeforeClose(oboe::AudioStream *stream, oboe::Result error) override {
-        std::cerr << "Error before close: " << oboe::convertToText(error) << std::endl;
-    }
-
-    void onErrorAfterClose(oboe::AudioStream *stream, oboe::Result error) override {
-        std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
-    }
-
-private:
-    std::string mFilePath;
-    std::ifstream mFile;
-};
-
-void playAudio(const std::string& filePath,int ptime) {
-    MyAudioCallback myCallback(filePath);
-
-    oboe::AudioStreamBuilder builder;
-    builder.setCallback(&myCallback);
-    builder.setFormat(oboe::AudioFormat::Float);
-    builder.setChannelCount(oboe::ChannelCount::Stereo);
-    builder.setSampleRate(48000);
-
-    oboe::AudioStream *stream = nullptr;
-    oboe::Result result = builder.openStream(&stream);
-
-    if (result != oboe::Result::OK) {
-        std::cerr << "Failed to create stream. Error: " << oboe::convertToText(result) << std::endl;
-        return;
-    }
-
-    result = stream->start();
-    if (result != oboe::Result::OK) {
-        std::cerr << "Failed to start stream. Error: " << oboe::convertToText(result) << std::endl;
-        stream->close();
-        return;
-    }
-
-    // Sleep for the duration of the audio file
-    std::this_thread::sleep_for(std::chrono::seconds(ptime*60)); // Adjust the duration as needed
-
-    stream->stop();
-    stream->close();
+ButtonOption style(){
+	auto option = ButtonOption::Animated();
+	option.transform = [](const EntryState& s){
+		auto element = text(s.label);
+		if (s.focused)
+			element |= bold;
+		return element|center|borderEmpty|flex;
+	};
+	return option;
 }
 
-int main(int argc, char **argv) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <audio_file>" << std::endl;
-        return 1;
-    }
+int main(){
+	const 
+	auto time_text=Renderer([&](){
+			return text(timer_text) | flex ;
+			});
+	auto start_btn = Button("START",startTimer,style());
+	auto pause_btn = Button("PAUSE",pauseTimer,style());
+	auto stop_btn = Button("STOP",stopTimer,style());
 
-    std::string audioFilePath = argv[1];
-		std::string arg2 = argv[2];
-    int ptime = std::stoi(arg2);
-    playAudio(audioFilePath,ptime);
+	Component TimerWindow = Window({
+			.inner = Container::Vertical({
+					timer_text,
+					Container::Horizontal({
+							start_btn,
+							pause_btn,
+							stop_btn
+							})
+					})
+			});
 
-    return 0;
+	screen = ScreenInteractive::Fullscreen();
+	screen.Loop(TimerWindow);
+	return 0;
 }
