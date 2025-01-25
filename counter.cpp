@@ -7,8 +7,8 @@
 
 std::atomic<bool> counting{true};
 std::atomic<int> stateTime;
-std::string g_timeCount;
-ftxui::ScreenInteractive g_screen;
+std::string g_timeCount{"0"};
+ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 void startTimer(){
 	std::thread([&](){

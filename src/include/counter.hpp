@@ -3,8 +3,8 @@
 #include <string>
 #include <ftxui/component/screen_interactive.hpp>
 
-extern std::string g_timeCounti{"0"};
-extern ftxui::ScreenInteractive g_screen = ftxui::ScreenInteractive::Fullscreen();
+extern std::string g_timeCount;
+extern ftxui::ScreenInteractive g_screen; 
 
 void startTimer();
 void stopTimer();
