@@ -2,6 +2,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/component/component_options.hpp>
+#include <array>
 #include "counter.hpp"
 
 using namespace ftxui;
@@ -27,8 +28,22 @@ int main(){
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
 	auto stop_btn = Button("STOP",stopTimer,style());
+std::array<int, 30> time_options;
+for(int i=1;i<time_options.size();++i){
+	time_options[i] = i*5;
+}
 
-	Component time_entry = Input(g_stateTime,"Time in Seconds: ");
+Component timer_Options_list = Container::Horizontal({});
+		for(int& val:time_options){
+		SliderOptions<int> option;
+		option.value = &val;
+		option.max = 1000;
+		option.increment = 5;
+		option.direction = Direction::Up;
+		timer_Options_list->Add(Slider<int>(option));
+		}
+
+timer_Options_list |= size(HEIGHT,GREATER_THAN,20) | border;
 
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
@@ -39,7 +54,7 @@ int main(){
 							pause_btn,
 							stop_btn
 							}),
-					time_entry
+					timer_Options_list
 					}),
 			.width=50,
 			});
