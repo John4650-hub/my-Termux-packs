@@ -7,12 +7,12 @@
 
 std::atomic<bool> counting{true};
 std::atomic<int> stateTime{10};
-std::string g_timeCount{"0"};
+std::string g_timeCount{std::to_string(stateTime)};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 void startTimer(){
 	std::thread([&](){
-	while(stateTime>=0 && counting == true){
+	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
 		stateTime-=1;
 		g_timeCount = std::to_string(stateTime);
