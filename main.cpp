@@ -29,7 +29,7 @@ int main(){
 	auto stop_btn = Button("STOP",stopTimer,style());
 
 	auto time_entry = Renderer([&]{
-			return Input(&g_stateTime,"Time in Seconds: ")|border|color(Color::Green);
+			return Input(g_stateTime,"Time in Seconds: ")|border|color(Color::Green);
 			});
 
 	Component TimerWindow = Window({
