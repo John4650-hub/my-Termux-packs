@@ -21,13 +21,18 @@ int main(){
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});
+	auto gauge = Renderer([&]{
+			return gauge(timer_progress)| color(Color::Red);
+			});
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
 	auto stop_btn = Button("STOP",stopTimer,style());
 
+
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
 					time_text,
+					gauge,
 					Container::Horizontal({
 							start_btn,
 							pause_btn,

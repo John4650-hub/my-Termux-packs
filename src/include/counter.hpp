@@ -5,6 +5,7 @@
 
 extern std::string g_timeCount;
 extern ftxui::ScreenInteractive g_screen; 
+extern float timer_progress;
 
 void startTimer();
 void stopTimer();
