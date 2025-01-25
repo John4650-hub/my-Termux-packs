@@ -6,9 +6,6 @@
 
 using namespace ftxui;
 
-std::string g_timeCount;
-ScreenInteractive g_screen;
-
 ButtonOption style(){
 	auto option = ButtonOption::Animated();
 	option.transform = [](const EntryState& s){
