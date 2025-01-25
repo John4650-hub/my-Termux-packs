@@ -5,7 +5,7 @@
 #include <ftxui/component/event.hpp>
 #include "counter.hpp"
 
-std::atomic<bool> counting{true};
+std::atomic<bool> counting{false};
 std::atomic<int> stateTime{10000};
 std::string g_timeCount{std::to_string(stateTime)};
 float timer_progress{};
