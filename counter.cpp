@@ -12,11 +12,11 @@ extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
 void startTimer(){
-	std::thread t(timer,stateTime);
+	std::thread t(timer,std::ref(stateTime));
 	t.detach();
 }
 // function to start timer
-void timer(int current_time){
+void timer(int& current_time){
 	while(current_time>=0 && counting == true){
 		screen.PostEvent(ftxui::Event::Custom);
 		current_time-=1;
