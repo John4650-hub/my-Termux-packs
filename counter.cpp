@@ -10,13 +10,16 @@ extern std::atomic<int> stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
-void timer(int& current_time){
+void startTimer(){
+	std::thread t([&](){
 	while(current_time>=0 && counting == true){
 		screen.PostEvent(ftxui::Event::Custom);
 		current_time-=1;
 		timeCount = std::to_string(current_time);
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
+		}
+}
+).detach();
 }
 
 // function to start timer

@@ -2,20 +2,11 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/component/component_options.hpp>
-#include <atomic>
-#include <thread>
 #include "counter.hpp"
 
 using namespace ftxui;
-extern std::string timeCount;
-extern std::atomic<int> stateTime;
+extern std::string timeCount
 extern ScreenInteractive screen;
-
-void startTimer(){
-	std::thread t(timer,std::ref(stateTime));
-	t.detach();
-}
-
 
 ButtonOption style(){
 	auto option = ButtonOption::Animated();
@@ -29,7 +20,6 @@ ButtonOption style(){
 }
 
 int main(){
-	const 
 	auto time_text=Renderer([&]{
 			return text(timeCount) | flex ;
 			});
