@@ -21,7 +21,7 @@ int main(){
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});
-	auto gauge = Renderer([&]{
+	auto gaugeProg = Renderer([&]{
 			return gauge(timer_progress)| color(Color::Red);
 			});
 	auto start_btn = Button("START",startTimer,style());
@@ -32,7 +32,7 @@ int main(){
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
 					time_text,
-					gauge,
+					gaugeProg,
 					Container::Horizontal({
 							start_btn,
 							pause_btn,
