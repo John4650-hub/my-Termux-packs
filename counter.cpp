@@ -1,12 +1,13 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <atomic>
 #include <string>
 #include <ftxui/component/event.hpp>
 #include "counter.hpp"
 
-bool counting{true};
-int stateTime{5};
+std::atomic<bool> counting{true};
+std::atomic<int> stateTime{10};
 int* ptr = &stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;

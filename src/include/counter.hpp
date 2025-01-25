@@ -8,5 +8,5 @@ std::string timeCount{"0"};
 void startTimer();
 void stopTimer();
 void pauseTimer();
-void timer();
+void timer(int& tim);
 #endif
