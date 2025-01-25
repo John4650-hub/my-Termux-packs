@@ -19,7 +19,7 @@ void startTimer(){
 		return;
 	else if(g_stateTime.length()>0)
 		stateTime=std::stoi(g_stateTime.c_str());
-	init_time=startTimer;
+	init_time=stateTime;
 	counting = true;
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
