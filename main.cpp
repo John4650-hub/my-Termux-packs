@@ -5,8 +5,9 @@
 #include "counter.hpp"
 
 using namespace ftxui;
-extern std::string timeCount;
-extern ScreenInteractive screen;
+
+std::string g_timeCount;
+ScreenInteractive g_screen;
 
 ButtonOption style(){
 	auto option = ButtonOption::Animated();
@@ -21,7 +22,7 @@ ButtonOption style(){
 
 int main(){
 	auto time_text=Renderer([&]{
-			return text(timeCount) | flex ;
+			return text(g_timeCount) | flex ;
 			});
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
@@ -39,6 +40,6 @@ int main(){
 			});
 
 	//screen = ScreenInteractive::Fullscreen();
-	screen.Loop(TimerWindow);
+	g_screen.Loop(TimerWindow);
 	return 0;
 }

@@ -6,16 +6,16 @@
 #include "counter.hpp"
 
 std::atomic<bool> counting{true};
-extern std::atomic<int> stateTime;
-extern std::string timeCount;
-extern ftxui::ScreenInteractive screen;
+std::atomic<int> stateTime;
+std::string g_timeCount;
+ftxui::ScreenInteractive g_screen;
 
 void startTimer(){
 	std::thread([&](){
 	while(stateTime>=0 && counting == true){
-		screen.PostEvent(ftxui::Event::Custom);
+		g_screen.PostEvent(ftxui::Event::Custom);
 		stateTime-=1;
-		timeCount = std::to_string(stateTime);
+		g_timeCount = std::to_string(stateTime);
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 }
