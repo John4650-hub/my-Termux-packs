@@ -2,8 +2,6 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/elements.hpp>
-#include <ftxui/dom/direction.hpp>
-#include <array>
 #include "counter.hpp"
 
 using namespace ftxui;
@@ -20,6 +18,7 @@ ButtonOption style(){
 }
 
 int main(){
+	selected_item = 10;
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});
@@ -29,22 +28,19 @@ int main(){
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
 	auto stop_btn = Button("STOP",stopTimer,style());
-std::array<int, 30> time_options;
-for(int i=1;i<time_options.size();++i){
-	time_options[i] = i*5;
+
+for(int i=1;i<100;++i){
+	time_options.push_back(std::to_string(i*5));
 }
 
-Component timer_Options_list = Container::Horizontal({});
-		for(int& val:time_options){
-		SliderOption<int> option;
-		option.value = &val;
-		option.max = 1000;
-		option.increment = 5;
-		option.direction = Direction::Up;
-		timer_Options_list->Add(Slider<int>(option));
-		}
+auto timer_Options_list =  Menu(&time_options, &selected_time);
 
-timer_Options_list |= size(HEIGHT,GREATER_THAN,20) | border;
+auto time_list_render = Renderer(timer_Options_list,[&]{
+		return vbox({
+				timer_Options_list->Render(),
+				text("selected time: "+ time_options[selected_time]),
+				}) | border;
+		});
 
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
@@ -55,7 +51,7 @@ timer_Options_list |= size(HEIGHT,GREATER_THAN,20) | border;
 							pause_btn,
 							stop_btn
 							}),
-					timer_Options_list
+					time_list_render
 					}),
 			.width=50,
 			.height=50

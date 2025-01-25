@@ -19,6 +19,7 @@ ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 void startTimer(){
 	if(counting)
 		return;
+	init_time = std.stoi(time_options[selected_time].c_str());
 	counting = true;
 	ptr->store(init_time.load());
 	std::thread([&](){
