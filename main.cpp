@@ -3,6 +3,7 @@
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/elements.hpp>
 #include "counter.hpp"
+#include <vector>
 
 using namespace ftxui;
 
@@ -18,7 +19,8 @@ ButtonOption style(){
 }
 
 int main(){
-	selected_time = 10;
+	std::vector<std::string> time_options;
+	int selected_time = 0;
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});

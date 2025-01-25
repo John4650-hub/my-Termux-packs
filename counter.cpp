@@ -4,11 +4,15 @@
 #include <string>
 #include <ftxui/component/event.hpp>
 #include "counter.hpp"
+#include <vector>
 
 std::atomic<bool> counting{false};
 std::atomic<int> stateTime{10};
 std::string g_stateTime = "";
 std::string g_timeCount{std::to_string(stateTime)};
+int selected_time = 0;
+std::vector<std::string> time_options;
+
 
 std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
