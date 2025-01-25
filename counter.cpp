@@ -7,7 +7,7 @@
 #include "counter.hpp"
 
 std::atomic<bool> counting{true};
-std::atomic<int> stateTime{10};
+extern std::atomic<int> stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
@@ -20,10 +20,6 @@ void timer(int& current_time){
 	}
 }
 
-void startTimer(){
-	std::thread t(timer,std::ref(stateTime));
-	t.detach();
-}
 // function to start timer
 
 
