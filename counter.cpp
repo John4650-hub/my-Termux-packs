@@ -12,6 +12,9 @@ float timer_progress{};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 void startTimer(){
+	if(counting){
+		return;
+	}
 	counting = true;
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
