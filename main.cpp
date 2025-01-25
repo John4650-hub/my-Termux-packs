@@ -24,8 +24,8 @@ int main(){
 	auto gaugeProg = Renderer([&]{
 			return gauge(timer_progress)| color(Color::Red)|border;
 			});
-	auto start_btn = Button("START",startTimer,style())flex;
-	auto pause_btn = Button("PAUSE",pauseTimer,style())|flex;
+	auto start_btn = Button("START",startTimer,style()) | flex;
+	auto pause_btn = Button("PAUSE",pauseTimer,style()) | flex;
 	auto stop_btn = Button("STOP",stopTimer,style())| flex;
 
 
