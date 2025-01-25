@@ -19,7 +19,7 @@ void startTimer(){
 		stateTime-=1;
 		timer_progress = 1.0f - (static_cast<double>(stateTime)/10);
 		g_timeCount = std::to_string(stateTime);
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 }
 ).detach();
