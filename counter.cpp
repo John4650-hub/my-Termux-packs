@@ -6,7 +6,7 @@
 #include "counter.hpp"
 
 std::atomic<bool> counting{true};
-std::atomic<int> stateTime{10};
+std::atomic<int> stateTime{10000};
 std::string g_timeCount{std::to_string(stateTime)};
 float timer_progress{};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
@@ -41,7 +41,7 @@ void pauseTimer(){
 //funtion to stop the timer
 std::atomic<int>* ptr = &stateTime;
 void stopTimer(){
-	*ptr=10;
+	*ptr=10000;
 	g_timeCount=std::to_string(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting = false;
