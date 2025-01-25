@@ -19,7 +19,7 @@ ButtonOption style(){
 
 int main(){
 	auto time_text=Renderer([&]{
-			return text(g_timeCount) | flex ;
+			return text(g_timeCount) | flex |center ;
 			});
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
