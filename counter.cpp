@@ -36,7 +36,7 @@ void pauseTimer(){
 }
 
 //funtion to stop the timer
-int* ptr = &stateTime;
+std::atomic<int>* ptr = &stateTime;
 void stopTimer(){
 	*ptr=10;
 	g_screen.Post(ftxui::Event::Custom);
