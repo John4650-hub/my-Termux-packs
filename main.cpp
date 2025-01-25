@@ -18,7 +18,7 @@ ButtonOption style(){
 }
 
 int main(){
-	selected_item = 10;
+	selected_time = 10;
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});
