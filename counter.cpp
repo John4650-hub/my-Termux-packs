@@ -39,6 +39,7 @@ void pauseTimer(){
 std::atomic<int>* ptr = &stateTime;
 void stopTimer(){
 	*ptr=10;
+	g_timeCount=std::to_string(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting = false;
 }
