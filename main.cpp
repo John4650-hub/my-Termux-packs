@@ -5,7 +5,7 @@
 #include "counter.hpp"
 
 using namespace ftxui;
-extern std::string timeCount
+extern std::string timeCount;
 extern ScreenInteractive screen;
 
 ButtonOption style(){
