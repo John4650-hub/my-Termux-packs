@@ -1,6 +1,5 @@
 #include <iostream>
 #include <chrono>
-#include <thread>
 #include <atomic>
 #include <string>
 #include <ftxui/component/event.hpp>
