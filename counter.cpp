@@ -42,4 +42,6 @@ void stopTimer(){
 	g_timeCount=std::to_string(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting = false;
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	counting = true;
 }
