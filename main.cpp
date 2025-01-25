@@ -22,7 +22,7 @@ int main(){
 			return text(g_timeCount) | flex |center ;
 			});
 	auto gaugeProg = Renderer([&]{
-			return gauge(timer_progress)| color(Color::Red);
+			return gauge(timer_progress)| color(Color::Red)|border;
 			});
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
