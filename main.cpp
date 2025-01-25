@@ -24,9 +24,9 @@ int main(){
 	auto gaugeProg = Renderer([&]{
 			return gauge(timer_progress)| color(Color::Red)|border;
 			});
-	auto start_btn = Button("START",startTimer,style()) | flex;
-	auto pause_btn = Button("PAUSE",pauseTimer,style()) | flex;
-	auto stop_btn = Button("STOP",stopTimer,style())| flex;
+	auto start_btn = Button("START",startTimer,style());
+	auto pause_btn = Button("PAUSE",pauseTimer,style());
+	auto stop_btn = Button("STOP",stopTimer,style());
 
 
 	Component TimerWindow = Window({
@@ -38,7 +38,8 @@ int main(){
 							pause_btn,
 							stop_btn
 							})
-					})
+					}),
+			.width=50,
 			});
 
 	//screen = ScreenInteractive::Fullscreen();
