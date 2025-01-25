@@ -6,7 +6,7 @@
 #include "counter.hpp"
 
 std::atomic<bool> counting{true};
-std::atomic<int> stateTime;
+std::atomic<int> stateTime{10};
 std::string g_timeCount{"0"};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
