@@ -36,7 +36,7 @@ for(int i=1;i<time_options.size();++i){
 
 Component timer_Options_list = Container::Horizontal({});
 		for(int& val:time_options){
-		SliderOptions<int> option;
+		SliderOption<int> option;
 		option.value = &val;
 		option.max = 1000;
 		option.increment = 5;

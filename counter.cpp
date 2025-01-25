@@ -9,18 +9,18 @@ std::atomic<bool> counting{false};
 std::atomic<int> stateTime{10};
 std::string g_stateTime = "";
 std::string g_timeCount{std::to_string(stateTime)};
-std::atomic<int> init_time{10};
+
+std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
+std::atomic<int> init_time{10};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 // function to start timer
 void startTimer(){
 	if(counting)
 		return;
-	else if(g_stateTime.length()>0)
-		stateTime=std::stoi(g_stateTime.c_str());
-	init_time=stateTime;
 	counting = true;
+	ptr->store(init_time.load());
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
@@ -44,9 +44,8 @@ void pauseTimer(){
 }
 
 //funtion to stop the timer
-std::atomic<int>* ptr = &stateTime;
 void stopTimer(){
-	*ptr=init_time;
+	ptr->store(init_time.load());
 	g_timeCount=std::to_string(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting = false;
