@@ -8,7 +8,6 @@
 
 std::atomic<bool> counting{true};
 std::atomic<int> stateTime{10};
-std::atomic<int>* ptr = &stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
@@ -38,6 +37,6 @@ void pauseTimer(){
 
 //funtion to stop the timer
 void stopTimer(){
-	*ptr = 0;
+	stateTime=0;
 	counting = false;
 }
