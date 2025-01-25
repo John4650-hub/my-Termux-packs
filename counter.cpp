@@ -37,6 +37,7 @@ void pauseTimer(){
 
 //funtion to stop the timer
 void stopTimer(){
-	stateTime=0;
+	stateTime=10;
+	screen.Post(ftxui::Event::Custom);
 	counting = false;
 }
