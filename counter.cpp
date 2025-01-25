@@ -8,7 +8,7 @@
 
 std::atomic<bool> counting{true};
 std::atomic<int> stateTime{10};
-std::atomic<int>* ptr = stateTime;
+std::atomic<int>* ptr = &stateTime;
 extern std::string timeCount;
 extern ftxui::ScreenInteractive screen;
 
