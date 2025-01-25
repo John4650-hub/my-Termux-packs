@@ -3,6 +3,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <atomic>
+#include <thread>
 #include "counter.hpp"
 
 using namespace ftxui;
