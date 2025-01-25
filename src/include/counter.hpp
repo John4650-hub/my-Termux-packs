@@ -8,7 +8,7 @@ extern std::string g_timeCount;
 extern std::string g_stateTime;
 extern ftxui::ScreenInteractive g_screen; 
 extern float timer_progress;
-extern int selected_item;
+extern int selected_time;
 extern std::vector<std::string> time_options;
 
 void startTimer();
