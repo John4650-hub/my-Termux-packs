@@ -11,6 +11,7 @@ std::string g_timeCount{std::to_string(stateTime)};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 void startTimer(){
+	counting = true;
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
@@ -42,6 +43,4 @@ void stopTimer(){
 	g_timeCount=std::to_string(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting = false;
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	counting = true;
 }
