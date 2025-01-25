@@ -17,7 +17,7 @@ void startTimer(){
 	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
 		stateTime-=1;
-		timer_progress = 1.0f - (static_cast<double>(stateTime)/10);
+		timer_progress = 1.0f - (static_cast<double>(stateTime)/10000);
 		g_timeCount = std::to_string(stateTime);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
