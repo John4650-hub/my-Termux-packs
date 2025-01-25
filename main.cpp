@@ -58,6 +58,7 @@ timer_Options_list |= size(HEIGHT,GREATER_THAN,20) | border;
 					timer_Options_list
 					}),
 			.width=50,
+			.height=50
 			});
 
 	//screen = ScreenInteractive::Fullscreen();
