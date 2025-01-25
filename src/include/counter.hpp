@@ -4,6 +4,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 
 extern std::string g_timeCount;
+extern std::string g_stateTime;
 extern ftxui::ScreenInteractive g_screen; 
 extern float timer_progress;
 

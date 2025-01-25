@@ -6,15 +6,17 @@
 #include "counter.hpp"
 
 std::atomic<bool> counting{false};
-std::atomic<int> stateTime{10000};
+std::atomic<int> stateTime{10};
+std::string g_stateTime = "";
 std::string g_timeCount{std::to_string(stateTime)};
 float timer_progress{};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 void startTimer(){
-	if(counting){
+	if(counting)
 		return;
-	}
+	else if(g_stateTime.length()>0)
+		stateTime=std::stoi(g_stateTime.c_str());
 	counting = true;
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
