@@ -28,7 +28,7 @@ int main(){
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
 	auto stop_btn = Button("STOP",stopTimer,style());
 
-	Component time_entry = Input(g_stateTime,"Time in Seconds: ")|border|color(Color::Green);
+	Component time_entry = Input(g_stateTime,"Time in Seconds: ");
 
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
