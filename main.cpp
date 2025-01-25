@@ -6,7 +6,7 @@
 
 using namespace ftxui;
 extern std::string timeCount;
-extern ScreenInteractive screen screen;
+extern ScreenInteractive screen;
 
 ButtonOption style(){
 	auto option = ButtonOption::Animated();
@@ -21,8 +21,8 @@ ButtonOption style(){
 
 int main(){
 	const 
-	auto time_text=Renderer([&](){
-			return text(timer_text) | flex ;
+	auto time_text=Renderer([&]{
+			return text(timeCount) | flex ;
 			});
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
@@ -30,7 +30,7 @@ int main(){
 
 	Component TimerWindow = Window({
 			.inner = Container::Vertical({
-					timer_text,
+					time_text,
 					Container::Horizontal({
 							start_btn,
 							pause_btn,
@@ -39,7 +39,7 @@ int main(){
 					})
 			});
 
-	screen = ScreenInteractive::Fullscreen();
+	//screen = ScreenInteractive::Fullscreen();
 	screen.Loop(TimerWindow);
 	return 0;
 }
