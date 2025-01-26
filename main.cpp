@@ -36,11 +36,12 @@ for(int i=1;i<100;++i){
 }
 
 auto timer_Options_list =  Menu(&time_options, &selected_time);
-
-auto time_list_render = Renderer(timer_Options_list,[&]{
+auto container = Container::Vertical({
+		timer_Options_list,
+		});
+auto time_list_render = Renderer(container,[&]{
 		return vbox({
-				timer_Options_list->Render(),
-				text("selected time: "+ time_options[selected_time]),
+				timer_Options_list->Render() | vscroll_indicator|frame|size(HEIGHT,GREATER_THAN,10)
 				}) | border;
 		});
 
