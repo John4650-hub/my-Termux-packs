@@ -28,23 +28,23 @@ std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
-std::string  Seek= "0 %";
-std::string* Seek_ptr = &Seek;
+std::atomic<std::string>  Seek{"0 %"};
+std::atomic<std::string>* Seek_ptr = &Seek;
 Component musicListWindow;
 Component slider;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
 bool* isPlaying_ptr=&isPlaying;
-bool isPaused{false};
-bool* isPaused_ptr = &isPaused;
-int total_frames{};
-int slider_position{};
+std::atomic<bool> isPaused{false};
+std::atomic<bool>* isPaused_ptr = &isPaused;
+std::atomic<int> total_frames{};
+std::atomic<int> slider_position{};
 int prev_selected_item_index{};
 int* prev_selected_item_index_ptr = &prev_selected_item_index;
-int interval{};
-int* interval_ptr=&interval;
-int* total_frames_ptr = &total_frames;
-int* slider_position_ptr=&slider_position;
+std::atomic<int> interval{};
+std::atomic<int>* interval_ptr=&interval;
+std::atomic<int>* total_frames_ptr = &total_frames;
+std::atomic<int>* slider_position_ptr=&slider_position;
 
 ma_uint64 FirstFrame;
 ma_uint64 currentFrame;
@@ -64,9 +64,9 @@ void addLog(std::string a);
 void clearInterval();
 
 void init_vars(){
-	*currentFrame_ptr=0;
-	*total_frames_ptr=0;
-	*slider_position_ptr=0;
+	currentFrame_ptr->store(0);
+	total_frames_ptr->store(0);
+	slider_position_ptr->store(0);
 }
 void clearInterval() {
     stopFlag.store(true);
@@ -76,8 +76,8 @@ void setInterval() {
     std::thread([&]() {
         while (!stopFlag.load()) {
 						screen.PostEvent(Event::Custom);
-						if (currentFrame == total_frames) {
-						*isPlaying_ptr=false;
+						if (currentFrame.load() == total_frames.load()) {
+						isPlaying_ptr->store(false);
 						ma_device_stop(&device);
             clearInterval();
 						addLog("It is done");
@@ -85,9 +85,9 @@ void setInterval() {
 						}
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
-        slider_position = (static_cast<double>(currentFrame) / static_cast<double>(total_frames)) * 100;
-        *Seek_ptr = std::to_string(slider_position) + " %";
-        addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
+        slider_position_ptr->store((static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100);
+        Seek_ptr->store(std::to_string(slider_position.load()) + " %");
+        addLog(std::to_string(currentFrame.load()) + " / " + std::to_string(total_frames.load()) + " = " + std::to_string(slider_position.load()));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 		}).detach();
@@ -95,13 +95,13 @@ void setInterval() {
 
 
 void seek_audio(ma_uint64 position){
-	if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) <= 100){
+	if (static_cast<int>(slider_position.load())>=0 && static_cast<int>(slider_position.load()) <= 100){
 	screen.PostEvent(Event::Custom);
-	*slider_position_ptr=(static_cast<double>(currentFrame)/total_frames)*100;
-	*Seek_ptr=std::to_string(slider_position)+" %";
+	slider_position_ptr->store((static_cast<double>(currentFrame.load())/total_frames.load())*100);
+	Seek_ptr->store(std::to_string(slider_position.load())+" %");
 	clearInterval();
 	ma_device_stop(&device);
-	*isPaused_ptr=true;
+	isPaused_ptr->store(true);
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
 	}
 }
@@ -208,16 +208,16 @@ void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
 	
-	if(isPlaying){
+	if(isPlaying.load()){
 		if(prev_selected_item_index==selected_item_index){
-			if(isPaused){
-				*isPaused_ptr=false;
+			if(isPaused.load()){
+				isPaused_ptr->store(false);
 				ma_device_start(&device);
 				clearInterval();
 				setInterval();
 				return;
 			}else{
-				*isPaused_ptr = true;
+				isPaused_ptr->store(true);
 				clearInterval();
 				ma_device_stop(&device);
 				return;
@@ -230,15 +230,15 @@ void play() {
     addLog(msg);
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	}
-	else if(!isPlaying){
+	else if(!isPlaying.load()){
 		init_vars();
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 		*isPlaying_ptr=true;	
 	}
 
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
-	*total_frames_ptr = (int)lengthInFrames;
-	addLog("totalFrames: " + std::to_string(total_frames));
+	total_frames_ptr->store((int)lengthInFrames);
+	addLog("totalFrames: " + std::to_string(total_frames.load()));
 	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
 	addLog("Format: "+std::to_string(decoder.outputFormat));
 	addLog("outputChannels: "+ std::to_string(decoder.outputChannels));
@@ -271,7 +271,7 @@ void play() {
     msg = "audio file loaded, starting.... ";
 		addLog(msg);
 		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
-		*interval_ptr = (total_frames - FirstFrame)/99;
+		interval_ptr->store((total_frames.load() - FirstFrame.load())/99);
 		setInterval();
 		*prev_selected_item_index_ptr=selected_item_index;
 }
@@ -360,7 +360,7 @@ auto audioPlayerWindow = Window({
 						seek_audio(0);
 						return true;
 						}else if (event == Event::ArrowRight) {
-								*currentFrame_ptr +=interval;
+								*currentFrame_ptr +=interval.load();
 								seek_audio(currentFrame);
 								return true;
 						}
