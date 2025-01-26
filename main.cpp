@@ -39,10 +39,14 @@ auto timer_Options_list =  Menu(&time_options, &selected_time);
 auto container = Container::Vertical({
 		timer_Options_list,
 		});
-auto time_list_render = Renderer(container,[&]{
+auto time_list_render = Window({
+		.inner = Renderer(container,[&]{
 		return vbox({
-				timer_Options_list->Render() | vscroll_indicator|frame|size(HEIGHT,GREATER_THAN,10)
+				timer_Options_list->Render() | vscroll_indicator|frame|size(HEIGHT,LESS_THAN,10)
 				}) | border;
+		}),
+		.width = 10,
+		.top = 20
 		});
 
 	Component TimerWindow = Window({
