@@ -10,7 +10,7 @@
 std::atomic<bool> counting{false};
 std::atomic<int> stateTime{10};
 std::string g_stateTime = "";
-std::string g_timeCount{std::to_string(stateTime)};
+std::string g_timeCount{formatSeconds(stateTime)};
 int selected_time = 0;
 
 std::atomic<int>* ptr = &stateTime;
@@ -60,10 +60,10 @@ void pauseTimer(){
 	}
 }
 
-//funtion to stop the timer
+//funtion to stop the timer and reset it. to start
 void stopTimer(){
 	ptr->store(g_init_time.load());
-	g_timeCount=std::to_string(stateTime);
+	g_timeCount=formatSeconds(stateTime);
 	g_screen.Post(ftxui::Event::Custom);
 	counting.store(false);
 }
