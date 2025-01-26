@@ -3,6 +3,7 @@
 #include <string>
 #include <ftxui/component/screen_interactive.hpp>
 #include <atomic>
+#include <string>
 
 extern std::string g_timeCount;
 extern std::string g_stateTime;
@@ -14,4 +15,5 @@ extern int selected_time;
 void startTimer();
 void stopTimer();
 void pauseTimer();
+std::string formatSeconds(int);
 #endif
