@@ -22,7 +22,7 @@ ButtonOption style(){
 }
 
 int main(){
-	std::atomic<int> g_init_time{10};
+	g_init_time=10;
 	std::atomic<int>* ptr_  = &g_init_time;
 	std::vector<std::string> time_options;
 	int selected_time = 0;

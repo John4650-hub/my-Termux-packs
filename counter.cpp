@@ -13,7 +13,7 @@ int selected_time = 0;
 
 std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
-std::atomic<int> g_init_time{10};
+g_init_time = 10;
 int n{10};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
