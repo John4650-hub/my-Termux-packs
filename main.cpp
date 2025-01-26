@@ -24,7 +24,7 @@ using namespace ftxui;
 
 
 extern int selected_item_index;
-std::string textarea_txt = ".....welcome.....";
+std::string textarea_txt = ".....welcome.to.PlayerTermux...";
 std::mutex mtx;
 std::string rootPath = "";
 std::string msg{};
