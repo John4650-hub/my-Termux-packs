@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <oboe/Oboe.h>
 #include <thread>
 #include <mutex>
@@ -20,7 +21,7 @@ public:
     void enqueuePCMData(uint8_t *data, size_t size);
 
 private:
-    std::unique_ptr<oboe::AudioStream> mStream;
+    std::shared_ptr<oboe::AudioStream> mStream;
     std::vector<uint8_t> mBuffer;
     std::mutex mMutex;
     std::condition_variable mCondVar;
@@ -112,7 +113,7 @@ int main(int argc, char **argv) {
     SwrContext *swr_context = swr_alloc_set_opts(
         NULL, av_get_default_channel_layout(2), AV_SAMPLE_FMT_S16,
         stream->codecpar->sample_rate, av_get_default_channel_layout(2),
-        stream->codecpar->format, stream->codecpar->sample_rate, 0, NULL);
+        (AVSampleFormat)stream->codecpar->format, stream->codecpar->sample_rate, 0, NULL);
     swr_init(swr_context);
 
     AudioEngine audioEngine;
