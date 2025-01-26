@@ -15,7 +15,7 @@ std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
 int n{10};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
-
+std::atomic<int> g_init_time=10;
 // function to start timer
 void startTimer(){
 	if(counting.load())
