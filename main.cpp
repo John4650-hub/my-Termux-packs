@@ -60,7 +60,7 @@ auto time_list_render = Renderer(container,[&]{
 auto windows = Container::Stacked({
 		TimerWindow,
 		time_list_render
-		})
+		});
 	//screen = ScreenInteractive::Fullscreen();
 	g_screen.Loop(TimerWindow);
 	return 0;
