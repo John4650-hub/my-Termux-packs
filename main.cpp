@@ -28,7 +28,7 @@ private:
 };
 
 bool AudioEngine::start() {
-    oboe::AudioStreamBuilder builder;
+    oboe::AudioStreamBuilder builder=new oboe::AudioStreamBuilder();
     builder.setDirection(oboe::Direction::Output);
     builder.setFormat(oboe::AudioFormat::I16);
     builder.setChannelCount(oboe::ChannelCount::Stereo);
