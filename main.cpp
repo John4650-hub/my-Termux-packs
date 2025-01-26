@@ -60,8 +60,8 @@ auto time_list_render = Window({
 				timer_Options_list->Render() | vscroll_indicator|frame|size(HEIGHT,LESS_THAN,10)
 				}) | border;
 		}),
+		.top = 10,
 		.width = 10,
-		.top = 10
 		});
 
 	Component TimerWindow = Window({
