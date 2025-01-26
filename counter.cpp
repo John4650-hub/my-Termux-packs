@@ -20,6 +20,7 @@ ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 // function to start timer
 void startTimer(){
+	std::cout<<std::stoi(time_options[selected_time].c_str())<<std::endl;
 	if(counting.load())
 		return;
 	//init_time.store(std::stoi(time_options[selected_time].c_str()));
