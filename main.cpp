@@ -41,13 +41,13 @@ for(int i=1;i<100;++i){
 }
 auto timer_Options_list =  Menu(&time_options, &selected_time)|CatchEvent([&](Event event) {
         if (event == Event::ArrowDown) {
-				screen.PostEvent(Event::Custom);
+				g_screen.PostEvent(Event::Custom);
             selected_time = (selected_time + 1) % time_options.size();
 						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
         }
         if (event == Event::ArrowUp) {
-				screen.PostEvent(Event::Custom);
+				g_screen.PostEvent(Event::Custom);
             selected_time = (selected_time + time_options.size() - 1) % time_options.size();
 						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
