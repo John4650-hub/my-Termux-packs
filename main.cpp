@@ -29,11 +29,11 @@ private:
 
 bool AudioEngine::start() {
     oboe::AudioStreamBuilder builder;
-    builder.setDirection(oboe::Direction::Output)
-           .setFormat(oboe::AudioFormat::I16)
-           .setChannelCount(oboe::ChannelCount::Stereo)
-           .setSampleRate(44100)
-           .setCallback(this);
+    builder->setDirection(oboe::Direction::Output)
+           ->setFormat(oboe::AudioFormat::I16)
+           ->setChannelCount(oboe::ChannelCount::Stereo)
+           ->setSampleRate(44100)
+           ->setCallback(this);
 
     oboe::Result result = builder.openStream(mStream);
     if (result != oboe::Result::OK) return false;
