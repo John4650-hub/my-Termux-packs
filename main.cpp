@@ -61,6 +61,12 @@ std::atomic<bool> stopFlag(false);
 void addLog(std::string a);
 void clearInterval();
 
+void init_vars(){
+	*currentFrame_ptr=0;
+	*total_frames_ptr=0;
+	*slider_position_ptr=0;
+
+}
 void clearInterval() {
     stopFlag.store(true);
 }
@@ -74,10 +80,8 @@ void setInterval() {
 						ma_device_stop(&device);
             clearInterval();
 						addLog("It is done");
-						*currentFrame_ptr=0;
-						*total_frames_ptr=0;
-						*slider_position_ptr=0;
-        }
+						init_vars();
+						}
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
         slider_position = (static_cast<double>(currentFrame) / static_cast<double>(total_frames)) * 100;
