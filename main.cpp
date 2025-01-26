@@ -62,6 +62,6 @@ auto windows = Container::Stacked({
 		time_list_render
 		});
 	//screen = ScreenInteractive::Fullscreen();
-	g_screen.Loop(TimerWindow);
+	g_screen.Loop(windows);
 	return 0;
 }
