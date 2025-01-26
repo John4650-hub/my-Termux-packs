@@ -31,6 +31,9 @@ void startTimer(){
 		stateTime.fetch_sub(1);
 		timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 		g_timeCount = formatSeconds(stateTime.load());
+		if(stateTime.load()<1){
+		counting.store(false);
+		}
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 }
@@ -49,7 +52,7 @@ void pauseTimer(){
 				stateTime.fetch_sub(1);
 				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 				g_timeCount = formatSeconds(stateTime.load());
-				if (stateTime.load()==0){
+				if (stateTime.load()<1){
 				counting.store(false);
 				}
 				std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -62,7 +65,7 @@ void pauseTimer(){
 
 //funtion to stop the timer and reset it. to start
 void stopTimer(){
-	ptr->store(g_init_time.load()*60);
+	ptr->store(g_init_time.load());
 	g_timeCount=formatSeconds(stateTime*60);
 	g_screen.Post(ftxui::Event::Custom);
 	counting.store(false);
