@@ -41,11 +41,13 @@ for(int i=1;i<100;++i){
 }
 auto timer_Options_list =  Menu(&time_options, &selected_time)|CatchEvent([&](Event event) {
         if (event == Event::ArrowDown) {
+				screen.PostEvent(Event::Custom);
             selected_time = (selected_time + 1) % time_options.size();
 						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
         }
         if (event == Event::ArrowUp) {
+				screen.PostEvent(Event::Custom);
             selected_time = (selected_time + time_options.size() - 1) % time_options.size();
 						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
@@ -77,10 +79,18 @@ auto time_list_render = Window({
 					}),
 			.width=50
 			});
-auto windows = Container::Stacked({
+auto renderer = Renderer([&] {
+    return vbox({
+      text("Message: " + std::to_string(g_init_time)),
+      text("Value: " + std::to_string(g_init_time))
+    }) | border;
+  });
+auto windows = Container::Vertical({
 		TimerWindow,
-		time_list_render
+		time_list_render,
+		renderer
 		});
+
 	//screen = ScreenInteractive::Fullscreen();
 	g_screen.Loop(windows);
 	return 0;
