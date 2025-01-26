@@ -11,7 +11,6 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
-#include <mutex>
 #include <functional>
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component_base.hpp"
@@ -25,25 +24,29 @@ using namespace ftxui;
 
 extern int selected_item_index;
 std::string textarea_txt = ".....welcome.to.PlayerTermux...";
-std::mutex mtx;
 std::string rootPath = "";
 std::string msg{};
 std::shared_ptr<std::wstring> play_button_text;
 std::vector<std::string> audioNames;
 std::string  Seek= "0 %";
+std::string* Seek_ptr = &Seek;
 Component musicListWindow;
 Component slider;
 auto screen = ScreenInteractive::Fullscreen();
 bool isPlaying = false;
-bool isPaused=false;
+bool* isPlaying_ptr=&isPlaying;
+bool isPaused{false};
+bool* isPaused_ptr = &isPaused;
 int total_frames{};
 int slider_position{};
 int prev_selected_item_index{};
 int interval;
-
+int* total_frames_ptr = &total_frames;
+int* slider_position_ptr=&slider_position;
 
 ma_uint64 FirstFrame;
 ma_uint64 currentFrame;
+ma_uint64* currentFrame_ptr=&currentFrame;
 ma_result result;
 ma_decoder decoder;
 ma_decoder_config decoderConfig;
@@ -58,38 +61,29 @@ std::atomic<bool> stopFlag(false);
 void addLog(std::string a);
 void clearInterval();
 
-void init_vars(){
-	currentFrame=0;
-	total_frames=0;
-	slider_position=0;
-}
-
 void clearInterval() {
-    stopFlag = true;
+    stopFlag.store(true);
 }
 
 void setInterval() {
     std::thread([&]() {
-        while (!stopFlag) {
-						mtx.lock();
+        while (!stopFlag.load()) {
 						screen.PostEvent(Event::Custom);
 						if (currentFrame == total_frames) {
-						isPlaying=false;
+						*isPlaying_ptr=false;
 						ma_device_stop(&device);
             clearInterval();
 						addLog("It is done");
-						currentFrame=0;
-						total_frames=0;
-						slider_position=0;
-						return;
+						*currentFrame_ptr=0;
+						*total_frames_ptr=0;
+						*slider_position_ptr=0;
         }
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
         slider_position = (static_cast<double>(currentFrame) / static_cast<double>(total_frames)) * 100;
-        Seek = std::to_string(slider_position) + " %";
+        *Seek_ptr = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames) + " = " + std::to_string(slider_position));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    mtx.unlock();
         }
 		}).detach();
 }
@@ -98,11 +92,11 @@ void setInterval() {
 void seek_audio(ma_uint64 position){
 	if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) <= 100){
 	screen.PostEvent(Event::Custom);
-	slider_position=(static_cast<double>(currentFrame)/total_frames)*100;
-	Seek=std::to_string(slider_position)+" %";
+	*slider_position_ptr=(static_cast<double>(currentFrame)/total_frames)*100;
+	*Seek_ptr=std::to_string(slider_position)+" %";
 	clearInterval();
 	ma_device_stop(&device);
-	isPaused=true;
+	*isPaused_ptr=true;
 	ma_decoder_seek_to_pcm_frame(&decoder,position);
 	}
 }
@@ -357,11 +351,11 @@ auto audioPlayerWindow = Window({
         }), [&](Event event) {
             if (event == Event::ArrowLeft)
 						{
-						currentFrame=FirstFrame;
+						*currentFrame_ptr=FirstFrame;
 						seek_audio(0);
 						return true;
 						}else if (event == Event::ArrowRight) {
-								currentFrame+=interval;
+								*currentFrame_ptr +=interval;
 								seek_audio(currentFrame);
 								return true;
 						}
