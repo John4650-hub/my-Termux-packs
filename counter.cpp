@@ -13,7 +13,6 @@ std::string g_timeCount{std::to_string(stateTime)};
 int selected_time = 0;
 std::vector<std::string> time_options;
 
-
 std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
 std::atomic<int> init_time{10};
@@ -25,7 +24,7 @@ void startTimer(){
 		return;
 	init_time.store(std::stoi(time_options[selected_time].c_str()));
 	counting.store(true);
-	ptr->store(init_time.load());
+	//ptr->store(init_time.load());
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
