@@ -4,7 +4,7 @@ CFLAGS += -Wall -Wextra -Werror
 LDFLAGS = -lOpenSLES -pthread -lm -ldl -L./oboe/libs -loboe
 LDFLAGS += -L./src/lib/ -lavformat -lavcodec -lswresample -lavutil
 liblisdir.so: $(FILENAME)
-	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./oboe/include -I./src/include decoder.cpp main.cpp -o liblisdir.so $(LDFLAGS)
+	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./oboe/include -I./src/include main.cpp -o liblisdir.so $(LDFLAGS)
 install: liblisdir.so
 	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
 
