@@ -347,8 +347,6 @@ int main() {
   musicListWindow = Window({
       .inner = MusicList(),
       .title = "My Music",
-      .left = 0,
-      .top = 18,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy*0.6,
   });
@@ -371,27 +369,21 @@ auto audioPlayerWindow = Window({
         }),
         PlayerWidget()
     }),
-    .left = 0,
-    .top = 60,
     .width = Terminal::Size().dimx,
     .height = Terminal::Size().dimy * 0.65,
 });
    auto logout = Window({
       .inner = logsWindow(),
       .title = "Audio logs",
-      .left = 0,
-      .top = 5,
       .width = Terminal::Size().dimx,
       .height = Terminal::Size().dimy*0.59});
 	auto exitBtn = Window({
 			.inner = Renderer(exit_button,[exit_button]{return exit_button->Render();}),
-			.left=0,
-			.top=0,
 			.width=Terminal::Size().dimx,
 			.height = Terminal::Size().dimy*0.25,
 			});
   auto windowContainer =
-      Container::Stacked({exitBtn,logout,musicListWindow,audioPlayerWindow});
+      Container::Vertical({exitBtn,logout,musicListWindow,audioPlayerWindow});
   screen.Loop(windowContainer);
 	ma_decoder_uninit(&decoder);
   ma_device_uninit(&device);
