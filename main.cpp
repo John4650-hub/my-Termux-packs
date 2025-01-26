@@ -40,7 +40,9 @@ bool* isPaused_ptr = &isPaused;
 int total_frames{};
 int slider_position{};
 int prev_selected_item_index{};
-int interval;
+int* prev_selected_item_index_ptr = &prev_selected_item_index;
+int interval{};
+int* interval_ptr=&interval;
 int* total_frames_ptr = &total_frames;
 int* slider_position_ptr=&slider_position;
 
@@ -65,7 +67,6 @@ void init_vars(){
 	*currentFrame_ptr=0;
 	*total_frames_ptr=0;
 	*slider_position_ptr=0;
-
 }
 void clearInterval() {
     stopFlag.store(true);
@@ -210,13 +211,13 @@ void play() {
 	if(isPlaying){
 		if(prev_selected_item_index==selected_item_index){
 			if(isPaused){
-				isPaused=false;
+				*isPaused_ptr=false;
 				ma_device_start(&device);
 				clearInterval();
 				setInterval();
 				return;
 			}else{
-				isPaused = true;
+				*isPaused_ptr = true;
 				clearInterval();
 				ma_device_stop(&device);
 				return;
@@ -232,11 +233,11 @@ void play() {
 	else if(!isPlaying){
 		init_vars();
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
-		isPlaying=true;	
+		*isPlaying_ptr=true;	
 	}
 
 	ma_decoder_get_length_in_pcm_frames(&decoder,&lengthInFrames);
-	total_frames = (int)lengthInFrames;
+	*total_frames_ptr = (int)lengthInFrames;
 	addLog("totalFrames: " + std::to_string(total_frames));
 	addLog("sampleRate: "+std::to_string(decoder.outputSampleRate));
 	addLog("Format: "+std::to_string(decoder.outputFormat));
@@ -270,9 +271,9 @@ void play() {
     msg = "audio file loaded, starting.... ";
 		addLog(msg);
 		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
-		interval = (total_frames - FirstFrame)/99;
+		*interval_ptr = (total_frames - FirstFrame)/99;
 		setInterval();
-		prev_selected_item_index=selected_item_index;
+		*prev_selected_item_index_ptr=selected_item_index;
 }
 
 void prev() {
