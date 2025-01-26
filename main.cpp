@@ -23,6 +23,7 @@ ButtonOption style(){
 
 int main(){
 	std::atomic<int> g_init_time{10};
+	std::atomic<int>* ptr_  = &g_init_time;
 	std::vector<std::string> time_options;
 	int selected_time = 0;
 
@@ -41,12 +42,12 @@ for(int i=1;i<100;++i){
 auto timer_Options_list =  Menu(&time_options, &selected_time)|CatchEvent([&](Event event) {
         if (event == Event::ArrowDown) {
             selected_time = (selected_time + 1) % time_options.size();
-						g_init_time.store(std::stoi(time_options[selected_time]));
+						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
         }
         if (event == Event::ArrowUp) {
             selected_time = (selected_time + time_options.size() - 1) % time_options.size();
-						g_init_time.store(std::stoi(time_options[selected_time]));
+						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
         }
         return false;
