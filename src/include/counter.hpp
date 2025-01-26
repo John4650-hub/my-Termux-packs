@@ -2,14 +2,14 @@
 #define COUNTER_HPP
 #include <string>
 #include <ftxui/component/screen_interactive.hpp>
-#include <vector>
+#include <atomic>
 
 extern std::string g_timeCount;
 extern std::string g_stateTime;
+extern std::atomic g_intit_time;
 extern ftxui::ScreenInteractive g_screen; 
 extern float timer_progress;
 extern int selected_time;
-extern std::vector<std::string> time_options;
 
 void startTimer();
 void stopTimer();

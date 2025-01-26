@@ -5,6 +5,8 @@
 #include <ftxui/component/event.hpp>
 #include "counter.hpp"
 #include <vector>
+#include <atomic>
+#include <string>
 
 using namespace ftxui;
 
@@ -20,8 +22,10 @@ ButtonOption style(){
 }
 
 int main(){
+	std::atomic<int> g_init_time{10};
 	std::vector<std::string> time_options;
 	int selected_time = 0;
+
 	auto time_text=Renderer([&]{
 			return text(g_timeCount) | flex |center ;
 			});
@@ -31,18 +35,18 @@ int main(){
 	auto start_btn = Button("START",startTimer,style());
 	auto pause_btn = Button("PAUSE",pauseTimer,style());
 	auto stop_btn = Button("STOP",stopTimer,style());
-
 for(int i=1;i<100;++i){
 	time_options.push_back(std::to_string(i*5));
 }
-
 auto timer_Options_list =  Menu(&time_options, &selected_time)|CatchEvent([&](Event event) {
         if (event == Event::ArrowDown) {
             selected_time = (selected_time + 1) % time_options.size();
+						g_init_time.store(std::stoi(time_options[selected_time]));
             return true;
         }
         if (event == Event::ArrowUp) {
             selected_time = (selected_time + time_options.size() - 1) % time_options.size();
+						g_init_time.store(std::stoi(time_options[selected_time]));
             return true;
         }
         return false;
