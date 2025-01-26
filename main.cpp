@@ -46,7 +46,7 @@ auto time_list_render = Window({
 				}) | border;
 		}),
 		.width = 10,
-		.top = 20
+		.top = 10
 		});
 
 	Component TimerWindow = Window({
