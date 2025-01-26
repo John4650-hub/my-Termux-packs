@@ -25,7 +25,7 @@ void startTimer(){
 		return;
 	init_time = 10;//std::stoi(time_options[selected_time].c_str());
 	counting = true;
-	ptr->store(init_time.load());
+	//ptr->store(init_time.load());
 	std::thread([&](){
 	while(stateTime>0 && counting == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
