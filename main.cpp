@@ -79,7 +79,7 @@ auto time_list_render = Window({
 auto renderer = Renderer([&] {
     return vbox({
       text("Minutes"),
-      text(std::to_string(static_cast<double>(g_init_time)/60.0f))
+      text(formatSeconds(g_init_time*60))
     }) | border;
   });
 auto windows = Container::Vertical({
