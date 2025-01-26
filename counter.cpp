@@ -22,11 +22,11 @@ ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 void startTimer(){
 	if(counting.load())
 		return;
-	init_time.store(std::stoi(time_options[selected_time].c_str()));
+	//init_time.store(std::stoi(time_options[selected_time].c_str()));
 	counting.store(true);
-	//ptr->store(init_time.load());
+	ptr->store(init_time.load());
 	std::thread([&](){
-	while(stateTime>0 && counting == true){
+	while(stateTime.load()>0 && counting.load() == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
 		stateTime.fetch_sub(1);
 		timer_progress = 1.0f - (static_cast<double>(stateTime.load())/init_time.load());
