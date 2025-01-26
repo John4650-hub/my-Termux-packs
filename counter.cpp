@@ -47,6 +47,9 @@ void pauseTimer(){
 				stateTime.fetch_sub(1);
 				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 				g_timeCount = std::to_string(stateTime.load());
+				if (stateTime.load()==0){
+				counting.store(false);
+				}
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 				}
 		}
