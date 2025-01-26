@@ -46,7 +46,7 @@ void pauseTimer(){
   		while(stateTime.load()>0 && counting.load() == true){
 				g_screen.PostEvent(ftxui::Event::Custom);
 				stateTime.fetch_sub(1);
-				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n.load());
+				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 				g_timeCount = std::to_string(stateTime.load());
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 				}
