@@ -78,8 +78,8 @@ auto time_list_render = Window({
 			});
 auto renderer = Renderer([&] {
     return vbox({
-      text("Message: " + std::to_string(g_init_time)),
-      text("Value: " + std::to_string(g_init_time))
+      text("Minutes"),
+      text(std::to_string(static_cast<double>(g_init_time)/60.0f));
     }) | border;
   });
 auto windows = Container::Vertical({
