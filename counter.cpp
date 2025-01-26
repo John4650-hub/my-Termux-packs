@@ -14,6 +14,7 @@ int selected_time = 0;
 std::atomic<int>* ptr = &stateTime;
 float timer_progress{};
 std::atomic<int> g_init_time{10};
+int n{10};
 ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 
 // function to start timer
@@ -22,7 +23,7 @@ void startTimer(){
 		return;
 	counting.store(true);
 	ptr->store(g_init_time.load());
-	int n = g_init_time.load();
+	n = g_init_time.load();
 	std::thread([&](){
 	while(stateTime.load()>0 && counting.load() == true){
 		g_screen.PostEvent(ftxui::Event::Custom);
@@ -45,7 +46,7 @@ void pauseTimer(){
   		while(stateTime.load()>0 && counting.load() == true){
 				g_screen.PostEvent(ftxui::Event::Custom);
 				stateTime.fetch_sub(1);
-				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/init_time.load());
+				timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n.load());
 				g_timeCount = std::to_string(stateTime.load());
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 				}

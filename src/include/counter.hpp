@@ -6,7 +6,7 @@
 
 extern std::string g_timeCount;
 extern std::string g_stateTime;
-extern std::atomic g_init_time;
+extern std::atomic g_init_time{10};
 extern ftxui::ScreenInteractive g_screen; 
 extern float timer_progress;
 extern int selected_time;
