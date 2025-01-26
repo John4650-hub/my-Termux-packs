@@ -28,14 +28,14 @@ private:
 };
 
 bool AudioEngine::start() {
-    oboe::AudioStreamBuilder builder=new oboe::AudioStreamBuilder();
-    builder.setDirection(oboe::Direction::Output);
-    builder.setFormat(oboe::AudioFormat::I16);
-    builder.setChannelCount(oboe::ChannelCount::Stereo);
-    builder.setSampleRate(44100);
-		builder.setCallback(this);
+    oboe::AudioStreamBuilder* builder=new oboe::AudioStreamBuilder();
+    builder->setDirection(oboe::Direction::Output)
+			->setFormat(oboe::AudioFormat::I16)
+			->setChannelCount(oboe::ChannelCount::Stereo)
+    ->.setSampleRate(44100)
+		->.setCallback(this);
 
-    oboe::Result result = builder.openStream(mStream);
+    oboe::Result result = builder->openStream(mStream);
     if (result != oboe::Result::OK) return false;
 
     return mStream->start() == oboe::Result::OK;
