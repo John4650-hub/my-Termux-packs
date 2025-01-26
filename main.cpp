@@ -53,13 +53,14 @@ auto time_list_render = Renderer(container,[&]{
 							start_btn,
 							pause_btn,
 							stop_btn
-							}),
-					time_list_render
+							})
 					}),
-			.width=50,
-			.height=50
+			.width=50
 			});
-
+auto windows = Container::Stacked({
+		TimerWindow,
+		time_list_render
+		})
 	//screen = ScreenInteractive::Fullscreen();
 	g_screen.Loop(TimerWindow);
 	return 0;
