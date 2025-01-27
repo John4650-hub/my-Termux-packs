@@ -38,11 +38,11 @@ bool* isPlaying_ptr=&isPlaying;
 bool isPaused{false};
 bool* isPaused_ptr = &isPaused;
 std::atomic<int> total_frames{};
-std::atomic<int> slider_position{};
+int slider_position{};
 int prev_selected_item_index{};
 int interval;
 std::atomic<int>* total_frames_ptr = &total_frames;
-std::atomic<int>* slider_position_ptr=&slider_position;
+int* slider_position_ptr=&slider_position;
 
 ma_uint64 FirstFrame;
 ma_uint64 currentFrame;
@@ -63,7 +63,7 @@ void clearInterval();
 void init_vars(){
 	*currentFrame_ptr=0;
 	total_frames_ptr->store(0);
-	slider_position_ptr->store(0);
+	*slider_position_ptr=0;
 
 }
 void clearInterval() {
@@ -83,7 +83,7 @@ void setInterval() {
 						}
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
-        slider_position_ptr->store((static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100);
+        *slider_position_ptr=(static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100;
         *Seek_ptr = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames.load()) + " = " + std::to_string(slider_position.load()));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
