@@ -4,12 +4,15 @@
 #include <mutex>
 #include <condition_variable>
 #include <vector>
+#include <fstream>
+
 extern "C"{
-	#include <libavformat/avformat.h>
-	#include <libavcodec/avcodec.h>
-	#include <libavutil/avutil.h>
-	#include <libswresample/swresample.h>
+    #include <libavformat/avformat.h>
+    #include <libavcodec/avcodec.h>
+    #include <libavutil/avutil.h>
+    #include <libswresample/swresample.h>
 }
+
 class AudioEngine : public oboe::AudioStreamCallback {
 public:
     bool start();
@@ -17,7 +20,6 @@ public:
 
     // Oboe callback
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
-
     void enqueuePCMData(uint8_t *data, size_t size);
 
 private:
@@ -25,6 +27,7 @@ private:
     std::vector<uint8_t> mBuffer;
     std::mutex mMutex;
     std::condition_variable mCondVar;
+    std::ofstream pcmFile;
 };
 
 bool AudioEngine::start() {
@@ -38,6 +41,12 @@ bool AudioEngine::start() {
     oboe::Result result = builder.openStream(mStream);
     if (result != oboe::Result::OK) return false;
 
+    pcmFile.open("output.pcm", std::ios::binary);
+    if (!pcmFile.is_open()) {
+        fprintf(stderr, "ERROR: failed to open output.pcm\n");
+        return false;
+    }
+
     return mStream->start() == oboe::Result::OK;
 }
 
@@ -46,25 +55,29 @@ void AudioEngine::stop() {
         mStream->stop();
         mStream->close();
     }
+    if (pcmFile.is_open()) {
+        pcmFile.close();
+    }
 }
 
 oboe::DataCallbackResult AudioEngine::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-    std::unique_lock<std::mutex> lock(mMutex);
-    mCondVar.wait(lock, [this]() { return !mBuffer.empty(); });
+   // std::unique_lock<std::mutex> lock(mMutex);
+    //mCondVar.wait(lock, [this]() { return !mBuffer.empty(); });
 
     size_t bytesToCopy = numFrames * mStream->getChannelCount() * sizeof(int16_t);
     if (bytesToCopy > mBuffer.size()) bytesToCopy = mBuffer.size();
 
     memcpy(audioData, mBuffer.data(), bytesToCopy);
+    pcmFile.write(reinterpret_cast<const char*>(mBuffer.data()), bytesToCopy);
     mBuffer.erase(mBuffer.begin(), mBuffer.begin() + bytesToCopy);
 
     return oboe::DataCallbackResult::Continue;
 }
 
 void AudioEngine::enqueuePCMData(uint8_t *data, size_t size) {
-    std::lock_guard<std::mutex> lock(mMutex);
+    //std::lock_guard<std::mutex> lock(mMutex);
     mBuffer.insert(mBuffer.end(), data, data + size);
-    mCondVar.notify_one();
+   // mCondVar.notify_one();
 }
 
 int main(int argc, char **argv) {
