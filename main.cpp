@@ -4,12 +4,12 @@
 #include <mutex>
 #include <condition_variable>
 #include <vector>
-
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libavutil/avutil.h>
-#include <libswresample/swresample.h>
-
+extern "C"{
+	#include <libavformat/avformat.h>
+	#include <libavcodec/avcodec.h>
+	#include <libavutil/avutil.h>
+	#include <libswresample/swresample.h>
+}
 class AudioEngine : public oboe::AudioStreamCallback {
 public:
     bool start();
