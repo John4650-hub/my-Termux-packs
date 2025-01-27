@@ -77,7 +77,7 @@ void setInterval() {
         while (!stopFlag.load()) {
 						screen.PostEvent(Event::Custom);
 						if (currentFrame.load() == total_frames.load()) {
-						isPlaying_ptr->store(false);
+						*isPlaying_ptr=false;
 						ma_device_stop(&device);
             clearInterval();
 						addLog("It is done");
@@ -208,7 +208,7 @@ void play() {
   std::string audio_playing = rootPath + "/" + audioNames[selected_item_index];
   musicListWindow->TakeFocus();
 	
-	if(isPlaying.load()){
+	if(isPlaying){
 		if(prev_selected_item_index==selected_item_index){
 			if(isPaused.load()){
 				isPaused_ptr->store(false);
@@ -230,7 +230,7 @@ void play() {
     addLog(msg);
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 	}
-	else if(!isPlaying.load()){
+	else if(!isPlaying){
 		init_vars();
 		result = ma_decoder_init_file(audio_playing.c_str(), NULL, &decoder);
 		*isPlaying_ptr=true;	
@@ -271,7 +271,7 @@ void play() {
     msg = "audio file loaded, starting.... ";
 		addLog(msg);
 		ma_decoder_get_cursor_in_pcm_frames(&decoder,&FirstFrame);
-		interval_ptr->store((total_frames.load() - FirstFrame.load())/99);
+		interval_ptr->store((total_frames.load() - FirstFrame)/99);
 		setInterval();
 		*prev_selected_item_index_ptr=selected_item_index;
 }
