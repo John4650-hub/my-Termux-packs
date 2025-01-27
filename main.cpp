@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <oboe/Oboe.h>
 #include <thread>
+#include <chrono>
 #include <mutex>
 #include <condition_variable>
 #include <vector>
@@ -155,6 +156,7 @@ int main(int argc, char **argv) {
     });
 
     decodeThread.join();
+		std::this_thread::sleep_for(std::chrono::minutes(4));
     audioEngine.stop();
 
     av_packet_free(&packet);
