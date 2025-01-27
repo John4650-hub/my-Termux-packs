@@ -83,7 +83,7 @@ void setInterval() {
 						}
         ma_decoder_get_cursor_in_pcm_frames(&decoder, &currentFrame);
         addLog(std::to_string(currentFrame));
-        slider_position->store((static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100);
+        slider_position_ptr->store((static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100);
         *Seek_ptr = std::to_string(slider_position) + " %";
         addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames.load()) + " = " + std::to_string(slider_position.load()));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
