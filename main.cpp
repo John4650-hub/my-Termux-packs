@@ -85,7 +85,7 @@ void setInterval() {
         addLog(std::to_string(currentFrame));
         *slider_position_ptr=(static_cast<double>(currentFrame) / static_cast<double>(total_frames.load())) * 100;
         *Seek_ptr = std::to_string(slider_position) + " %";
-        addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames.load()) + " = " + std::to_string(slider_position.load()));
+        addLog(std::to_string(currentFrame) + " / " + std::to_string(total_frames.load()) + " = " + std::to_string(slider_position));
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 		}).detach();
@@ -93,10 +93,10 @@ void setInterval() {
 
 
 void seek_audio(ma_uint64 position){
-	if (static_cast<int>(slider_position.load())>=0 && static_cast<int>(slider_position.load()) <= 100){
+	if (static_cast<int>(slider_position)>=0 && static_cast<int>(slider_position) <= 100){
 	screen.PostEvent(Event::Custom);
 	*slider_position_ptr=(static_cast<double>(currentFrame)/total_frames.load())*100;
-	*Seek_ptr=std::to_string(slider_position.load())+" %";
+	*Seek_ptr=std::to_string(slider_position)+" %";
 	clearInterval();
 	ma_device_stop(&device);
 	*isPaused_ptr=true;
