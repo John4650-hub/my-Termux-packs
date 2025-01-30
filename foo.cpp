@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include <stdio.h>
 extern "C"{
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -8,7 +10,7 @@ extern "C"{
 }
 
 int main(int argc,char **argv){
-	int ret{};
+	int ret{},data_size{},i{},ch{};
 	AVFormatContext *formatCtx = NULL;
 	ret = avformat_open_input(&formatCtx,argv[1],NULL,NULL);
 	if (ret<0){
@@ -31,6 +33,46 @@ int main(int argc,char **argv){
 		std::cout << "decoder not found\n";
 		return -1;
 	}
+	AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
+	avcodec_parameters_to_context(decoder_ctx,stream->codecpar);
+	ret = avcodec_open2(decoder_ctx,decoder,NULL);
+	if(ret<0){
+		std::cout<<"failed to open decoder\n";
+		return -1;
+	}
+	AVPacket *packet = av_packet_alloc();
+	AVFrame *frame = av_frame_alloc();
+	SwrContext *swr_context=swr_alloc_set_opts(
+			NULL,
+			av_get_default_channel_layout(2),
+			AV_SAMPLE_FMT_S16,
+			stream->codecpar->sample_rate,
+			av_get_default_channel_layout(2),
+			(AVSampleFormat)stream->codecpar->format,
+			stream->codecpar->sample_rate,
+			0,
+			NULL,
+			);
+	swr_init(swr_context);
+while (ret >= 0) {
+        ret = avcodec_receive_frame(decoder_ctx, frame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+            return;
+        else if (ret < 0) {
+					std::cerr<<"Error during decoding\n";
+            return -1;
+        }
+        data_size = av_get_bytes_per_sample(decoder_ctx->sample_fmt);
+        if (data_size < 0) {
+            /* This should not occur, checking just for paranoia */
+					std::cerr<< "Failed to calculate data size\n";
+            return -1;
+        }
+        for (i = 0; i < frame->nb_samples; i++)
+            for (ch = 0; ch < dec_ctx->ch_layout.nb_channels; ch++)
+                fwrite(frame->data[ch] + data_size*i, 1, data_size, "output.pcm");
+    }
+
 	std::cout<<"file opened success fully\n";
 	return 0;
 }

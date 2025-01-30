@@ -122,9 +122,16 @@ int main(int argc, char **argv) {
     AVPacket *packet = av_packet_alloc();
     AVFrame *frame = av_frame_alloc();
     SwrContext *swr_context = swr_alloc_set_opts(
-        NULL, av_get_default_channel_layout(2), AV_SAMPLE_FMT_S16,
-        stream->codecpar->sample_rate, av_get_default_channel_layout(2),
-        (AVSampleFormat)stream->codecpar->format, stream->codecpar->sample_rate, 0, NULL);
+        NULL, 
+				av_get_default_channel_layout(2), 
+				AV_SAMPLE_FMT_S16,
+				stream->codecpar->sample_rate,
+				av_get_default_channel_layout(2),
+				(AVSampleFormat)stream->codecpar->format, 
+				stream->codecpar->sample_rate,
+				0,
+				NULL
+				);
     swr_init(swr_context);
 
     AudioEngine audioEngine;
