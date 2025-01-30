@@ -75,7 +75,7 @@ while (ret >= 0) {
             return -1;
         }
         for (i = 0; i < frame->nb_samples; i++)
-            for (ch = 0; ch < decoder_ctx->ch_layout.nb_channels; ch++)
+            for (ch = 0; ch < frame->linesize[0].nb_channels; ch++)
                 fwrite(frame->data[ch] + data_size*i, 1, data_size, outfile);
     }
 
