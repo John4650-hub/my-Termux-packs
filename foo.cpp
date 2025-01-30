@@ -20,6 +20,17 @@ int main(int argc,char **argv){
 		std::cout<<"could not find any info\n";
 		return -1;
 	}
+	int stream_index = av_find_best_stream(formatCtx,AVMEDIA_TYPE_AUDIO,-1,-1,NULL,0);
+	if(stream_index<0){
+		std::cout<<"no audio stream found\n";
+		return -1;
+	}
+	const AVStream *stream = formatCtx->streams[stream_index];
+	const AVCodec *decoder = avcodec_find_decoder(stream->codecpar->codec_id);
+	if(!decoder){
+		std::cout << "decoder not found\n";
+		return -1;
+	}
 	std::cout<<"file opened success fully\n";
 	return 0;
 }
