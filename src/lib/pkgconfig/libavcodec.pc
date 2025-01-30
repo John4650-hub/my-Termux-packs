@@ -1,0 +1,14 @@
+prefix=/data/data/com.termux/files/usr
+exec_prefix=${prefix}
+libdir=/data/data/com.termux/files/usr/lib
+includedir=/data/data/com.termux/files/usr/include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 58.54.100
+Requires: 
+Requires.private: libswresample >= 3.5.100, libavutil >= 56.31.100
+Conflicts:
+Libs: -L${libdir}  -lavcodec 
+Libs.private: -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -pthread -liconv -lm -L/data/data/com.termux/files/usr/lib -lz -lmp3lame -lm -L/data/data/com.termux/files/usr/lib -lopus -L/data/data/com.termux/files/usr/lib -lvorbis -L/data/data/com.termux/files/usr/lib -lvorbisenc -L/data/data/com.termux/files/usr/lib -lx264 -L/data/data/com.termux/files/usr/lib -lx265 -lxvidcore
+Cflags: -I${includedir}
