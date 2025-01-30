@@ -15,6 +15,11 @@ int main(int argc,char **argv){
 		std::cout<<"Can't open file\n";
 		return -1;
 	}
+	ret = avformat_find_stream_info(formatCtx,NULL);
+	if (ret<0){
+		std::cout<<"could not find any info\n";
+		return -1;
+	}
 	std::cout<<"file opened success fully\n";
 	return 0;
 }
