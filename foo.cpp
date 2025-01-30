@@ -28,8 +28,8 @@ int main(int argc,char **argv){
 		std::cout<<"no audio stream found\n";
 		return -1;
 	}
-	const AVStream *stream = formatCtx->streams[stream_index];
-	const AVCodec *decoder = avcodec_find_decoder(stream->codecpar->codec_id);
+	const AVStream *media = formatCtx->streams[stream_index];
+	const AVCodec *decoder = avcodec_find_decoder(media->codecpar->codec_id);
 	if(!decoder){
 		std::cout << "decoder not found\n";
 		return -1;
@@ -41,7 +41,8 @@ outfile = fopen("output.pcm", "wb");
         return -1;
     }
 
-	avcodec_parameters_to_context(decoder_ctx,stream->codecpar);
+	avcodec_parameters_to_context(decoder_ctx,media->codecpar);
+	decoder_ctx->pkt_timebase = media->time_base;
 	ret = avcodec_open2(decoder_ctx,decoder,NULL);
 	if(ret<0){
 		std::cout<<"failed to open decoder\n";
@@ -53,10 +54,10 @@ outfile = fopen("output.pcm", "wb");
 			NULL,
 			av_get_default_channel_layout(2),
 			AV_SAMPLE_FMT_S16,
-			stream->codecpar->sample_rate,
+			media->codecpar->sample_rate,
 			av_get_default_channel_layout(2),
-			(AVSampleFormat)stream->codecpar->format,
-			stream->codecpar->sample_rate,
+			(AVSampleFormat)media->codecpar->format,
+			media->codecpar->sample_rate,
 			0,
 			NULL);
 	swr_init(swr_context);
