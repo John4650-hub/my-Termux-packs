@@ -61,9 +61,12 @@ outfile = fopen("output.pcm", "wb");
 			NULL);
 	swr_init(swr_context);
 while (ret >= 0) {
+				std::cout<<"ret: "<<ret<<", ";
         ret = avcodec_receive_frame(decoder_ctx, frame);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
+					std::cerr<<"AVERROR OCCURED"
             return -1;
+				}
         else if (ret < 0) {
 					std::cerr<<"Error during decoding\n";
             return -1;
