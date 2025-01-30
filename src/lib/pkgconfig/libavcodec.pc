@@ -5,10 +5,10 @@ includedir=/data/data/com.termux/files/usr/include
 
 Name: libavcodec
 Description: FFmpeg codec library
-Version: 58.54.100
+Version: 61.19.100
 Requires: 
-Requires.private: libswresample >= 3.5.100, libavutil >= 56.31.100
+Requires.private: libswresample >= 5.3.100, libavutil >= 59.39.100
 Conflicts:
 Libs: -L${libdir}  -lavcodec 
-Libs.private: -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -pthread -liconv -lm -L/data/data/com.termux/files/usr/lib -lz -lmp3lame -lm -L/data/data/com.termux/files/usr/lib -lopus -L/data/data/com.termux/files/usr/lib -lvorbis -L/data/data/com.termux/files/usr/lib -lvorbisenc -L/data/data/com.termux/files/usr/lib -lx264 -L/data/data/com.termux/files/usr/lib -lx265 -lxvidcore
+Libs.private: -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lvpx -lm -L/data/data/com.termux/files/usr/lib -lwebpmux -lwebp -lsharpyuv -pthread -liconv -L/data/data/com.termux/files/usr/lib -llcms2 -lm -latomic -llzma -L/data/data/com.termux/files/usr/lib -ldav1d -lopencore-amrwb -L/data/data/com.termux/files/usr/lib -laom -lmp3lame -lm -lopencore-amrnb -L/data/data/com.termux/files/usr/lib -lopus -L/data/data/com.termux/files/usr/lib -lrav1e -L/data/data/com.termux/files/usr/lib -lSvtAv1Enc -ltheoraenc -ltheoradec -logg -lvo-amrwbenc -L/data/data/com.termux/files/usr/lib -lvorbis -L/data/data/com.termux/files/usr/lib -lvorbisenc -L/data/data/com.termux/files/usr/lib -lwebp -lsharpyuv -L/data/data/com.termux/files/usr/lib -lx264 -L/data/data/com.termux/files/usr/lib -lx265 -lxvidcore -landroid -lmediandk -L/data/data/com.termux/files/usr/lib -lz
 Cflags: -I${includedir}

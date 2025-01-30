@@ -5,10 +5,10 @@ includedir=/data/data/com.termux/files/usr/include
 
 Name: libavutil
 Description: FFmpeg utility library
-Version: 56.31.100
+Version: 59.39.100
 Requires: 
 Requires.private: 
 Conflicts:
 Libs: -L${libdir}  -lavutil 
-Libs.private: -pthread -lm
+Libs.private: -pthread -lm -L/data/data/com.termux/files/usr/lib -lOpenCL -latomic -landroid -lmediandk -L/data/data/com.termux/files/usr/lib -lX11
 Cflags: -I${includedir}
