@@ -12,6 +12,12 @@ extern "C"{
 int main(int argc,char **argv){
 	int ret{},data_size{},i{},ch{};
 	AVFormatContext *formatCtx = NULL;
+	FILE *outfile;
+	outfile = fopen("output.pcm", "wb");
+    if (!outfile) {
+        av_free(c);
+        return -1;
+    }
 	ret = avformat_open_input(&formatCtx,argv[1],NULL,NULL);
 	if (ret<0){
 		std::cout<<"Can't open file\n";
@@ -51,13 +57,12 @@ int main(int argc,char **argv){
 			(AVSampleFormat)stream->codecpar->format,
 			stream->codecpar->sample_rate,
 			0,
-			NULL,
-			);
+			NULL);
 	swr_init(swr_context);
 while (ret >= 0) {
         ret = avcodec_receive_frame(decoder_ctx, frame);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-            return;
+            return -1;
         else if (ret < 0) {
 					std::cerr<<"Error during decoding\n";
             return -1;
@@ -69,8 +74,8 @@ while (ret >= 0) {
             return -1;
         }
         for (i = 0; i < frame->nb_samples; i++)
-            for (ch = 0; ch < dec_ctx->ch_layout.nb_channels; ch++)
-                fwrite(frame->data[ch] + data_size*i, 1, data_size, "output.pcm");
+            for (ch = 0; ch < decoder_ctx->ch_layout.nb_channels; ch++)
+                fwrite(frame->data[ch] + data_size*i, 1, data_size, outfile);
     }
 
 	std::cout<<"file opened success fully\n";
