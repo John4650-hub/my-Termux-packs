@@ -13,11 +13,6 @@ int main(int argc,char **argv){
 	int ret{},data_size{},i{},ch{};
 	AVFormatContext *formatCtx = NULL;
 	FILE *outfile;
-	outfile = fopen("output.pcm", "wb");
-    if (!outfile) {
-        av_free(c);
-        return -1;
-    }
 	ret = avformat_open_input(&formatCtx,argv[1],NULL,NULL);
 	if (ret<0){
 		std::cout<<"Can't open file\n";
@@ -40,6 +35,12 @@ int main(int argc,char **argv){
 		return -1;
 	}
 	AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
+outfile = fopen("output.pcm", "wb");
+    if (!outfile) {
+        av_free(decoder_ctx);
+        return -1;
+    }
+
 	avcodec_parameters_to_context(decoder_ctx,stream->codecpar);
 	ret = avcodec_open2(decoder_ctx,decoder,NULL);
 	if(ret<0){
