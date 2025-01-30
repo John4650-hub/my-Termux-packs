@@ -51,10 +51,10 @@ outfile = fopen("output.pcm", "wb");
 	AVFrame *frame = av_frame_alloc();
 	SwrContext *swr_context=swr_alloc_set_opts(
 			NULL,
-			av_get_default_channel_layout(2),
+			av_get_default_channel_layout(1),
 			AV_SAMPLE_FMT_S16,
 			stream->codecpar->sample_rate,
-			av_get_default_channel_layout(2),
+			av_get_default_channel_layout(1),
 			(AVSampleFormat)stream->codecpar->format,
 			stream->codecpar->sample_rate,
 			0,
