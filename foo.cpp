@@ -51,19 +51,19 @@ outfile = fopen("output.pcm", "wb");
 	AVFrame *frame = av_frame_alloc();
 	SwrContext *swr_context=swr_alloc_set_opts(
 			NULL,
-			av_get_default_channel_layout(1),
+			av_get_default_channel_layout(2),
 			AV_SAMPLE_FMT_S16,
 			stream->codecpar->sample_rate,
-			av_get_default_channel_layout(1),
+			av_get_default_channel_layout(2),
 			(AVSampleFormat)stream->codecpar->format,
 			stream->codecpar->sample_rate,
 			0,
 			NULL);
 	swr_init(swr_context);
 	std::cout<<"while started";
-while (ret >= 0) {
+while (av_read_frame(formatCtx,packet)==0) {
+        ret = avcodec_send_packet(decoder_ctx, packet);
 				std::cout<<"ret: "<<ret<<", ";
-        ret = avcodec_receive_frame(decoder_ctx, frame);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF){
 					std::cerr<<"AVERROR OCCURED\n";
             return -1;
