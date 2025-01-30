@@ -62,9 +62,6 @@ void AudioEngine::stop() {
 }
 
 oboe::DataCallbackResult AudioEngine::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-   // std::unique_lock<std::mutex> lock(mMutex);
-    //mCondVar.wait(lock, [this]() { return !mBuffer.empty(); });
-
     size_t bytesToCopy = numFrames * mStream->getChannelCount() * sizeof(int16_t);
     if (bytesToCopy > mBuffer.size()) bytesToCopy = mBuffer.size();
 
@@ -87,7 +84,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    int ret;
+    int ret{};
     AVFormatContext *format_context = NULL;
     ret = avformat_open_input(&format_context, argv[1], NULL, NULL);
     if (ret < 0) {
