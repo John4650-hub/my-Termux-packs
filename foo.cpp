@@ -17,7 +17,7 @@ extern "C" {
 
 constexpr uint32_t kBytesPerFrame = 4;  // Assuming 2 channels * 2 bytes per sample
 constexpr uint32_t kCapacityInFrames = 4096;
-oboe::FifoBuffer fifoBuffer(kCapacityInFrames * kBytesPerFrame);
+oboe::FifoBuffer fifoBuffer(kBytesPerFrame,kCapacityInFrames);
 
 
 void producerThread(oboe::FifoBuffer& buffer, const std::vector<float>& pcmData) {
