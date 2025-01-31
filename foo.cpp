@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     SwrContext *swr_context = swr_alloc_set_opts(
         NULL,
         av_get_default_channel_layout(2),
-        AV_SAMPLE_FMT_S16,
+        AV_SAMPLE_FMT_FLT,
         media->codecpar->sample_rate,
         av_get_default_channel_layout(2),
         (AVSampleFormat)media->codecpar->format,
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 
                 uint8_t **converted_data = NULL;
                 av_samples_alloc_array_and_samples(
-                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_S16, 0
+                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
                 );
 
                 int convert_ret = swr_convert(
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
                     return -1;
                 }
 
-                fwrite(converted_data[0], 1, convert_ret * 2 * sizeof(uint8_t), outfile);
+								fwrite(converted_data[0], sizeof(float), convert_ret * decoder_ctx->channels, outfile);
                 av_freep(&converted_data[0]);
             }
         }
