@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         av_get_default_channel_layout(2),
         AV_SAMPLE_FMT_S16,
         media->codecpar->sample_rate,
-        av_get_default_channel_layout(decoder_ctx->channels),
+        av_get_default_channel_layout(2),
         (AVSampleFormat)media->codecpar->format,
         media->codecpar->sample_rate,
         0,
