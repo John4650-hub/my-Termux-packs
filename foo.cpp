@@ -79,10 +79,10 @@ int main(int argc, char **argv) {
         NULL,
         av_get_default_channel_layout(2),
         AV_SAMPLE_FMT_FLT,
-        media->codecpar->sample_rate,
-        av_get_default_channel_layout(2),
-        (AVSampleFormat)media->codecpar->format,
-        media->codecpar->sample_rate,
+        48000,
+        av_get_default_channel_layout(decoder_ctx->channels),
+        decoder_ctx->sample_fmt,
+        decoder_ctx->sample_rate,
         0,
         NULL
     );
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
                     return -1;
                 }
 
-								fwrite(converted_data[0], sizeof(float), convert_ret * decoder_ctx->channels, outfile);
+								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
                 av_freep(&converted_data[0]);
             }
         }
