@@ -14,7 +14,7 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-constexpr int32_t kBufferSize=4096;
+constexpr int32_t kBufferSize = 4096;
 oboe::FifoBuffer<float> fifoBuffer(kBufferSize);
 
 void producerThread(oboe::FifoBuffer<float>& buffer, const std::vector<float>& pcmData) {
@@ -25,7 +25,6 @@ void producerThread(oboe::FifoBuffer<float>& buffer, const std::vector<float>& p
         writeIndex += framesToWrite;
     }
 }
-
 
 class MyAudioCallback : public oboe::AudioStreamCallback {
 public:
@@ -45,9 +44,7 @@ private:
     oboe::FifoBuffer<float>& fifoBuffer;
 };
 
-
 int main(int argc, char **argv) {
-	std::vector<float> pcmData;
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
@@ -126,55 +123,53 @@ int main(int argc, char **argv) {
         std::cerr << "Could not initialize resampler\n";
         return -1;
     }
-		std::thread([&](){
-    while (av_read_frame(formatCtx, packet) >= 0) {
-        if (packet->stream_index == stream_index) {
-            ret = avcodec_send_packet(decoder_ctx, packet);
-            if (ret < 0) {
-                std::cerr << "Error sending packet for decoding\n";
-                break;
-            }
 
-            while (ret >= 0) {
-                ret = avcodec_receive_frame(decoder_ctx, frame);
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+    std::vector<float> pcmData;
+
+    std::thread producer([&](){
+        while (av_read_frame(formatCtx, packet) >= 0) {
+            if (packet->stream_index == stream_index) {
+                ret = avcodec_send_packet(decoder_ctx, packet);
+                if (ret < 0) {
+                    std::cerr << "Error sending packet for decoding\n";
                     break;
-                } else if (ret < 0) {
-                    std::cerr << "Error during decoding\n";
-                    return -1;
                 }
 
-                int32_t **converted_data = NULL;
-                av_samples_alloc_array_and_samples(
-                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
-                );
+                while (ret >= 0) {
+                    ret = avcodec_receive_frame(decoder_ctx, frame);
+                    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                        break;
+                    } else if (ret < 0) {
+                        std::cerr << "Error during decoding\n";
+                        return -1;
+                    }
 
-                int convert_ret = swr_convert(
-                    swr_context, converted_data, frame->nb_samples,
-                    (const int8_t **)frame->data, frame->nb_samples
-                );
+                    uint8_t **converted_data = NULL;
+                    av_samples_alloc_array_and_samples(&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
 
-                if (convert_ret < 0) {
-                    std::cerr << "Error during resampling\n";
-                    return -1;
+                    int convert_ret = swr_convert(swr_context, converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+                    if (convert_ret < 0) {
+                        std::cerr << "Error during resampling\n";
+                        return -1;
+                    }
+
+                    pcmData.insert(pcmData.end(), (float*)converted_data[0], (float*)converted_data[0] + convert_ret * 2);
+                    av_freep(&converted_data[0]);
                 }
-
-								pcmData.push_back(converted_data[0]); //sizeof(float), convert_ret * 2, outfile);
-                av_freep(&converted_data[0]);
             }
+            av_packet_unref(packet);
         }
-        av_packet_unref(packet);
-    }
-		}).dispatch();
-		oboe::FifoBuffer<float> fifoBuffer(kBufferSize);
-    std::thread producer(producerThread, std::ref(fifoBuffer), std::ref(pcmData));
-		MyAudioCallback audioCallback(fifoBuffer);
-		oboe::AudioStreamBuilder builder;
+    });
+
+    MyAudioCallback audioCallback(fifoBuffer);
+
+    oboe::AudioStreamBuilder builder;
     builder.setFormat(oboe::AudioFormat::Float)
-           ->setSampleRate(48000)
-           ->setChannelCount(oboe::ChannelCount::Stereo)
-           ->setCallback(&audioCallback);
-		oboe::AudioStream* stream = nullptr;
+           .setSampleRate(48000)
+           .setChannelCount(oboe::ChannelCount::Stereo)
+           .setCallback(&audioCallback);
+
+    oboe::AudioStream* stream = nullptr;
     oboe::Result result = builder.openStream(&stream);
     if (result != oboe::Result::OK || stream == nullptr) {
         std::cerr << "Failed to open stream: " << oboe::convertToText(result) << std::endl;
@@ -182,7 +177,8 @@ int main(int argc, char **argv) {
     }
 
     stream->requestStart();
-		// Wait for playback to finish
+
+    // Wait for playback to finish
     producer.join();
     stream->stop();
     stream->close();
