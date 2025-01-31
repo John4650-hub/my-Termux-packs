@@ -39,8 +39,8 @@ void playAudio(const std::string& filePath,int ptime) {
 
     oboe::AudioStreamBuilder builder;
     builder.setCallback(&myCallback);
-   // builder.setFormat(oboe::AudioFormat::I16);
-   // builder.setChannelCount(oboe::ChannelCount::Stereo);
+    builder.setFormat(oboe::AudioFormat::I16);
+	  builder.setChannelCount(oboe::ChannelCount::Μono);
     //builder.setSampleRate(48000);
 
     oboe::AudioStream *media = nullptr;
