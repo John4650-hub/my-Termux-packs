@@ -2,6 +2,10 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstring>
+#include <thread>
+#include <chrono>
+#include "oboe/Oboe.h"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
