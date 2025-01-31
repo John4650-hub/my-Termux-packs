@@ -2,12 +2,6 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
-#include <thread>
-#include <vector>
-#include <algorithm>
-#include "oboe/Oboe.h"
-#include "oboe/FifoBuffer.h"
-
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -15,43 +9,18 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-constexpr uint32_t kBytesPerFrame = 4;  // Assuming 2 channels * 2 bytes per sample
-constexpr uint32_t kCapacityInFrames = 4096;
-oboe::FifoBuffer fifoBuffer(kBytesPerFrame,kCapacityInFrames);
-
-
-void producerThread(oboe::FifoBuffer& buffer, const std::vector<float>& pcmData) {
-    int32_t writeIndex = 0;
-    while (writeIndex < pcmData.size()) {
-        int32_t framesToWrite = std::min(kCapacityInFrames, static_cast<int32_t>(pcmData.size() - writeIndex));
-        buffer.write(pcmData.data() + writeIndex, framesToWrite);
-        writeIndex += framesToWrite;
-    }
+class MyCallback : public oboe::AudioStreamCallback{
+	public:
+		MyCallback()
 }
-
-class MyAudioCallback : public oboe::AudioStreamCallback {
-public:
-    MyAudioCallback(oboe::FifoBuffer& buffer) : fifoBuffer(buffer) {}
-
-    oboe::DataCallbackResult onAudioReady(oboe::AudioStream* audioStream, void* audioData, int32_t numFrames) override {
-        int32_t framesRead = fifoBuffer.read(static_cast<float*>(audioData), numFrames);
-        if (framesRead < numFrames) {
-            // Handle underflow (e.g., fill the rest with silence)
-            std::fill(static_cast<float*>(audioData) + framesRead, static_cast<float*>(audioData) + numFrames, 0.0f);
-            return oboe::DataCallbackResult::Continue;
-        }
-        return oboe::DataCallbackResult::Continue;
-    }
-
-private:
-    oboe::FifoBuffer& fifoBuffer;
-};
 
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
+
+
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -127,63 +96,44 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    std::vector<float> pcmData;
-
-    std::thread producer([&](){
-        while (av_read_frame(formatCtx, packet) >= 0) {
-            if (packet->stream_index == stream_index) {
-                ret = avcodec_send_packet(decoder_ctx, packet);
-                if (ret < 0) {
-                    std::cerr << "Error sending packet for decoding\n";
-                    break;
-                }
-
-                while (ret >= 0) {
-                    ret = avcodec_receive_frame(decoder_ctx, frame);
-                    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                        break;
-                    } else if (ret < 0) {
-                        std::cerr << "Error during decoding\n";
-                        return -1;
-                    }
-
-                    uint8_t **converted_data = NULL;
-                    av_samples_alloc_array_and_samples(&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
-
-                    int convert_ret = swr_convert(swr_context, converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
-                    if (convert_ret < 0) {
-                        std::cerr << "Error during resampling\n";
-                        return -1;
-                    }
-
-                    pcmData.insert(pcmData.end(), (float*)converted_data[0], (float*)converted_data[0] + convert_ret * 2);
-                    av_freep(&converted_data[0]);
-                }
+    while (av_read_frame(formatCtx, packet) >= 0) {
+        if (packet->stream_index == stream_index) {
+            ret = avcodec_send_packet(decoder_ctx, packet);
+            if (ret < 0) {
+                std::cerr << "Error sending packet for decoding\n";
+                break;
             }
-            av_packet_unref(packet);
+
+            while (ret >= 0) {
+                ret = avcodec_receive_frame(decoder_ctx, frame);
+                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                    break;
+                } else if (ret < 0) {
+                    std::cerr << "Error during decoding\n";
+                    return -1;
+                }
+
+                uint8_t **converted_data = NULL;
+                av_samples_alloc_array_and_samples(
+                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
+                );
+
+                int convert_ret = swr_convert(
+                    swr_context, converted_data, frame->nb_samples,
+                    (const uint8_t **)frame->data, frame->nb_samples
+                );
+
+                if (convert_ret < 0) {
+                    std::cerr << "Error during resampling\n";
+                    return -1;
+                }
+
+								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
+                av_freep(&converted_data[0]);
+            }
         }
-    });
-
-    MyAudioCallback audioCallback(fifoBuffer);
-    oboe::AudioStreamBuilder builder;
-    builder.setFormat(oboe::AudioFormat::Float)
-           ->setSampleRate(48000)
-           ->setChannelCount(oboe::ChannelCount::Stereo)
-           ->setCallback(&audioCallback);
-
-    oboe::AudioStream* stream = nullptr;
-    oboe::Result result = builder.openStream(&stream);
-    if (result != oboe::Result::OK || stream == nullptr) {
-        std::cerr << "Failed to open stream: " << oboe::convertToText(result) << std::endl;
-        return -1;
+        av_packet_unref(packet);
     }
-
-    stream->requestStart();
-
-    // Wait for playback to finish
-    producer.join();
-    stream->stop();
-    stream->close();
 
     fclose(outfile);
     av_frame_free(&frame);
