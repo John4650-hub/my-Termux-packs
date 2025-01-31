@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <thread>
 #include <vector>
-#include "oboe/Oboe.h"
-#include "oboe/FifoBuffer.h"
+#include <oboe/Oboe.h>
+#include <oboe/FifoBuffer.h>
 
 extern "C" {
     #include <libavformat/avformat.h>
