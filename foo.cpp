@@ -2,6 +2,8 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <thread>
+#include <vector>
 #include "oboe/Oboe.h"
 #include "oboe/FifoBuffer.h"
 
