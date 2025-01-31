@@ -2,6 +2,9 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include "oboe/Oboe.h"
+#include "oboe/FifoBuffer.h"
+
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -9,13 +12,44 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
+constexpr int32_t kBufferSize=4096;
+oboe::FifoBuffer<float> fifoBuffer(kBufferSize);
+
+void producerThread(oboe::FifoBuffer<float>& buffer, const std::vector<float>& pcmData) {
+    int32_t writeIndex = 0;
+    while (writeIndex < pcmData.size()) {
+        int32_t framesToWrite = std::min(kBufferSize, static_cast<int32_t>(pcmData.size() - writeIndex));
+        buffer.write(pcmData.data() + writeIndex, framesToWrite);
+        writeIndex += framesToWrite;
+    }
+}
+
+
+class MyAudioCallback : public oboe::AudioStreamCallback {
+public:
+    MyAudioCallback(oboe::FifoBuffer<float>& buffer) : fifoBuffer(buffer) {}
+
+    oboe::DataCallbackResult onAudioReady(oboe::AudioStream* audioStream, void* audioData, int32_t numFrames) override {
+        int32_t framesRead = fifoBuffer.read(static_cast<float*>(audioData), numFrames);
+        if (framesRead < numFrames) {
+            // Handle underflow (e.g., fill the rest with silence)
+            std::fill(static_cast<float*>(audioData) + framesRead, static_cast<float*>(audioData) + numFrames, 0.0f);
+            return oboe::DataCallbackResult::Continue;
+        }
+        return oboe::DataCallbackResult::Continue;
+    }
+
+private:
+    oboe::FifoBuffer<float>& fifoBuffer;
+};
+
+
 int main(int argc, char **argv) {
+	std::vector<float> pcmData;
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
-
-
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -90,7 +124,7 @@ int main(int argc, char **argv) {
         std::cerr << "Could not initialize resampler\n";
         return -1;
     }
-
+		std::thread([&](){
     while (av_read_frame(formatCtx, packet) >= 0) {
         if (packet->stream_index == stream_index) {
             ret = avcodec_send_packet(decoder_ctx, packet);
@@ -108,14 +142,14 @@ int main(int argc, char **argv) {
                     return -1;
                 }
 
-                uint8_t **converted_data = NULL;
+                int32_t **converted_data = NULL;
                 av_samples_alloc_array_and_samples(
                     &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
                 );
 
                 int convert_ret = swr_convert(
                     swr_context, converted_data, frame->nb_samples,
-                    (const uint8_t **)frame->data, frame->nb_samples
+                    (const int8_t **)frame->data, frame->nb_samples
                 );
 
                 if (convert_ret < 0) {
@@ -123,12 +157,33 @@ int main(int argc, char **argv) {
                     return -1;
                 }
 
-								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
+								pcmData.push_back(converted_data[0]); //sizeof(float), convert_ret * 2, outfile);
                 av_freep(&converted_data[0]);
             }
         }
         av_packet_unref(packet);
     }
+		}).dispatch();
+		oboe::FifoBuffer<float> fifoBuffer(kBufferSize);
+    std::thread producer(producerThread, std::ref(fifoBuffer), std::ref(pcmData));
+		MyAudioCallback audioCallback(fifoBuffer);
+		oboe::AudioStreamBuilder builder;
+    builder.setFormat(oboe::AudioFormat::Float)
+           ->setSampleRate(48000)
+           ->setChannelCount(oboe::ChannelCount::Stereo)
+           ->setCallback(&audioCallback);
+		oboe::AudioStream* stream = nullptr;
+    oboe::Result result = builder.openStream(&stream);
+    if (result != oboe::Result::OK || stream == nullptr) {
+        std::cerr << "Failed to open stream: " << oboe::convertToText(result) << std::endl;
+        return -1;
+    }
+
+    stream->requestStart();
+		// Wait for playback to finish
+    producer.join();
+    stream->stop();
+    stream->close();
 
     fclose(outfile);
     av_frame_free(&frame);
