@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <thread>
 #include <vector>
+#include <algorithm>
 #include "oboe/Oboe.h"
 #include "oboe/FifoBuffer.h"
 
@@ -16,7 +17,8 @@ extern "C" {
 
 constexpr uint32_t kBytesPerFrame = 4;  // Assuming 2 channels * 2 bytes per sample
 constexpr uint32_t kCapacityInFrames = 4096;
-oboe::FifoBuffer fifoBuffer(kBytesPerFrame, kCapacityInFrames);
+oboe::FifoBuffer fifoBuffer(kCapacityInFrames * kBytesPerFrame);
+
 
 void producerThread(oboe::FifoBuffer& buffer, const std::vector<float>& pcmData) {
     int32_t writeIndex = 0;
@@ -163,7 +165,6 @@ int main(int argc, char **argv) {
     });
 
     MyAudioCallback audioCallback(fifoBuffer);
-
     oboe::AudioStreamBuilder builder;
     builder.setFormat(oboe::AudioFormat::Float)
            ->setSampleRate(48000)
