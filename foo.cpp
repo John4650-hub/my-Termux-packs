@@ -15,8 +15,6 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-   // av_register_all();
-    // avcodec_register_all();
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -56,7 +54,6 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-// decoder_ctx->pkt_timebase = media->time_base;
     ret = avcodec_open2(decoder_ctx, decoder, NULL);
     if (ret < 0) {
         std::cerr << "Failed to open decoder\n";
