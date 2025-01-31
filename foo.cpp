@@ -9,10 +9,59 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
+uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) {
+    uint8_t **converted_data = NULL;
+    if (av_read_frame(formatCtx, packet) >= 0) {
+        if (packet->stream_index == *stream_index) {
+            int ret = avcodec_send_packet(decoder_ctx, packet);
+            if (ret < 0) {
+                std::cerr << "Error sending packet for decoding\n";
+                return NULL;
+            }
+
+            ret = avcodec_receive_frame(decoder_ctx, frame);
+            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                return NULL;
+            } else if (ret < 0) {
+                std::cerr << "Error during decoding\n";
+                return NULL;
+            }
+
+            av_samples_alloc_array_and_samples(&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
+
+            int convert_ret = swr_convert(swr_context, converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+
+            if (convert_ret < 0) {
+                std::cerr << "Error during resampling\n";
+                return NULL;
+            }
+        }
+        av_packet_unref(packet);
+    }
+    return converted_data;
+}
+
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback()
-}
+		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index){}
+		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
+			std::memcpy(audioData,getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
+		return  oboe::DataCallbackResult::Continue;
+		}
+		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
+        std::cerr << "Error before close: " << oboe::convertToText(error) << std::endl;
+    }
+
+    void onErrorAfterClose(oboe::AudioStream *media, oboe::Result error) override {
+        std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
+		}
+	private:
+		AVFormatContext mFormatCtx;
+		mPacket;
+		AVCodecContext mDecCtx;
+		AVFrame mFrame; SwrContext SwrCtx;
+		int mStream_index;
+};
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -95,47 +144,31 @@ int main(int argc, char **argv) {
         std::cerr << "Could not initialize resampler\n";
         return -1;
     }
+		//OBOE GOES HERE
+		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, stream_index);
+		oboe::AudioStreamBuilder builder;
+		builder.setCallback(&audioCallback);
+		builder.setFormat(oboe::AudioFormat::Float);
+		builder.setChannelCount(oboe::ChannelCount::Stereo);
+		builder.setSampleRate(48000);
 
-    while (av_read_frame(formatCtx, packet) >= 0) {
-        if (packet->stream_index == stream_index) {
-            ret = avcodec_send_packet(decoder_ctx, packet);
-            if (ret < 0) {
-                std::cerr << "Error sending packet for decoding\n";
-                break;
-            }
+		oboe::AudioStream *mediaStream=nullptr;
+		oboe::Result result = builder.openStream(&mediaStream);
 
-            while (ret >= 0) {
-                ret = avcodec_receive_frame(decoder_ctx, frame);
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                    break;
-                } else if (ret < 0) {
-                    std::cerr << "Error during decoding\n";
-                    return -1;
-                }
+		if(result != oboe::Result::OK){
+			std::cerr<<"failed to create stream\n";
+			return -1;
+		}
 
-                uint8_t **converted_data = NULL;
-                av_samples_alloc_array_and_samples(
-                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
-                );
+		result=mediaStream->start();
+		if(result != oboe::Result::Ok){
+			std::cerr << "failed to start stream\n";
+			return -1;
+		}
+		std::this_thread::sleep_for(std::chrono::minutes(1));
+		mediaStream.stop();
+		mediaStream.close();
 
-                int convert_ret = swr_convert(
-                    swr_context, converted_data, frame->nb_samples,
-                    (const uint8_t **)frame->data, frame->nb_samples
-                );
-
-                if (convert_ret < 0) {
-                    std::cerr << "Error during resampling\n";
-                    return -1;
-                }
-
-								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
-                av_freep(&converted_data[0]);
-            }
-        }
-        av_packet_unref(packet);
-    }
-
-    fclose(outfile);
     av_frame_free(&frame);
     av_packet_free(&packet);
     avcodec_free_context(&decoder_ctx);
