@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
     }
 
 
+
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
     if (ret < 0) {
