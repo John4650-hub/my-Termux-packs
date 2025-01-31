@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <thread>
 #include <vector>
-#include <oboe/Oboe.h>
-#include <oboe/FifoBuffer.h>
+#include "oboe/Oboe.h"
+#include "oboe/FifoBuffer.h"
 
 extern "C" {
     #include <libavformat/avformat.h>
@@ -14,13 +14,14 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-constexpr int32_t kBufferSize = 4096;
-oboe::FifoBuffer<float> fifoBuffer(kBufferSize);
+constexpr uint32_t kBytesPerFrame = 4;  // Assuming 2 channels * 2 bytes per sample
+constexpr uint32_t kCapacityInFrames = 4096;
+oboe::FifoBuffer fifoBuffer(kBytesPerFrame, kCapacityInFrames);
 
-void producerThread(oboe::FifoBuffer<float>& buffer, const std::vector<float>& pcmData) {
+void producerThread(oboe::FifoBuffer& buffer, const std::vector<float>& pcmData) {
     int32_t writeIndex = 0;
     while (writeIndex < pcmData.size()) {
-        int32_t framesToWrite = std::min(kBufferSize, static_cast<int32_t>(pcmData.size() - writeIndex));
+        int32_t framesToWrite = std::min(kCapacityInFrames, static_cast<int32_t>(pcmData.size() - writeIndex));
         buffer.write(pcmData.data() + writeIndex, framesToWrite);
         writeIndex += framesToWrite;
     }
@@ -28,7 +29,7 @@ void producerThread(oboe::FifoBuffer<float>& buffer, const std::vector<float>& p
 
 class MyAudioCallback : public oboe::AudioStreamCallback {
 public:
-    MyAudioCallback(oboe::FifoBuffer<float>& buffer) : fifoBuffer(buffer) {}
+    MyAudioCallback(oboe::FifoBuffer& buffer) : fifoBuffer(buffer) {}
 
     oboe::DataCallbackResult onAudioReady(oboe::AudioStream* audioStream, void* audioData, int32_t numFrames) override {
         int32_t framesRead = fifoBuffer.read(static_cast<float*>(audioData), numFrames);
@@ -41,7 +42,7 @@ public:
     }
 
 private:
-    oboe::FifoBuffer<float>& fifoBuffer;
+    oboe::FifoBuffer& fifoBuffer;
 };
 
 int main(int argc, char **argv) {
