@@ -165,9 +165,9 @@ int main(int argc, char **argv) {
 
     oboe::AudioStreamBuilder builder;
     builder.setFormat(oboe::AudioFormat::Float)
-           .setSampleRate(48000)
-           .setChannelCount(oboe::ChannelCount::Stereo)
-           .setCallback(&audioCallback);
+           ->setSampleRate(48000)
+           ->setChannelCount(oboe::ChannelCount::Stereo)
+           ->setCallback(&audioCallback);
 
     oboe::AudioStream* stream = nullptr;
     oboe::Result result = builder.openStream(&stream);
