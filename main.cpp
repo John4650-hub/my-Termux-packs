@@ -14,18 +14,18 @@ public:
         }
     }
 
-    oboe::DataCallbackResult onAudioReady(oboe::AudioStream *stream, void *audioData, int32_t numFrames) override {
-        if (!mFile.read(static_cast<char*>(audioData), numFrames * stream->getChannelCount() * sizeof(float))) {
+    oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media, void *audioData, int32_t numFrames) override {
+        if (!mFile.read(static_cast<char*>(audioData), numFrames * media->getChannelCount() * sizeof(float))) {
             return oboe::DataCallbackResult::Stop;
         }
         return oboe::DataCallbackResult::Continue;
     }
 
-    void onErrorBeforeClose(oboe::AudioStream *stream, oboe::Result error) override {
+    void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
         std::cerr << "Error before close: " << oboe::convertToText(error) << std::endl;
     }
 
-    void onErrorAfterClose(oboe::AudioStream *stream, oboe::Result error) override {
+    void onErrorAfterClose(oboe::AudioStream *media, oboe::Result error) override {
         std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
     }
 
@@ -43,26 +43,26 @@ void playAudio(const std::string& filePath,int ptime) {
    // builder.setChannelCount(oboe::ChannelCount::Stereo);
     //builder.setSampleRate(48000);
 
-    oboe::AudioStream *stream = nullptr;
-    oboe::Result result = builder.openStream(&stream);
+    oboe::AudioStream *media = nullptr;
+    oboe::Result result = builder.openStream(&media);
 
     if (result != oboe::Result::OK) {
         std::cerr << "Failed to create stream. Error: " << oboe::convertToText(result) << std::endl;
         return;
     }
 
-    result = stream->start();
+    result = media->start();
     if (result != oboe::Result::OK) {
         std::cerr << "Failed to start stream. Error: " << oboe::convertToText(result) << std::endl;
-        stream->close();
+        media->close();
         return;
     }
 
     // Sleep for the duration of the audio file
     std::this_thread::sleep_for(std::chrono::seconds(ptime*60)); // Adjust the duration as needed
 
-    stream->stop();
-    stream->close();
+    media->stop();
+    media->close();
 }
 
 int main(int argc, char **argv) {
