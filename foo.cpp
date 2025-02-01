@@ -61,14 +61,14 @@ uint32_t totalFrames(AVFormatContext *fmt_ctx) {
         return 0;
     }
 
-    AVPacket packet;
-    av_init_packet(&packet);
+    AVPacket packet1;
+    av_init_packet(&packet1);
 
-    while (av_read_frame(fmt_ctx, &packet) >= 0) {
-        if (packet.stream_index == audio_stream_index) {
-            total_frames += packet.duration;
+    while (av_read_frame(fmt_ctx, &packet1) >= 0) {
+        if (packet1.stream_index == audio_stream_index) {
+            total_frames += packet1.duration;
         }
-        av_packet_unref(&packet);
+        av_packet_unref(&packet1);
     }
 
     std::cout << "TotalFrames: " << total_frames << "\n";
