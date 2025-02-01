@@ -189,7 +189,8 @@ int main(int argc, char **argv) {
 		uint32_t bytesPerFrame = 4;
 		uint32_t CapacityInFrames = totalFrames(formatCtx);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
-		std::thread(getPcmData, formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff).detach();
+		std::thread t(getPcmData, formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
+	t.detach();
 		MyCallback audioCallback(buff);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
