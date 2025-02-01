@@ -1,4 +1,5 @@
-uint8_t **converted_data = NULL;
+fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
+int8_t **converted_data = NULL;
                 av_samples_alloc_array_and_samples(
                     &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
                 );

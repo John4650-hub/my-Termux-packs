@@ -14,9 +14,8 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) {
-    uint8_t **converted_data = NULL;
-    if (av_read_frame(formatCtx, packet) >= 0) {
+void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
+    while (av_read_frame(formatCtx, packet) >= 0) {
         if (packet->stream_index == *stream_index) {
             int ret = avcodec_send_packet(decoder_ctx, packet);
             if (ret < 0) {
@@ -25,6 +24,7 @@ uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContex
             }
 
             ret = avcodec_receive_frame(decoder_ctx, frame);
+						while(ret>=0){
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 return NULL;
             } else if (ret < 0) {
@@ -32,6 +32,7 @@ uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContex
                 return NULL;
             }
 
+						uint8_t **converted_data = NULL;
             av_samples_alloc_array_and_samples(&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
 
             int convert_ret = swr_convert(swr_context, converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
@@ -40,10 +41,13 @@ uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContex
                 std::cerr << "Error during resampling\n";
                 return NULL;
             }
+
+			Buff.write(converted_data[0],1);
+			av_freep(&converted_data[0])
         }
+				}
         av_packet_unref(packet);
-    }
-    return converted_data;
+		}
 }
 
 uint32_t totalFrames(AVFormatContext *fmt_ctx) {
@@ -77,10 +81,9 @@ uint32_t totalFrames(AVFormatContext *fmt_ctx) {
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &buff) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index),mBuff(buff){}
+		MyCallback(oboe::FifoBuffer &buff) : mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
-
-			mBuff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames);
+			std::cout << "starting playback\n";
 			mBuff.read(audioData,numFrames);
 		return  oboe::DataCallbackResult::Continue;
 		}
@@ -186,8 +189,8 @@ int main(int argc, char **argv) {
 		uint32_t bytesPerFrame = 4;
 		uint32_t CapacityInFrames = totalFrames(formatCtx);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
-
-		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index,buff);
+		std::thread(getPcmData, formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff).detach();
+		MyCallback audioCallback(buff);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
