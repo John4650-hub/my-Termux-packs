@@ -42,7 +42,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
                 return;
             }
 
-			Buff.write(converted_data[0],1);
+			Buff.write(converted_data[0],frame->nb_samples);
 			av_freep(&converted_data[0]);
         }
 				}
