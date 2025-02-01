@@ -15,7 +15,7 @@ extern "C" {
 }
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
-    while (av_read_frame(formatCtx, packet) >= 0) {
+    if (av_read_frame(formatCtx, packet) >= 0) {
         if (packet->stream_index == *stream_index) {
             int ret = avcodec_send_packet(decoder_ctx, packet);
             if (ret < 0) {
@@ -24,7 +24,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
             }
 
             ret = avcodec_receive_frame(decoder_ctx, frame);
-						while(ret>=0){
+						if(ret>=0){
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
                 return;
             } else if (ret < 0) {
