@@ -56,6 +56,7 @@ uint32_t totalFrames(AVFormatContext *fmt_ctx){
         }
     }
 	total_frames=fmt_ctx->streams[audio_stream_index]->nb_frames;
+	std::cout<<"TotalFrames: "<<total_frames<<"\n";
 	return total_frames;
 }
 
