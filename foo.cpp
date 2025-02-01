@@ -33,9 +33,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
             }
 
 						float *converted_data = NULL;
-            av_samples_alloc_array_and_samples((uint8_t **)&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
+            av_samples_alloc_array_and_samples((uint8_t **)converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
 
-            int convert_ret = swr_convert(swr_context, (uint8_t **)&converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+            int convert_ret = swr_convert(swr_context, (uint8_t **)converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
 
             if (convert_ret < 0) {
                 std::cerr << "Error during resampling\n";
