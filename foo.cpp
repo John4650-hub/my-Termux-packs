@@ -41,12 +41,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
                 std::cerr << "Error during resampling\n";
                 return;
             }
-			size_t numElms = sizeof(converted_data) / sizeof(uint8_t);
-			float floatDataArray[numElms];
-			for(size_t i=0;i<numElms;++i){
-				floatDataArray[i] = static_cast<float>(converted_data[0][i]);
-			}
-			Buff.write(floatDataArray,frame->nb_samples);
+			Buff.write(converted_data[0],frame->nb_samples);
 			//av_freep(&converted_data[0]);
         }
 				}
@@ -107,6 +102,26 @@ class MyCallback : public oboe::AudioStreamCallback{
 		int *mStream_index;
 		oboe::FifoBuffer &mBuff;
 };
+
+void playback(oboe::AudioStream* stream, oboe::FifoBuffer &buffer) {
+    int32_t numFrames = stream->getFramesPerBurst();
+    float* audioBuffer = new float[numFrames * stream->getChannelCount()];
+
+    while (true) {
+        int32_t framesRead = buffer.read(audioBuffer, numFrames);
+        if (framesRead > 0) {
+            oboe::ResultWithValue<int32_t> result = stream->write(audioBuffer, framesRead, oboe::kNanosPerSecond);
+            if (!result) {
+                std::cerr << "Stream write error: " << convertToText(result.error()) << std::endl;
+                break;
+            }
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep to avoid busy waiting
+        }
+    }
+
+    delete[] audioBuffer;
+}
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -197,9 +212,9 @@ int main(int argc, char **argv) {
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
 				});
 	t.detach();
-		MyCallback audioCallback(buff);
+		//MyCallback audioCallback(buff);
 		oboe::AudioStreamBuilder builder;
-		builder.setCallback(&audioCallback);
+		//builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
 		builder.setSampleRate(48000);
@@ -217,7 +232,8 @@ int main(int argc, char **argv) {
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
-		std::this_thread::sleep_for(std::chrono::minutes(5));
+		//std::this_thread::sleep_for(std::chrono::minutes(1));
+		playback(mediaStream,buff);
 		mediaStream->stop();
 		mediaStream->close();
 
