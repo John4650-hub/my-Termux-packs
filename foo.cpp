@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, stream_index);
+		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
 		}
 
 		result=mediaStream->start();
-		if(result != oboe::Result::Ok){
+		if(result != oboe::Result::OK){
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
