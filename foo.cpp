@@ -20,16 +20,16 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
             int ret = avcodec_send_packet(decoder_ctx, packet);
             if (ret < 0) {
                 std::cerr << "Error sending packet for decoding\n";
-                return NULL;
+                return;
             }
 
             ret = avcodec_receive_frame(decoder_ctx, frame);
 						while(ret>=0){
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                return NULL;
+                return;
             } else if (ret < 0) {
                 std::cerr << "Error during decoding\n";
-                return NULL;
+                return;
             }
 
 						uint8_t **converted_data = NULL;
@@ -39,7 +39,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
             if (convert_ret < 0) {
                 std::cerr << "Error during resampling\n";
-                return NULL;
+                return;
             }
 
 			Buff.write(converted_data[0],1);
