@@ -41,8 +41,12 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
                 std::cerr << "Error during resampling\n";
                 return;
             }
-
-			Buff.write(static_cast<float*>(converted_data[0]),frame->nb_samples);
+			size_t numElms = sizeof(converted_data) / sizeof(uint8_t);
+			float floatDataArray[numElms];
+			for(size_t i=0;i<numElms;++i){
+				floatDataArray[i] = static_cast<float>(converted_data[0][i]);
+			}
+			Buff.write(floatDataArray),frame->nb_samples);
 			//av_freep(&converted_data[0]);
         }
 				}
