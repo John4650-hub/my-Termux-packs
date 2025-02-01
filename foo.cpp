@@ -83,7 +83,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 	public:
 		MyCallback(oboe::FifoBuffer &buff) : mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
-			mBuff.read(audioData,numFrames);
+			mBuff.read((float *)audioData,numFrames);
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
