@@ -43,7 +43,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
             }
 
 			Buff.write(converted_data[0],1);
-			av_freep(&converted_data[0])
+			av_freep(&converted_data[0]);
         }
 				}
         av_packet_unref(packet);
@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
-		std::this_thread::sleep_for(std::chrono::minutes(1));
+		std::this_thread::sleep_for(std::chrono::minutes(5));
 		mediaStream->stop();
 		mediaStream->close();
 
