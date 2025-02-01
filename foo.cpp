@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include "oboe/Oboe.h"
+#include "oboe/FifoBuffer.h"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -45,11 +46,25 @@ uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContex
     return converted_data;
 }
 
+uint32_t totalFrames(AVFormatContext *fmt_ctx){
+	int audio_stream_index = -1;
+  uint32_t total_frames = 0;
+	for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
+        if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio_stream_index = i;
+            break;
+        }
+    }
+	total_frames=fmt_ctx->streams[audio_stream_index]->nb_frames;
+	return totalFrames;
+}
+
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index){}
+		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer *buff) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index),mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
-			std::memcpy(static_cast<char*>(audioData),getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
+			buff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
+			buff.read(audioData,numFrames * media->getChannelCount() * sizeof(float));
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
@@ -66,6 +81,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		AVFrame *mFrame; 
 		SwrContext *mSwrCtx;
 		int *mStream_index;
+		oboe::FifoBuffer *mBuff;
 };
 
 int main(int argc, char **argv) {
@@ -150,7 +166,11 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index);
+		uint32_t bytesPerFrame = 4;
+		uint32_t CapacityInFrames = totalFrames(formatCtx);
+		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
+
+		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index,&buff);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
