@@ -15,7 +15,6 @@ extern "C" {
 
 uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) {
     uint8_t **converted_data = NULL;
-		std::this_thread::sleep_for(std::chrono::seconds(5));
     if (av_read_frame(formatCtx, packet) >= 0) {
         if (packet->stream_index == *stream_index) {
             int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -50,7 +49,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 	public:
 		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
-			std::memcpy(audioData,getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
+			std::memcpy(static_cast<char*>(audioData),getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
