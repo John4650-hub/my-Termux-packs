@@ -56,15 +56,16 @@ uint32_t totalFrames(AVFormatContext *fmt_ctx){
         }
     }
 	total_frames=fmt_ctx->streams[audio_stream_index]->nb_frames;
-	return totalFrames;
+	return total_frames;
 }
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer *buff) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index),mBuff(buff){}
+		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &buff) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index),mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
-			buff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
-			buff.read(audioData,numFrames * media->getChannelCount() * sizeof(float));
+
+			mBuff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
+			mBuff.read(audioData,numFrames * media->getChannelCount() * sizeof(float));
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
@@ -81,7 +82,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		AVFrame *mFrame; 
 		SwrContext *mSwrCtx;
 		int *mStream_index;
-		oboe::FifoBuffer *mBuff;
+		oboe::FifoBuffer &mBuff;
 };
 
 int main(int argc, char **argv) {
@@ -170,7 +171,7 @@ int main(int argc, char **argv) {
 		uint32_t CapacityInFrames = totalFrames(formatCtx);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
 
-		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index,&buff);
+		MyCallback audioCallback(formatCtx, packet, decoder_ctx,frame, swr_context, &stream_index,buff);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
