@@ -15,6 +15,7 @@ extern "C" {
 
 uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index) {
     uint8_t **converted_data = NULL;
+		std::this_thread::sleep_for(std::chrono::seconds(5));
     if (av_read_frame(formatCtx, packet) >= 0) {
         if (packet->stream_index == *stream_index) {
             int ret = avcodec_send_packet(decoder_ctx, packet);
