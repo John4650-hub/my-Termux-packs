@@ -65,7 +65,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		AVCodecContext *mDecCtx;
 		AVFrame *mFrame; 
 		SwrContext *mSwrCtx;
-		int mStream_index;
+		int *mStream_index;
 };
 
 int main(int argc, char **argv) {
