@@ -46,18 +46,33 @@ uint8_t** getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContex
     return converted_data;
 }
 
-uint32_t totalFrames(AVFormatContext *fmt_ctx){
-	int audio_stream_index = -1;
-  uint32_t total_frames = 0;
-	for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
+uint32_t totalFrames(AVFormatContext *fmt_ctx) {
+    int audio_stream_index = -1;
+    uint32_t total_frames = 0;
+    for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
         if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_index = i;
             break;
         }
     }
-	total_frames=fmt_ctx->streams[audio_stream_index]->nb_frames;
-	std::cout<<"TotalFrames: "<<total_frames<<"\n";
-	return total_frames;
+
+    if (audio_stream_index == -1) {
+        std::cerr << "No audio stream found.\n";
+        return 0;
+    }
+
+    AVPacket packet;
+    av_init_packet(&packet);
+
+    while (av_read_frame(fmt_ctx, &packet) >= 0) {
+        if (packet.stream_index == audio_stream_index) {
+            total_frames += packet.duration;
+        }
+        av_packet_unref(&packet);
+    }
+
+    std::cout << "TotalFrames: " << total_frames << "\n";
+    return total_frames;
 }
 
 class MyCallback : public oboe::AudioStreamCallback{
