@@ -60,11 +60,11 @@ class MyCallback : public oboe::AudioStreamCallback{
         std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
 		}
 	private:
-		AVFormatContext mFormatCtx;
-		AVPacket mPacket;
-		AVCodecContext mDecCtx;
-		AVFrame mFrame; 
-		SwrContext SwrCtx;
+		AVFormatContext *mFormatCtx;
+		AVPacket *mPacket;
+		AVCodecContext *mDecCtx;
+		AVFrame *mFrame; 
+		SwrContext *mSwrCtx;
 		int mStream_index;
 };
 
@@ -171,8 +171,8 @@ int main(int argc, char **argv) {
 			return -1;
 		}
 		std::this_thread::sleep_for(std::chrono::minutes(1));
-		mediaStream.stop();
-		mediaStream.close();
+		mediaStream->stop();
+		mediaStream->close();
 
     av_frame_free(&frame);
     av_packet_free(&packet);
