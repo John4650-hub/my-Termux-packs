@@ -64,8 +64,8 @@ class MyCallback : public oboe::AudioStreamCallback{
 		MyCallback(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &buff) : mFormatCtx(formatCtx), mPacket(packet),mDecCtx(decoder_ctx),mFrame(frame),mSwrCtx(swr_context),mStream_index(stream_index),mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 
-			mBuff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames * media->getChannelCount() * sizeof(float));
-			mBuff.read(audioData,numFrames * media->getChannelCount() * sizeof(float));
+			mBuff.write(getPcmData(mFormatCtx, mPacket, mDecCtx, mFrame, mSwrCtx,mStream_index)[0],numFrames);
+			mBuff.read(audioData,numFrames);
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
