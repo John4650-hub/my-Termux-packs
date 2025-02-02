@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
         NULL,
         av_get_default_channel_layout(2),
         AV_SAMPLE_FMT_FLT,
-        48000,
+        decoder_ctx->sample_rate,
         av_get_default_channel_layout(decoder_ctx->channels),
         decoder_ctx->sample_fmt,
         decoder_ctx->sample_rate,
@@ -210,7 +210,8 @@ int main(int argc, char **argv) {
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
-		builder.setSampleRate(48000);
+		builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
+		builder.setSampleRate(decoder_ctx->sample_rate);
 
 		oboe::AudioStream *mediaStream=nullptr;
 		oboe::Result result = builder.openStream(&mediaStream);
