@@ -9,14 +9,42 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
+void decode_and_write(AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, FILE *outfile) {
+    int ret;
+    while (true) {
+        ret = avcodec_receive_frame(decoder_ctx, frame);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+            break;
+        } else if (ret < 0) {
+            std::cerr << "Error during decoding\n";
+            exit(1);
+        }
+
+        uint8_t **converted_data = NULL;
+        av_samples_alloc_array_and_samples(
+            &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
+        );
+
+        int convert_ret = swr_convert(
+            swr_context, converted_data, frame->nb_samples,
+            (const uint8_t **)frame->data, frame->nb_samples
+        );
+
+        if (convert_ret < 0) {
+            std::cerr << "Error during resampling\n";
+            exit(1);
+        }
+
+        fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
+        av_freep(&converted_data[0]);
+    }
+}
+
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
-
         return -1;
     }
-
-
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -99,37 +127,14 @@ int main(int argc, char **argv) {
                 std::cerr << "Error sending packet for decoding\n";
                 break;
             }
-
-            while (ret >= 0) {
-                ret = avcodec_receive_frame(decoder_ctx, frame);
-                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-                    break;
-                } else if (ret < 0) {
-                    std::cerr << "Error during decoding\n";
-                    return -1;
-                }
-
-                uint8_t **converted_data = NULL;
-                av_samples_alloc_array_and_samples(
-                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
-                );
-
-                int convert_ret = swr_convert(
-                    swr_context, converted_data, frame->nb_samples,
-                    (const uint8_t **)frame->data, frame->nb_samples
-                );
-
-                if (convert_ret < 0) {
-                    std::cerr << "Error during resampling\n";
-                    return -1;
-                }
-
-								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
-                av_freep(&converted_data[0]);
-            }
+            decode_and_write(decoder_ctx, frame, swr_context, outfile);
         }
         av_packet_unref(packet);
     }
+
+    // Flush the decoder
+    avcodec_send_packet(decoder_ctx, NULL);
+    decode_and_write(decoder_ctx, frame, swr_context, outfile);
 
     fclose(outfile);
     av_frame_free(&frame);
