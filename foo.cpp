@@ -16,26 +16,21 @@ extern "C" {
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
 	int ret = av_read_frame(formatCtx, packet);
-	std::cout<<"ret = "<<ret<<"\n";
 	while (av_read_frame(formatCtx, packet) >= 0) {
-					std::cout<<"Entered while loop\n";
 					if (packet->stream_index == *stream_index) {
-								std::cout<<"Inside if 1\n";
 							 ret = avcodec_send_packet(decoder_ctx, packet);
 							if (ret < 0) {
 									std::cerr << "Error sending packet for decoding\n";
 									break;
 							}
-
 							while (ret >= 0) {
-								std::cout<<"Entered while 2\n";
 									ret = avcodec_receive_frame(decoder_ctx, frame);
 									if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-								std::cout<<"Averror\n";
+								std::cout<<"Reached file end\n";
 											break;
 									} else if (ret < 0) {
 											std::cerr << "Error during decoding\n";
-											return;
+											break;
 									}
 
 									uint8_t **converted_data = NULL;
@@ -50,11 +45,10 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 									if (convert_ret < 0) {
 											std::cerr << "Error during resampling\n";
-											return;
+											break;
 									}
 
 								Buff.write(converted_data[0],frame->nb_samples);
-								std::cout<<"Written to buffer\n";
 									av_freep(&converted_data[0]);
 							}
 					}
@@ -69,8 +63,13 @@ uint32_t totalFrames(const char* filename) {
 		int ret = avformat_open_input(&fmt_ctx_t, filename, NULL, NULL);
 		if (ret < 0) {
 				std::cerr << "Can't open file\n";
-				return -1;
+				return 1;
 		}
+		if (avformat_find_stream_info(fmt_ctx_t, nullptr) < 0) {
+        std::cerr << "Could not find stream information\n";
+        avformat_close_input(&fmt_ctx);
+        return 1;
+    }
     for (unsigned int i = 0; i < fmt_ctx_t->nb_streams; i++) {
         if (fmt_ctx_t->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_index = i;
@@ -93,7 +92,6 @@ uint32_t totalFrames(const char* filename) {
         av_packet_unref(&packet1);
     }
 		avformat_close_input(&fmt_ctx_t);
-    std::cout << "TotalFrames: " << total_frames << "\n";
     return total_frames;
 }
 
@@ -123,33 +121,11 @@ class MyCallback : public oboe::AudioStreamCallback{
 		oboe::FifoBuffer &mBuff;
 };
 
-void playback(oboe::AudioStream* stream, oboe::FifoBuffer &buffer) {
-    int32_t numFrames = stream->getFramesPerBurst();
-    float* audioBuffer = new float[numFrames * stream->getChannelCount()];
-
-    while (true) {
-        int32_t framesRead = buffer.read(audioBuffer, numFrames);
-        if (framesRead > 0) {
-            oboe::ResultWithValue<int32_t> result = stream->write(audioBuffer, framesRead, oboe::kNanosPerSecond);
-            if (!result) {
-                std::cerr << "Stream write error: " << convertToText(result.error()) << std::endl;
-                break;
-            }
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Sleep to avoid busy waiting
-        }
-    }
-
-    delete[] audioBuffer;
-}
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
-
-
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -252,7 +228,10 @@ int main(int argc, char **argv) {
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
-		std::this_thread::sleep_for(std::chrono::minutes(1));
+		int64_t duration = formatCtx->duration + (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
+    double duration_seconds = duration / (double)AV_TIME_BASE;
+		std::cout<<"duration: "<<duration_seconds<<std::endl;
+		std::this_thread::sleep_for(std::chrono::seconds(duration_seconds));
 		mediaStream->stop();
 		mediaStream->close();
 
