@@ -51,7 +51,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 											return;
 									}
 
-								Buff.write(converted_data[0],nb_samp);
+								Buff.write(converted_data[0],frame->nb_samples);
 								std::cout<<"Written to buffer\n";
 									av_freep(&converted_data[0]);
 							}
