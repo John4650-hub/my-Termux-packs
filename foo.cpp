@@ -35,7 +35,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 											std::cerr << "Error during decoding\n";
 											return;
 									}
-j
+
 									uint8_t **converted_data = NULL;
 									av_samples_alloc_array_and_samples(
 											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
