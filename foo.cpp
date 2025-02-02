@@ -25,10 +25,15 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 							}
 							while (ret >= 0) {
 									ret = avcodec_receive_frame(decoder_ctx, frame);
-									if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-								std::cout<<"Reached file end\n";
+									if (ret == AVERROR(EAGAIN){
+											std::cout<<"More packets are needed";
 											break;
-									} else if (ret < 0) {
+									} 
+									else if(ret == AVERROR_EOF){
+											std::cout<<"reached end of file";
+											return;
+									}
+									else if (ret < 0) {
 											std::cerr << "Error during decoding\n";
 											break;
 									}
