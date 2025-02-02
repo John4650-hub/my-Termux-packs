@@ -15,11 +15,13 @@ extern "C" {
 }
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
+	int ret = av_read_frame(formatCtx, packet)
+	std::cout<<"ret = "<<ret<<"\n";
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					std::cout<<"Entered while loop\n";
 					if (packet->stream_index == *stream_index) {
 								std::cout<<"Inside if 1\n";
-							int ret = avcodec_send_packet(decoder_ctx, packet);
+							 ret = avcodec_send_packet(decoder_ctx, packet);
 							if (ret < 0) {
 									std::cerr << "Error sending packet for decoding\n";
 									break;
