@@ -17,7 +17,7 @@ extern "C" {
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					std::cout<<"Entered while loop\n";
-					if (packet->stream_index == stream_index) {
+					if (packet->stream_index == *stream_index) {
 								std::cout<<"Inside if 1\n";
 							int ret = avcodec_send_packet(decoder_ctx, packet);
 							if (ret < 0) {
@@ -33,9 +33,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 											break;
 									} else if (ret < 0) {
 											std::cerr << "Error during decoding\n";
-											return -1;
+											return;
 									}
-
+j
 									uint8_t **converted_data = NULL;
 									av_samples_alloc_array_and_samples(
 											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
@@ -48,7 +48,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 									if (convert_ret < 0) {
 											std::cerr << "Error during resampling\n";
-											return -1;
+											return;
 									}
 
 								Buff.write(converted_data[0],nb_samp);
