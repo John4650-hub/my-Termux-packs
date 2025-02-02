@@ -56,11 +56,11 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 			}
 }
 
-uint32_t totalFrames(const char* filename) {
+uint32_t totalFrames(const char *filename) {
+		std::cout<<"here is the problem";
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
 		AVFormatContext *fmt_ctx_t = NULL;
-		std::cout<<"here is the problem";
 		int ret = avformat_open_input(&fmt_ctx_t, filename, NULL, NULL);
 		if (ret < 0) {
 				std::cerr << "Can't open file\n";
@@ -196,7 +196,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		uint32_t bytesPerFrame = 8;
-		uint32_t CapacityInFrames =totalFrames(argv[1]);
+		uint32_t CapacityInFrames =90000000; //totalFrames(argv[1]);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
