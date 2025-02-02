@@ -60,6 +60,7 @@ uint32_t totalFrames(const char* filename) {
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
 		AVFormatContext *fmt_ctx_t = NULL;
+		std::cout<<"here is the problem";
 		int ret = avformat_open_input(&fmt_ctx_t, filename, NULL, NULL);
 		if (ret < 0) {
 				std::cerr << "Can't open file\n";
