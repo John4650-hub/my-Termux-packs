@@ -220,7 +220,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		uint32_t bytesPerFrame = 8;
-		uint32_t CapacityInFrames = totalFrames(formatCtx);
+		uint32_t CapacityInFrames =3562496; //totalFrames(formatCtx);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
