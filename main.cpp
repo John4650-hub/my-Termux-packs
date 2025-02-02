@@ -1,173 +1,143 @@
+#include <iostream>
+#include <string>
+#include <stdlib.h>
 #include <stdio.h>
-#include <oboe/Oboe.h>
-#include <thread>
-#include <chrono>
-#include <mutex>
-#include <condition_variable>
-#include <vector>
-#include <fstream>
-
-extern "C"{
+extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
     #include <libavutil/avutil.h>
     #include <libswresample/swresample.h>
 }
 
-class AudioEngine : public oboe::AudioStreamCallback {
-public:
-    bool start();
-    void stop();
-
-    // Oboe callback
-    oboe::DataCallbackResult onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) override;
-    void enqueuePCMData(uint8_t *data, size_t size);
-
-private:
-    std::shared_ptr<oboe::AudioStream> mStream;
-    std::vector<uint8_t> mBuffer;
-    std::mutex mMutex;
-    std::condition_variable mCondVar;
-    std::ofstream pcmFile;
-};
-
-bool AudioEngine::start() {
-    oboe::AudioStreamBuilder builder;
-    builder.setDirection(oboe::Direction::Output)
-           ->setFormat(oboe::AudioFormat::I16)
-           ->setChannelCount(oboe::ChannelCount::Stereo)
-           ->setSampleRate(44100)
-           ->setCallback(this);
-
-    oboe::Result result = builder.openStream(mStream);
-    if (result != oboe::Result::OK) return false;
-
-    pcmFile.open("output.pcm", std::ios::binary);
-    if (!pcmFile.is_open()) {
-        fprintf(stderr, "ERROR: failed to open output.pcm\n");
-        return false;
-    }
-
-    return mStream->start() == oboe::Result::OK;
-}
-
-void AudioEngine::stop() {
-    if (mStream) {
-        mStream->stop();
-        mStream->close();
-    }
-    if (pcmFile.is_open()) {
-        pcmFile.close();
-    }
-}
-
-oboe::DataCallbackResult AudioEngine::onAudioReady(oboe::AudioStream *oboeStream, void *audioData, int32_t numFrames) {
-    size_t bytesToCopy = numFrames * mStream->getChannelCount() * sizeof(int16_t);
-    if (bytesToCopy > mBuffer.size()) bytesToCopy = mBuffer.size();
-
-    memcpy(audioData, mBuffer.data(), bytesToCopy);
-    pcmFile.write(reinterpret_cast<const char*>(mBuffer.data()), bytesToCopy);
-    mBuffer.erase(mBuffer.begin(), mBuffer.begin() + bytesToCopy);
-
-    return oboe::DataCallbackResult::Continue;
-}
-
-void AudioEngine::enqueuePCMData(uint8_t *data, size_t size) {
-    //std::lock_guard<std::mutex> lock(mMutex);
-    mBuffer.insert(mBuffer.end(), data, data + size);
-   // mCondVar.notify_one();
-}
-
 int main(int argc, char **argv) {
     if (argc < 2) {
-        printf("Usage: %s <input_file>\n", argv[0]);
+        ustd::cerr << "Usage: " << argv[0] << " <input file>\n";
+
         return -1;
     }
 
-    int ret{};
-    AVFormatContext *format_context = NULL;
-    ret = avformat_open_input(&format_context, argv[1], NULL, NULL);
+
+
+    AVFormatContext *formatCtx = NULL;
+    int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
     if (ret < 0) {
-        fprintf(stderr, "ERROR: failed to open the media file '%s'\n", argv[1]);
+        std::cerr << "Can't open file\n";
         return -1;
     }
 
-    ret = avformat_find_stream_info(format_context, NULL);
+    ret = avformat_find_stream_info(formatCtx, NULL);
     if (ret < 0) {
-        fprintf(stderr, "ERROR: failed to find stream info\n");
+        std::cerr << "Could not find any info\n";
         return -1;
     }
 
-    int stream_index = av_find_best_stream(format_context, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
+    int stream_index = av_find_best_stream(formatCtx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
     if (stream_index < 0) {
-        fprintf(stderr, "ERROR: no audio stream found in '%s'\n", argv[1]);
+        std::cerr << "No audio stream found\n";
         return -1;
     }
 
-    const AVStream *stream = format_context->streams[stream_index];
-    const AVCodec *decoder = avcodec_find_decoder(stream->codecpar->codec_id);
+    AVStream *media = formatCtx->streams[stream_index];
+    AVCodec *decoder = avcodec_find_decoder(media->codecpar->codec_id);
     if (!decoder) {
-        fprintf(stderr, "ERROR: no decoder found\n");
+        std::cerr << "Decoder not found\n";
         return -1;
     }
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
-    avcodec_parameters_to_context(decoder_ctx, stream->codecpar);
+    if (!decoder_ctx) {
+        std::cerr << "Could not allocate decoder context\n";
+        return -1;
+    }
+
+    ret = avcodec_parameters_to_context(decoder_ctx, media->codecpar);
+    if (ret < 0) {
+        std::cerr << "Could not copy codec parameters\n";
+        return -1;
+    }
+
     ret = avcodec_open2(decoder_ctx, decoder, NULL);
     if (ret < 0) {
-        fprintf(stderr, "ERROR: failed to open the decoder\n");
+        std::cerr << "Failed to open decoder\n";
+        return -1;
+    }
+
+    FILE *outfile = fopen("output.pcm", "wb");
+    if (!outfile) {
+        std::cerr << "Could not open output file\n";
+        avcodec_free_context(&decoder_ctx);
         return -1;
     }
 
     AVPacket *packet = av_packet_alloc();
     AVFrame *frame = av_frame_alloc();
-    SwrContext *swr_context = swr_alloc_set_opts(
-        NULL, 
-				av_get_default_channel_layout(2), 
-				AV_SAMPLE_FMT_S16,
-				stream->codecpar->sample_rate,
-				av_get_default_channel_layout(2),
-				(AVSampleFormat)stream->codecpar->format, 
-				stream->codecpar->sample_rate,
-				0,
-				NULL
-				);
-    swr_init(swr_context);
-
-    AudioEngine audioEngine;
-    if (!audioEngine.start()) {
-        fprintf(stderr, "ERROR: failed to start audio engine\n");
+    if (!packet || !frame) {
+        std::cerr << "Could not allocate packet or frame\n";
         return -1;
     }
 
-    std::thread decodeThread([&]() {
-        while (av_read_frame(format_context, packet) == 0) {
-            if (packet->stream_index != stream_index) continue;
+    SwrContext *swr_context = swr_alloc_set_opts(
+        NULL,
+        av_get_default_channel_layout(2),
+        AV_SAMPLE_FMT_FLT,
+        48000,
+        av_get_default_channel_layout(decoder_ctx->channels),
+        decoder_ctx->sample_fmt,
+        decoder_ctx->sample_rate,
+        0,
+        NULL
+    );
+    if (!swr_context || swr_init(swr_context) < 0) {
+        std::cerr << "Could not initialize resampler\n";
+        return -1;
+    }
 
+    while (av_read_frame(formatCtx, packet) >= 0) {
+        if (packet->stream_index == stream_index) {
             ret = avcodec_send_packet(decoder_ctx, packet);
-            if (ret < 0 && (ret != AVERROR(EAGAIN))) {
-                fprintf(stderr, "ERROR: failed to decode a frame\n");
-                continue;
+            if (ret < 0) {
+                std::cerr << "Error sending packet for decoding\n";
+                break;
             }
 
-            while ((ret = avcodec_receive_frame(decoder_ctx, frame)) == 0) {
-                uint8_t *output[2];
-                int out_samples = swr_convert(swr_context, output, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
-                size_t out_size = out_samples * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16) * 2; // 2 channels
-                audioEngine.enqueuePCMData(output[0], out_size);
+            while (ret >= 0) {
+                ret = avcodec_receive_frame(decoder_ctx, frame);
+                if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+                    break;
+                } else if (ret < 0) {
+                    std::cerr << "Error during decoding\n";
+                    return -1;
+                }
+
+                uint8_t **converted_data = NULL;
+                av_samples_alloc_array_and_samples(
+                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
+                );
+
+                int convert_ret = swr_convert(
+                    swr_context, converted_data, frame->nb_samples,
+                    (const uint8_t **)frame->data, frame->nb_samples
+                );
+
+                if (convert_ret < 0) {
+                    std::cerr << "Error during resampling\n";
+                    return -1;
+                }
+
+								fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
+                av_freep(&converted_data[0]);
             }
         }
-    });
+        av_packet_unref(packet);
+    }
 
-    decodeThread.join();
-		std::this_thread::sleep_for(std::chrono::minutes(4));
-    audioEngine.stop();
-
-    av_packet_free(&packet);
+    fclose(outfile);
     av_frame_free(&frame);
+    av_packet_free(&packet);
+    avcodec_free_context(&decoder_ctx);
+    avformat_close_input(&formatCtx);
     swr_free(&swr_context);
-    avcodec_close(decoder_ctx);
-    avformat_close_input(&format_context);
 
+    std::cout << "Decoding finished successfully\n";
     return 0;
 }
