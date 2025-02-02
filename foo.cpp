@@ -17,7 +17,7 @@ extern "C" {
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
-							 ret = avcodec_send_packet(decoder_ctx, packet);
+							 int ret = avcodec_send_packet(decoder_ctx, packet);
 							if (ret < 0) {
 									std::cerr << "Error sending packet for decoding\n";
 									break;
