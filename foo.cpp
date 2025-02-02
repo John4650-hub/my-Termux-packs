@@ -62,11 +62,17 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 			}
 }
 
-uint32_t totalFrames(AVFormatContext *fmt_ctx) {
+uint32_t totalFrames(const char* filename) {
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
-    for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
-        if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+		AVFormatContext *fmt_ctx_t = NULL;
+		int ret = avformat_open_input(&fmt_ctx_t, filename, NULL, NULL);
+		if (ret < 0) {
+				std::cerr << "Can't open file\n";
+				return -1;
+		}
+    for (unsigned int i = 0; i < fmt_ctx_t->nb_streams; i++) {
+        if (fmt_ctx_t->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             audio_stream_index = i;
             break;
         }
@@ -80,13 +86,13 @@ uint32_t totalFrames(AVFormatContext *fmt_ctx) {
     AVPacket packet1;
     av_init_packet(&packet1);
 
-    while (av_read_frame(fmt_ctx, &packet1) >= 0) {
+    while (av_read_frame(fmt_ctx_t, &packet1) >= 0) {
         if (packet1.stream_index == audio_stream_index) {
             total_frames += packet1.duration;
         }
         av_packet_unref(&packet1);
     }
-
+		avformat_close_input(&fmt_ctx_t);
     std::cout << "TotalFrames: " << total_frames << "\n";
     return total_frames;
 }
@@ -220,7 +226,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		uint32_t bytesPerFrame = 8;
-		uint32_t CapacityInFrames =3562496; //totalFrames(formatCtx);
+		uint32_t CapacityInFrames =totalFrames(argv[1]);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);

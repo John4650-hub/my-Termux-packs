@@ -1,6 +1,28 @@
-fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
-int8_t **converted_data = NULL;
-                av_samples_alloc_array_and_samples(
-                    &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
-                );
+uint32_t totalFrames(AVFormatContext *fmt_ctx) {
+    int audio_stream_index = -1;
+    uint32_t total_frames = 0;
+    for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
+        if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            audio_stream_index = i;
+            break;
+        }
+    }
 
+    if (audio_stream_index == -1) {
+        std::cerr << "No audio stream found.\n";
+        return 0;
+    }
+
+    AVPacket packet1;
+    av_init_packet(&packet1);
+
+    while (av_read_frame(fmt_ctx, &packet1) >= 0) {
+        if (packet1.stream_index == audio_stream_index) {
+            total_frames += packet1.duration;
+        }
+        av_packet_unref(&packet1);
+    }
+
+    std::cout << "TotalFrames: " << total_frames << "\n";
+    return total_frames;
+}
