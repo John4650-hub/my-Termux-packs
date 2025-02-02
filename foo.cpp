@@ -15,7 +15,7 @@ extern "C" {
 }
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
-	int ret = av_read_frame(formatCtx, packet);
+	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 ret = avcodec_send_packet(decoder_ctx, packet);
@@ -62,7 +62,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 }
 
 uint32_t totalFrames(const char *filename) {
-		std::cout<<"here is the problem";
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
 		AVFormatContext *fmt_ctx_t = NULL;
