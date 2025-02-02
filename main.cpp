@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
             resampled_frame->format = AV_SAMPLE_FMT_FLT;
 
 
-              ret = convert_ret = swr_convert_frame(swr_context, resampled_frame,frame);
+              ret = swr_convert_frame(swr_context, resampled_frame,frame);
 
 								fwrite(resampled_frame->data[0], sizeof(float), resampled_frame->nb_samples * resampled_frame->channels*2, outfile);
                 av_frame_unref(frame);
