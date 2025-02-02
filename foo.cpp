@@ -42,6 +42,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
                 return;
             }
 			Buff.write(converted_data[0],frame->nb_samples);
+			std::cout<<"frames written:"<<frame->nb_samples;
 			//av_freep(&converted_data[0]);
         }
 				}
@@ -82,6 +83,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 	public:
 		MyCallback(oboe::FifoBuffer &buff) : mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
+			std::cout<<" ,frames Read: "<< numFrames<<"\n";;
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
 		return  oboe::DataCallbackResult::Continue;
@@ -205,16 +207,16 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		uint32_t bytesPerFrame = 4;
+		uint32_t bytesPerFrame = 8;
 		uint32_t CapacityInFrames = totalFrames(formatCtx);
 		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
 				});
 	t.detach();
-		//MyCallback audioCallback(buff);
+		MyCallback audioCallback(buff);
 		oboe::AudioStreamBuilder builder;
-		//builder.setCallback(&audioCallback);
+		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::Float);
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
 		builder.setSampleRate(48000);
@@ -232,8 +234,7 @@ int main(int argc, char **argv) {
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
-		//std::this_thread::sleep_for(std::chrono::minutes(1));
-		playback(mediaStream,buff);
+		std::this_thread::sleep_for(std::chrono::minutes(1));
 		mediaStream->stop();
 		mediaStream->close();
 
