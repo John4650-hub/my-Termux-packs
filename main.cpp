@@ -9,37 +9,6 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-void decode_and_write(AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, FILE *outfile) {
-    int ret;
-    while (true) {
-        ret = avcodec_receive_frame(decoder_ctx, frame);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-            break;
-        } else if (ret < 0) {
-            std::cerr << "Error during decoding\n";
-            exit(1);
-        }
-
-        uint8_t **converted_data = NULL;
-        av_samples_alloc_array_and_samples(
-            &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
-        );
-
-        int convert_ret = swr_convert(
-            swr_context, converted_data, frame->nb_samples,
-            (const uint8_t **)frame->data, frame->nb_samples
-        );
-
-        if (convert_ret < 0) {
-            std::cerr << "Error during resampling\n";
-            exit(1);
-        }
-
-        fwrite(converted_data[0], sizeof(float), convert_ret * 2, outfile);
-        av_freep(&converted_data[0]);
-    }
-}
-
 int main(int argc, char **argv) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
@@ -120,21 +89,74 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    while (av_read_frame(formatCtx, packet) >= 0) {
-        if (packet->stream_index == stream_index) {
-            ret = avcodec_send_packet(decoder_ctx, packet);
-            if (ret < 0) {
-                std::cerr << "Error sending packet for decoding\n";
-                break;
+    while (av_read_frame(formatCtx, packet) == 0) {
+        if (packet->stream_index != stream_index) {
+            av_packet_unref(packet);
+            continue;
+        }
+
+        ret = avcodec_send_packet(decoder_ctx, packet);
+        if (ret < 0 && (ret != AVERROR(EAGAIN))) {
+            std::cerr << "ERROR: failed to decode a frame\n";
+            av_packet_unref(packet);
+            continue;
+        }
+
+        while ((ret = avcodec_receive_frame(decoder_ctx, frame)) == 0) {
+            AVFrame *resampled_frame = av_frame_alloc();
+            if (!resampled_frame) {
+                std::cerr << "Could not allocate resampled frame\n";
+                return -1;
             }
-            decode_and_write(decoder_ctx, frame, swr_context, outfile);
+            resampled_frame->sample_rate = frame->sample_rate;
+            resampled_frame->channel_layout = frame->channel_layout;
+            resampled_frame->channels = frame->channels;
+            resampled_frame->format = AV_SAMPLE_FMT_FLT;
+
+            ret = swr_convert_frame(swr_context, resampled_frame, frame);
+            if (ret < 0) {
+                std::cerr << "Error during resampling\n";
+                av_frame_free(&resampled_frame);
+                return -1;
+            }
+
+            fwrite(resampled_frame->data[0], 1,
+                   resampled_frame->nb_samples * resampled_frame->channels * 2,
+                   outfile);
+
+            av_frame_unref(frame);
+            av_frame_free(&resampled_frame);
         }
         av_packet_unref(packet);
     }
 
     // Flush the decoder
     avcodec_send_packet(decoder_ctx, NULL);
-    decode_and_write(decoder_ctx, frame, swr_context, outfile);
+    while ((ret = avcodec_receive_frame(decoder_ctx, frame)) == 0) {
+        AVFrame *resampled_frame = av_frame_alloc();
+        if (!resampled_frame) {
+            std::cerr << "Could not allocate resampled frame\n";
+            return -1;
+        }
+        resampled_frame->sample_rate = frame->sample_rate;
+        resampled_frame->channel_layout = frame->channel_layout;
+        resampled_frame->channels = frame->channels;
+        resampled_frame->format = AV_SAMPLE_FMT_FLT;
+
+        ret = swr_convert_frame(swr_context, resampled_frame, frame);
+        if (ret < 0) {
+            std::cerr << "Error during resampling\n";
+            av_frame_free(&resampled_frame);
+            return -1;
+        }
+
+        fwrite(resampled_frame->data[0], 1,
+               resampled_frame->nb_samples * resampled_frame->channels * 2,
+               outfile);
+
+        av_frame_unref(frame);
+        av_frame_free(&resampled_frame);
+    }
 
     fclose(outfile);
     av_frame_free(&frame);
