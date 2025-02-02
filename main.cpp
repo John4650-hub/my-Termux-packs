@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
           break;
         }
 
-              while((ret = avcodec_receive_frame(decoder_ctx, frame)==0){
+              while((ret = avcodec_receive_frame(decoder_ctx, frame))==0){
             AVFrame *resampled_frame = av_frame_alloc();
             resampled_frame->sample_rate = frame->sample_rate;
             resampled_frame->channel_layout = frame->channel_layout;
