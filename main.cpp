@@ -11,7 +11,7 @@ extern "C" {
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        ustd::cerr << "Usage: " << argv[0] << " <input file>\n";
+        std::cerr << "Usage: " << argv[0] << " <input file>\n";
 
         return -1;
     }
