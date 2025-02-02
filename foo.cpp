@@ -15,44 +15,49 @@ extern "C" {
 }
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
-		std::cout<<"while start\n";
-    while (av_read_frame(formatCtx, packet) >= 0) {
-        if (packet->stream_index == *stream_index) {
-					std::cout<<"if1\n";
-            int ret = avcodec_send_packet(decoder_ctx, packet);
-            if (ret < 0) {
+	while (av_read_frame(formatCtx, packet) >= 0) {
+					std::cout<<"Entered while loop\n";
+					if (packet->stream_index == stream_index) {
+								std::cout<<"Inside if 1\n";
+							int ret = avcodec_send_packet(decoder_ctx, packet);
+							if (ret < 0) {
+									std::cerr << "Error sending packet for decoding\n";
+									break;
+							}
 
-					std::cout<<"if2\n";
-                std::cerr << "Error sending packet for decoding\n";
-                return;
-            }
+							while (ret >= 0) {
+								std::cout<<"Entered while 2\n";
+									ret = avcodec_receive_frame(decoder_ctx, frame);
+									if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+								std::cout<<"Averror\n";
+											break;
+									} else if (ret < 0) {
+											std::cerr << "Error during decoding\n";
+											return -1;
+									}
 
-            ret = avcodec_receive_frame(decoder_ctx, frame);
-						while(ret>=0){
-            if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
-							std::cout<<"AVERROR\n";
-                return;
-            } else if (ret < 0) {
-                std::cerr << "Error during decoding\n";
-                return;
-            }
+									uint8_t **converted_data = NULL;
+									av_samples_alloc_array_and_samples(
+											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
+									);
 
-						uint8_t **converted_data = NULL;
-            av_samples_alloc_array_and_samples(&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0);
+									int convert_ret = swr_convert(
+											swr_context, converted_data, frame->nb_samples,
+											(const uint8_t **)frame->data, frame->nb_samples
+									);
 
-            int convert_ret = swr_convert(swr_context,converted_data, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+									if (convert_ret < 0) {
+											std::cerr << "Error during resampling\n";
+											return -1;
+									}
 
-            if (convert_ret < 0) {
-                std::cerr << "Error during resampling\n";
-                return;
-            }
-			Buff.write(converted_data[0],frame->nb_samples);
-			std::cout<<"frames written:"<<frame->nb_samples;
-			//av_freep(&converted_data[0]);
-        }
-				}
-        av_packet_unref(packet);
-		}
+								Buff.write(converted_data[0],nb_samp);
+								std::cout<<"Written to buffer\n";
+									av_freep(&converted_data[0]);
+							}
+					}
+					av_packet_unref(packet);
+			}
 }
 
 uint32_t totalFrames(AVFormatContext *fmt_ctx) {
