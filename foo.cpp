@@ -20,21 +20,19 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
 							if (ret < 0) {
 									std::cerr << "Error sending packet for decoding\n";
-									break;
+									return;
 							}
 							while (ret >= 0) {
 									ret = avcodec_receive_frame(decoder_ctx, frame);
 									if (ret == AVERROR(EAGAIN)){
-											std::cout<<"More packets are needed\n";
 											break;
 									} 
 									else if(ret == AVERROR_EOF){
-											std::cout<<"reached end of file";
 											return;
 									}
 									else if (ret < 0) {
 											std::cerr << "Error during decoding\n";
-											break;
+											return;
 									}
 
 									uint8_t **converted_data = NULL;
@@ -96,7 +94,7 @@ uint32_t totalFrames(const char *filename) {
         av_packet_unref(&packet1);
     }
 		avformat_close_input(&fmt_ctx_t);
-    return total_frames;
+    return total_frames+10000;
 }
 
 class MyCallback : public oboe::AudioStreamCallback{
