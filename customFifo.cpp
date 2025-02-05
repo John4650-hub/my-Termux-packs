@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <time.h>
-#include <iostream>
 #include <memory.h>
 #include <assert.h>
 #include "oboe/FifoBuffer.h"
@@ -71,12 +70,10 @@ namespace oboe {
         int frames2 = framesToRead - frames1;
         int32_t numBytes2 = convertFramesToBytes(frames2);
         memset(destination, 0, (size_t) numBytes2);
-        std::cout << numBytes1 + numBytes2 << " cleared" << std::endl;
     } else {
         // just clear in one shot
         int32_t numBytes = convertFramesToBytes(framesToRead);
         memset(destination, 0, (size_t) numBytes);
-        std::cout << numBytes << " cleared" << std::endl;
     }
 }
 

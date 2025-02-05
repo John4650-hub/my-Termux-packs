@@ -53,8 +53,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 								Buff.write(converted_data[0],frame->nb_samples);
 								av_freep(&converted_data[0]);
-								if(count == 10){
-								std::this_thread::sleep_for(std::chrono::milliseconds(500));
+								if(count == 100){
+								std::this_thread::sleep_for(std::chrono::seconds(1000));
 								count=0;
 							}
 								count++;
