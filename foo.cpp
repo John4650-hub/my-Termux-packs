@@ -54,8 +54,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 								Buff.write(converted_data[0],frame->nb_samples);
 								av_freep(&converted_data[0]);
-								std::cout<<"count: "<<count<<"\n";
-								if(count == 100){
+								std::cout<<"writing position: "<<Buff.getWriteCounter()<<"\n";
+								if(count == 10000){
 								std::this_thread::sleep_for(std::chrono::milliseconds(100));
 								*pcount=0;	
 								std::cout<<"reset cout\n";
