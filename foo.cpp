@@ -62,6 +62,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 					av_packet_unref(packet);
 			}
 }
+}
 
 uint32_t totalFrames(const char *filename) {
     int audio_stream_index = -1;
