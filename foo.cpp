@@ -6,7 +6,7 @@
 #include <thread>
 #include <chrono>
 #include "oboe/Oboe.h"
-#include "oboe/FifoBuffer.h"
+#include "oboe/customFifo.h"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -18,7 +18,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
-							if (ret < 0) {
+							if (ret < 0){
 									std::cerr << "Error sending packet for decoding\n";
 									return;
 							}
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
 		//OBOE GOES HERE
 		uint32_t bytesPerFrame = 8;
 		uint32_t CapacityInFrames =totalFrames(argv[1]);
-		oboe::FifoBuffer buff(bytesPerFrame,CapacityInFrames);
+		oboe::CustomFifoBuffer buff(bytesPerFrame,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
 				});
