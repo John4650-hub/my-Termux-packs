@@ -2,21 +2,16 @@
 #define CUSTOM_FIFO_BUFFER_H
 
 #include <stdint.h>
-#include "oboe/FifoBuffer.h"
-#include <atomic>
+#include "fifo/FifoBuffer.h"
 
 namespace oboe {
 
 class CustomFifoBuffer : public FifoBuffer {
 public:
     CustomFifoBuffer(uint32_t bytesPerFrame, uint32_t capacityInFrames);
-    CustomFifoBuffer(uint32_t bytesPerFrame, uint32_t capacityInFrames,
-                     std::atomic<uint64_t>* readCounterAddress, std::atomic<uint64_t>* writeCounterAddress,
-                     uint8_t* dataStorageAddress);
 
-    int32_t read(void* buffer, int32_t numFrames) override;
+    int32_t read_custom(void* buffer, int32_t numFrames);
 
-private:
     void clearAfterRead(uint32_t readIndex, int32_t framesToRead);
 };
 
