@@ -76,6 +76,5 @@ namespace oboe {
             memset(destination, 0, (size_t) numBytes);
         }
     }
-};
 
 } // namespace oboe
