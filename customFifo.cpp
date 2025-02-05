@@ -9,13 +9,10 @@
 
 namespace oboe {
 
-class CustomFifoBuffer : public FifoBuffer {
-public:
-    CustomFifoBuffer(uint32_t bytesPerFrame, uint32_t capacityInFrames)
-        : FifoBuffer(bytesPerFrame, capacityInFrames) {}
+	CustomFifoBuffer::CustomFifoBuffer(uint32_t bytesPerFrame, uint32_t capacityInFrames): FifoBuffer(bytesPerFrame, capacityInFrames) {}
 
     // Custom read method that also clears the elements after reading
-    int32_t read_custom(void* buffer, int32_t numFrames) {
+    int32_t CustomFifoBuffer::read_custom(void* buffer, int32_t numFrames) {
         int32_t framesAvailable = mFifo->getFullFramesAvailable();
         int32_t framesToRead = numFrames;
         // Is there enough data in the FIFO
@@ -61,7 +58,7 @@ public:
     }
 
     // New method to clear elements after reading
-    void clearAfterRead(uint32_t readIndex, int32_t framesToRead) {
+    void CustomFifoBuffer::clearAfterRead(uint32_t readIndex, int32_t framesToRead) {
         uint8_t* destination = &mStorage[convertFramesToBytes(readIndex)];
         if ((readIndex + framesToRead) > mFrameCapacity) {
             // clear in two parts, first part here is at the end of the mStorage buffer
