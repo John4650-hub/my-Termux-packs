@@ -15,8 +15,6 @@ extern "C" {
 }
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::CustomFifoBuffer &Buff) {
-	int count{};
-	int* pcount= &count;
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -39,7 +37,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 									uint8_t **converted_data = NULL;
 									av_samples_alloc_array_and_samples(
-											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_FLT, 0
+											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_S16, 0
 									);
 
 									int convert_ret = swr_convert(
@@ -54,13 +52,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 								Buff.write(converted_data[0],frame->nb_samples);
 								av_freep(&converted_data[0]);
-								std::cout<<"writing position: "<<Buff.getWriteCounter()<<"\n";
-								if(count == 10000){
-								std::this_thread::sleep_for(std::chrono::milliseconds(100));
-								*pcount=0;	
-								std::cout<<"reset cout\n";
-							}
-								count++;
 					}
 					av_packet_unref(packet);
 			}
@@ -193,7 +184,7 @@ int main(int argc, char **argv) {
     SwrContext *swr_context = swr_alloc_set_opts(
         NULL,
         av_get_default_channel_layout(2),
-        AV_SAMPLE_FMT_FLT,
+        AV_SAMPLE_FMT_S16,
         decoder_ctx->sample_rate,
         av_get_default_channel_layout(decoder_ctx->channels),
         decoder_ctx->sample_fmt,
@@ -206,9 +197,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		//uint32_t bytesPerFrame = 8;
 		uint32_t CapacityInFrames =totalFrames(argv[1]);
-		oboe::CustomFifoBuffer buff(8,CapacityInFrames);
+		oboe::CustomFifoBuffer buff(4,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
 				});
@@ -216,7 +206,7 @@ int main(int argc, char **argv) {
 		MyCallback audioCallback(buff);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
-		builder.setFormat(oboe::AudioFormat::Float);
+		builder.setFormat(oboe::AudioFormat::I16);
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
 		builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
 		builder.setSampleRate(decoder_ctx->sample_rate);
