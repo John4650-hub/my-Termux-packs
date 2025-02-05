@@ -14,7 +14,7 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff) {
+void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::CustomFifoBuffer &Buff) {
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -99,7 +99,7 @@ uint32_t totalFrames(const char *filename) {
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(oboe::FifoBuffer &buff) : mBuff(buff){}
+		MyCallback(oboe::CustomFifoBuffer &buff) : mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
@@ -113,7 +113,7 @@ class MyCallback : public oboe::AudioStreamCallback{
         std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
 		}
 	private:
-		oboe::FifoBuffer &mBuff;
+		oboe::CustomFifoBuffer &mBuff;
 };
 
 int main(int argc, char **argv) {
