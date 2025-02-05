@@ -2,7 +2,7 @@
 #define CUSTOM_FIFO_BUFFER_H
 
 #include <stdint.h>
-#include "fifo/FifoBuffer.h"
+#include "oboe/FifoBuffer.h"
 
 namespace oboe {
 

@@ -5,6 +5,7 @@
 #include "oboe/FifoBuffer.h"
 #include "oboe/customFifo.h"
 #include "oboe/FifoControllerBase.h"
+#include "oboe/Definitions.h"
 
 namespace oboe {
 
