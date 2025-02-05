@@ -55,7 +55,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 								Buff.write(converted_data[0],frame->nb_samples);
 								av_freep(&converted_data[0]);
 								std::cout<<"count: "<<count<<"\n";
-								if(count == 9000){
+								if(count == 100){
 								std::this_thread::sleep_for(std::chrono::seconds(1000));
 								*pcount=0;	
 								std::cout<<"reset cout\n";
@@ -103,6 +103,7 @@ uint32_t totalFrames(const char *filename) {
         av_packet_unref(&packet1);
     }
 		avformat_close_input(&fmt_ctx_t);
+		std::cout<<"total_frames = "<<total_frames<<"\n";
     return total_frames+10000;
 }
 
