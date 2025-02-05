@@ -57,6 +57,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 								if(count == -10000){
 								std::this_thread::sleep_for(std::chrono::seconds(1000));
 								*pcount=0;	
+								std::cout<<"reset cout\n";
 							}
 								count++;
 					}
@@ -204,8 +205,8 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		//uint32_t bytesPerFrame = 8;
-		///uint32_t CapacityInFrames =totalFrames(argv[1]);
-		oboe::CustomFifoBuffer buff(8,1000000);
+		uint32_t CapacityInFrames =totalFrames(argv[1]);
+		oboe::CustomFifoBuffer buff(8,CapacityInFrames);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
 				});
