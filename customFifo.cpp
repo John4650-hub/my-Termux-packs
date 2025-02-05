@@ -60,25 +60,24 @@ namespace oboe {
 
     // New method to clear elements after reading
     void CustomFifoBuffer::clearAfterRead(uint32_t readIndex, int32_t framesToRead) {
-				int32_t numBytes{};
-        uint8_t* destination = &mStorage[convertFramesToBytes(readIndex)];
-        if ((readIndex + framesToRead) > mFifo->getFrameCapacity()) {
-            // clear in two parts, first part here is at the end of the mStorage buffer
-            int32_t frames1 = static_cast<int32_t>(mFifo->getFrameCapacity() - readIndex);
-            numBytes = convertFramesToBytes(frames1);
-            memset(destination, 0, (size_t) numBytes);
-            // clear second part, which is at the beginning of mStorage
-            destination = &mStorage[0];
-            int frames2 = framesToRead - frames1;
-            numBytes = convertFramesToBytes(frames2);
-            memset(destination, 0, (size_t) numBytes);
-        } else {
-            // just clear in one shot
-            numBytes = convertFramesToBytes(framesToRead);
-
-            memset(destination, 0, (size_t) numBytes);
-        }
-				std::cout<<numBytes<<" cleared"<<std::endl;
+    uint8_t* destination = &mStorage[convertFramesToBytes(readIndex)];
+    if ((readIndex + framesToRead) > mFifo->getFrameCapacity()) {
+        // clear in two parts, first part here is at the end of the mStorage buffer
+        int32_t frames1 = static_cast<int32_t>(mFifo->getFrameCapacity() - readIndex);
+        int32_t numBytes1 = convertFramesToBytes(frames1);
+        memset(destination, 0, (size_t) numBytes1);
+        // clear second part, which is at the beginning of mStorage
+        destination = &mStorage[0];
+        int frames2 = framesToRead - frames1;
+        int32_t numBytes2 = convertFramesToBytes(frames2);
+        memset(destination, 0, (size_t) numBytes2);
+        std::cout << numBytes1 + numBytes2 << " cleared" << std::endl;
+    } else {
+        // just clear in one shot
+        int32_t numBytes = convertFramesToBytes(framesToRead);
+        memset(destination, 0, (size_t) numBytes);
+        std::cout << numBytes << " cleared" << std::endl;
     }
+}
 
 } // namespace oboe
