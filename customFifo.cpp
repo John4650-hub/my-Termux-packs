@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <assert.h>
 #include "oboe/FifoBuffer.h"
+#include "oboe/customFifo.h"
 #include "oboe/FifoControllerBase.h"
 
 namespace oboe {
