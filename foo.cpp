@@ -16,6 +16,7 @@ extern "C" {
 
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::CustomFifoBuffer &Buff) {
 	int count{};
+	int* pcount= &count;
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -53,9 +54,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 
 								Buff.write(converted_data[0],frame->nb_samples);
 								av_freep(&converted_data[0]);
-								if(count == 100){
+								if(count == 10000){
 								std::this_thread::sleep_for(std::chrono::seconds(1000));
-								count=0;
+								*pcount=0;
 							}
 								count++;
 					}
