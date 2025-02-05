@@ -26,9 +26,9 @@ namespace oboe {
         uint32_t readIndex = mFifo->getReadIndex();
         uint8_t* destination = reinterpret_cast<uint8_t*>(buffer);
         uint8_t* source = &mStorage[convertFramesToBytes(readIndex)];
-        if ((readIndex + framesToRead) > mFrameCapacity) {
+        if ((readIndex + framesToRead) > mFifo->getFrameCapacity()) {
             // read in two parts, first part here is at the end of the mStorage buffer
-            uint32_t frames1 = mFrameCapacity - readIndex;
+            int32_t frames1 = static_cast<int32_t>(mFifo->getFrameCapacity() - readIndex);
             int32_t numBytes = convertFramesToBytes(frames1);
             if (numBytes < 0) {
                 return (int32_t) Result::ErrorOutOfRange;
@@ -60,9 +60,9 @@ namespace oboe {
     // New method to clear elements after reading
     void CustomFifoBuffer::clearAfterRead(uint32_t readIndex, int32_t framesToRead) {
         uint8_t* destination = &mStorage[convertFramesToBytes(readIndex)];
-        if ((readIndex + framesToRead) > mFrameCapacity) {
+        if ((readIndex + framesToRead) > mFifo->getFrameCapacity()) {
             // clear in two parts, first part here is at the end of the mStorage buffer
-            uint32_t frames1 = mFrameCapacity - readIndex;
+            int32_t frames1 = static_cast<int32_t>(mFifo->getFrameCapacity() - readIndex);
             int32_t numBytes = convertFramesToBytes(frames1);
             memset(destination, 0, (size_t) numBytes);
             // clear second part, which is at the beginning of mStorage
