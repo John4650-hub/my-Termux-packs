@@ -6,6 +6,7 @@
 #include <thread>
 #include <chrono>
 #include "oboe/Oboe.h"
+#include "oboe/FifoBuffer.h"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -62,7 +63,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 }
 }
 
-uint32_t totalFrames(const char *filename,int64_t end_time) {
+uint32_t totalFrames(const char *filename,int64_t end_time,AVFrame *frame) {
 	int64_t current_pts = 0;
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
@@ -210,7 +211,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		int64_t read_index{}, write_index{};
-		uint32_t CapacityInFrames =totalFrames(argv[1],end_time);
+		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
 		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
 		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
 		std::thread t([&](){
