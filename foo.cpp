@@ -29,15 +29,15 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
 
-							std::cout<<"current_pts_out: "<<current_pts<<"\n";
 						if(current_pts>=end_time){
 							std::cout<<"current_pts: "<<current_pts<<"\n";
 							std::cout<<"end_time: "<<end_time<<"\n";
 							//sleep
 							while(!(resume_decoding.load())){
 								std::this_thread::sleep_for(std::chrono::milliseconds(500));
+								std::cout<<"waiting... for callback to read all buffer \n";
 							}
-							end_time*=2;
+							end_time+=1*AV_TIME_BASE;
 							resume_decoding_ptr->store(false);
 						}
 						if (ret == AVERROR(EAGAIN)){
