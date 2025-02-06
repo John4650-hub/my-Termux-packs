@@ -235,8 +235,15 @@ int main(int argc, char **argv) {
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff,end_time);
 				});
 	t.detach();
-
-		std::this_thread::sleep_for(std::chrono::seconds(10));
+//wait writing to begin
+while(true){
+	if(buff.getWriteCounter()<100){
+		std::cout<<"seeking done\n";
+		break;
+	}
+	std::cout<<"still seeking to right position\n";
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+}
 		MyCallback audioCallback(buff,data_storage);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
