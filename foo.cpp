@@ -94,7 +94,7 @@ uint32_t totalFrames(const char *filename,int64_t end_time,AVFrame *frame) {
     av_init_packet(&packet1);
 
     while (av_read_frame(fmt_ctx_t, &packet1) >= 0) {
-			current_pts = frame->pts * av_q2d(formatCtx->streams[audio_stream_index]->time_base) * AV_TIME_BASE;
+			current_pts = frame->pts * av_q2d(fmt_ctx_t->streams[audio_stream_index]->time_base) * AV_TIME_BASE;
 			if(current_pts>=end_time){
 				break;
 			}
@@ -160,10 +160,11 @@ int main(int argc, char **argv) {
         std::cerr << "Decoder not found\n";
         return -1;
     }
-		av_seek_frame(formatCtx,stream_index,start_time,AVSEEK_FLAG_BACKGROUND);
-		avcodec_flush_buffers(decoder);
+		av_seek_frame(formatCtx,stream_index,start_time,AVSEEK_FLAG_BACKWARD);
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
+
+		avcodec_flush_buffers(decoder_ctx);
     if (!decoder_ctx) {
         std::cerr << "Could not allocate decoder context\n";
         return -1;
