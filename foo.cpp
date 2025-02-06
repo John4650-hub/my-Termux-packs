@@ -18,6 +18,7 @@ std::atomic<bool> resume_decoding{false};
 std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
+	end_time*=2;
 	while (av_read_frame(formatCtx, packet) >= 0) {
 		if (packet->stream_index == *stream_index) {
 				 int ret = avcodec_send_packet(decoder_ctx, packet);
