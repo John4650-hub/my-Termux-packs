@@ -165,7 +165,7 @@ int main(int argc, char **argv) {
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
 
-		avcodec_flush_buffers(decoder_ctx);
+		//avcodec_flush_buffers(decoder_ctx);
     if (!decoder_ctx) {
         std::cerr << "Could not allocate decoder context\n";
         return -1;
