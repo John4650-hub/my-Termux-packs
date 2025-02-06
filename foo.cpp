@@ -18,49 +18,49 @@ extern "C" {
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
 	while (av_read_frame(formatCtx, packet) >= 0) {
-					if (packet->stream_index == *stream_index) {
-							 int ret = avcodec_send_packet(decoder_ctx, packet);
-							if (ret < 0){
-									std::cerr << "Error sending packet for decoding\n";
-									return;
-							}
-							while (ret >= 0) {
-									ret = avcodec_receive_frame(decoder_ctx, frame);
-									current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
-									if(current_pts>=end_time){
-										break;
-									}
-									if (ret == AVERROR(EAGAIN)){
-											break;
-									} 
-									else if(ret == AVERROR_EOF){
-											return;
-									}
-									else if (ret < 0) {
-											std::cerr << "Error during decoding\n";
-											return;
-									}
+		if (packet->stream_index == *stream_index) {
+				 int ret = avcodec_send_packet(decoder_ctx, packet);
+				if (ret < 0){
+						std::cerr << "Error sending packet for decoding\n";
+						return;
+				}
+				while (ret >= 0) {
+						ret = avcodec_receive_frame(decoder_ctx, frame);
+						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
+						if(current_pts>=end_time){
+							break;
+						}
+						if (ret == AVERROR(EAGAIN)){
+								break;
+						} 
+						else if(ret == AVERROR_EOF){
+								return;
+						}
+						else if (ret < 0) {
+								std::cerr << "Error during decoding\n";
+								return;
+						}
 
-									uint8_t **converted_data = NULL;
-									av_samples_alloc_array_and_samples(
-											&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_S16, 0
-									);
+						uint8_t **converted_data = NULL;
+						av_samples_alloc_array_and_samples(
+								&converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_S16, 0
+						);
 
-									int convert_ret = swr_convert(
-											swr_context, converted_data, frame->nb_samples,
-											(const uint8_t **)frame->data, frame->nb_samples
-									);
+						int convert_ret = swr_convert(
+								swr_context, converted_data, frame->nb_samples,
+								(const uint8_t **)frame->data, frame->nb_samples
+						);
 
-									if (convert_ret < 0) {
-											std::cerr << "Error during resampling\n";
-											break;
-									}
+						if (convert_ret < 0) {
+								std::cerr << "Error during resampling\n";
+								break;
+						}
 
-								Buff.write(converted_data[0],frame->nb_samples);
-								av_freep(&converted_data[0]);
-					}
-					av_packet_unref(packet);
-			}
+					Buff.write(converted_data[0],frame->nb_samples);
+					av_freep(&converted_data[0]);
+		}
+		av_packet_unref(packet);
+}
 }
 }
 
@@ -213,7 +213,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		std::atomic<uint64_t> read_index{}, write_index{};
-		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
+		uint32_t CapacityInFrames =100000; //totalFrames(argv[1],end_time,frame);
 		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
 		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
 		std::thread t([&](){
