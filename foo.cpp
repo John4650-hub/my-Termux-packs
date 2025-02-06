@@ -211,7 +211,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		int64_t read_index{}, write_index{};
+		std::atomic<int64_t> read_index{}, write_index{};
 		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
 		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
 		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
