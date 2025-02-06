@@ -135,8 +135,8 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
-		int64_t start_time= 1* AV_TIME_BASE;
-		int64_t end_time=3*AV_TIME_BASE;
+		int64_t start_time= 60* AV_TIME_BASE;
+		int64_t end_time=120*AV_TIME_BASE;
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
