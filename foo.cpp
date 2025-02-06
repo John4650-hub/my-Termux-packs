@@ -57,6 +57,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						}
 
 					Buff.write(converted_data[0],frame->nb_samples);
+					std::cout<<Buff.getWriteCounter()<<"\n";
 					av_freep(&converted_data[0]);
 		}
 		av_packet_unref(packet);
@@ -115,6 +116,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
+			std::cout<<"reader counter = "<<mbuff.getReadCounter()<<"\n";
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
@@ -165,7 +167,6 @@ int main(int argc, char **argv) {
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
 
-		//avcodec_flush_buffers(decoder_ctx);
     if (!decoder_ctx) {
         std::cerr << "Could not allocate decoder context\n";
         return -1;
@@ -213,7 +214,7 @@ int main(int argc, char **argv) {
     }
 		//OBOE GOES HERE
 		std::atomic<uint64_t> read_index{}, write_index{};
-		uint32_t CapacityInFrames =100000; //totalFrames(argv[1],end_time,frame);
+		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
 		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
 		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
 		std::thread t([&](){
