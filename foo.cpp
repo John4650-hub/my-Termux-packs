@@ -116,7 +116,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
-			std::cout<<"reader counter = "<<mbuff.getReadCounter()<<"\n";
+			std::cout<<"reader counter = "<<mBuff.getReadCounter()<<"\n";
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
