@@ -31,9 +31,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						if(current_pts>=end_time){
 							//sleep
 							while(!(resume_decoding.load())){
-								std::this_thread::sleep_for(std::chrono::seconds(1));
+								std::this_thread::sleep_for(std::chrono::milliseconds(500));
 							}
-							end_time*=2;
+							end_time+=100000;
 							resume_decoding_ptr->store(false);
 						}
 						if (ret == AVERROR(EAGAIN)){
@@ -149,8 +149,8 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
-		int64_t start_time= 10* AV_TIME_BASE;
-		int64_t end_time=20*AV_TIME_BASE;
+		int64_t start_time= 120* AV_TIME_BASE;
+		int64_t end_time=140*AV_TIME_BASE;
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
