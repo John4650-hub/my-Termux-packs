@@ -29,6 +29,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
 						if(current_pts>=end_time){
+							std::cout<<"current_pts: "<<current_pts<<"\n";
+							std::cout<<"end_time: "<<end_time<<"\n";
 							//sleep
 							while(!(resume_decoding.load())){
 								std::this_thread::sleep_for(std::chrono::milliseconds(500));
