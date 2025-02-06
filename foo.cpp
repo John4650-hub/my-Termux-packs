@@ -28,6 +28,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 				while (ret >= 0) {
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
+
+							std::cout<<"current_pts_out: "<<current_pts<<"\n";
 						if(current_pts>=end_time){
 							std::cout<<"current_pts: "<<current_pts<<"\n";
 							std::cout<<"end_time: "<<end_time<<"\n";
