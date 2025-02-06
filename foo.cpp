@@ -14,7 +14,7 @@ extern "C" {
     #include <libavutil/avutil.h>
     #include <libswresample/swresample.h>
 }
-std::atomic<bool> resume_decoding.store(false);
+std::atomic<bool> resume_decoding{false};
 std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
@@ -128,7 +128,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 				delete[] mdata_storage;
 				mdata_storage = nullptr;
 				mdata_storage= new uint8_t[capacity];
-				resume_decoding_ptr.store->(true);
+				resume_decoding_ptr->store(true);
 			}
 		return  oboe::DataCallbackResult::Continue;
 		}
