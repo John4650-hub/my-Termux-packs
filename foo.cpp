@@ -242,7 +242,7 @@ int main(int argc, char **argv) {
 	t.detach();
 //wait writing to begin
 while(true){
-	if(buff.getWriteCounter()<2000){
+	if(buff.getWriteCounter()<5000){
 		std::cout<<"seeking done\n";
 		break;
 	}
