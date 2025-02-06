@@ -150,7 +150,7 @@ public:
         mFifo->setWriteCounter(n);
     }
 
-public:
+private:
     uint32_t mBytesPerFrame;
     uint8_t* mStorage;
     bool     mStorageOwned; // did this object allocate the storage?

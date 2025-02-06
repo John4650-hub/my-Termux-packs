@@ -6,7 +6,6 @@
 #include <thread>
 #include <chrono>
 #include "oboe/Oboe.h"
-#include "oboe/customFifo.h"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -14,7 +13,8 @@ extern "C" {
     #include <libswresample/swresample.h>
 }
 
-void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::CustomFifoBuffer &Buff) {
+void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
+	int64_t current_pts = 0;
 	while (av_read_frame(formatCtx, packet) >= 0) {
 					if (packet->stream_index == *stream_index) {
 							 int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -24,6 +24,10 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 							}
 							while (ret >= 0) {
 									ret = avcodec_receive_frame(decoder_ctx, frame);
+									current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
+									if(current_pts>=end_time){
+										break;
+									}
 									if (ret == AVERROR(EAGAIN)){
 											break;
 									} 
@@ -58,7 +62,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 }
 }
 
-uint32_t totalFrames(const char *filename) {
+uint32_t totalFrames(const char *filename,int64_t end_time) {
+	int64_t current_pts = 0;
     int audio_stream_index = -1;
     uint32_t total_frames = 0;
 		AVFormatContext *fmt_ctx_t = NULL;
@@ -88,6 +93,10 @@ uint32_t totalFrames(const char *filename) {
     av_init_packet(&packet1);
 
     while (av_read_frame(fmt_ctx_t, &packet1) >= 0) {
+			current_pts = frame->pts * av_q2d(formatCtx->streams[audio_stream_index]->time_base) * AV_TIME_BASE;
+			if(current_pts>=end_time){
+				break;
+			}
         if (packet1.stream_index == audio_stream_index) {
             total_frames += packet1.duration;
         }
@@ -100,10 +109,10 @@ uint32_t totalFrames(const char *filename) {
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(oboe::CustomFifoBuffer &buff) : mBuff(buff){}
+		MyCallback(oboe::FifoBuffer &buff) : mBuff(buff){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
-			int32_t framesRead = mBuff.read_custom(floatData,numFrames);
+			int32_t framesRead = mBuff.read(floatData,numFrames);
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
@@ -114,7 +123,7 @@ class MyCallback : public oboe::AudioStreamCallback{
         std::cerr << "Error after close: " << oboe::convertToText(error) << std::endl;
 		}
 	private:
-		oboe::CustomFifoBuffer &mBuff;
+		oboe::FifoBuffer &mBuff;
 };
 
 int main(int argc, char **argv) {
@@ -122,6 +131,8 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: " << argv[0] << " <input file>\n";
         return -1;
     }
+		int64_t start_time= 1* AV_TIME_BASE;
+		int64_t end_time=3*AV_TIME_BASE;
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -148,13 +159,14 @@ int main(int argc, char **argv) {
         std::cerr << "Decoder not found\n";
         return -1;
     }
+		av_seek_frame(formatCtx,stream_index,start_time,AVSEEK_FLAG_BACKGROUND);
+		avcodec_flush_buffers(decoder);
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
     if (!decoder_ctx) {
         std::cerr << "Could not allocate decoder context\n";
         return -1;
     }
-
     ret = avcodec_parameters_to_context(decoder_ctx, media->codecpar);
     if (ret < 0) {
         std::cerr << "Could not copy codec parameters\n";
@@ -197,10 +209,12 @@ int main(int argc, char **argv) {
         return -1;
     }
 		//OBOE GOES HERE
-		uint32_t CapacityInFrames =totalFrames(argv[1]);
-		oboe::CustomFifoBuffer buff(4,CapacityInFrames);
+		int64_t read_index{}, write_index{};
+		uint32_t CapacityInFrames =totalFrames(argv[1],end_time);
+		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
+		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
 		std::thread t([&](){
-				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff);
+				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff,end_time);
 				});
 	t.detach();
 		MyCallback audioCallback(buff);
