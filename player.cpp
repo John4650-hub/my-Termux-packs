@@ -138,13 +138,11 @@ class MyCallback : public oboe::AudioStreamCallback{
  * and plays the audio file
  */
 void play(const char* file_name,double rate,const std::string& seek_time) {
-		int64_t start_time= timeToSeconds(seek_time)* AV_TIME_BASE - 0.05 * AV_TIME_BASE;
-		int64_t end_time=(1*AV_TIME_BASE) + start_time;
 		if(rate<0.1||rate>5.0){
 			std::cerr<<"Rate must be from 0.1-3.0\n";
 			return;
 		}
-		double sampleRate=1.0;
+		double sampleRate=rate;
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, file_name, NULL, NULL);
@@ -164,13 +162,14 @@ void play(const char* file_name,double rate,const std::string& seek_time) {
         std::cerr << "No audio stream found\n";
         return;
     }
-
     AVStream *media = formatCtx->streams[stream_index];
+		int64_t start_time = av_rescale_q(timeToSeconds(seek_time)*AV_TIME_BASE, AV_TIME_BASE_Q, media->time_base);
     AVCodec *decoder = avcodec_find_decoder(media->codecpar->codec_id);
     if (!decoder) {
         std::cerr << "Decoder not found\n";
         return;
     }
+		int64_t end_time=(1*AV_TIME_BASE) + start_time;
 		av_seek_frame(formatCtx,stream_index,start_time,AVSEEK_FLAG_BACKWARD);
 
     AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
