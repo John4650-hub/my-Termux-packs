@@ -138,7 +138,7 @@ class MyCallback : public oboe::AudioStreamCallback{
  * and plays the audio file
  */
 void play(const char* file_name,double rate,const std::string& seek_time) {
-		int64_t start_time= timeToSeconds(seek_time)* AV_TIME_BASE;
+		int64_t start_time= timeToSeconds(seek_time)* AV_TIME_BASE - 0.05 * AV_TIME_BASE;
 		int64_t end_time=(1*AV_TIME_BASE) + start_time;
 		if(rate<0.1||rate>5.0){
 			std::cerr<<"Rate must be from 0.1-3.0\n";
