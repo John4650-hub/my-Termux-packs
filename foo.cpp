@@ -128,7 +128,7 @@ uint32_t totalFrames(const char *filename,int64_t end_time,AVFrame *frame) {
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(oboe::FifoBuffer &buff,uint8_t* data_storage ) : mBuff(buff),mdata_storage(data_storage){}
+		MyCallback(oboe::FifoBuffer &buff,uint8_t* data_storage,int duration_secs) : mBuff(buff),mdata_storage(data_storage),mDuration_secs{duration_secs}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
@@ -141,7 +141,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 				mdata_storage= new uint8_t[capacity];
 				resume_decoding_ptr->store(true);
 			}
-			if(seek_progress.load()>=playback_duration)
+			if(seek_progress.load()>=mDuration_secs)
 				return oboe::DataCallbackResult::Stop;
 		return  oboe::DataCallbackResult::Continue;
 		}
@@ -155,6 +155,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 	private:
 		oboe::FifoBuffer &mBuff;
 		uint8_t* mdata_storage;
+		int mDuration_secs;
 };
 
 int main(int argc, char **argv) {
@@ -239,6 +240,8 @@ int main(int argc, char **argv) {
         std::cerr << "Could not initialize resampler\n";
         return -1;
     }
+		int64_t duration_sec = formatCtx->duration + (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
+    int duration_seconds = duration_sec / (double)AV_TIME_BASE;
 		//OBOE GOES HERE
 		std::atomic<uint64_t> read_index{}, write_index{};
 		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
@@ -257,7 +260,7 @@ while(true){
 	std::cout<<"still seeking to right position\n";
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
-		MyCallback audioCallback(buff,data_storage);
+		MyCallback audioCallback(buff,data_storage,duration_seconds);
 		oboe::AudioStreamBuilder builder;
 		builder.setCallback(&audioCallback);
 		builder.setFormat(oboe::AudioFormat::I16);
@@ -278,8 +281,6 @@ while(true){
 			std::cerr << "failed to start stream\n";
 			return -1;
 		}
-		int64_t duration = formatCtx->duration + (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
-    int duration_seconds = duration / (double)AV_TIME_BASE;
 		std::cout<<"duration: "<<duration_seconds<<std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(duration_seconds));
 		mediaStream->stop();
