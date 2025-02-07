@@ -52,9 +52,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						if(current_pts>=end_time){
 							//sleep
 							while(!(resume_decoding.load())){
-								std::this_thread::sleep_for(std::chrono::milliseconds(200));
+								std::this_thread::sleep_for(std::chrono::milliseconds(50));
 							}
-							end_time+=2*AV_TIME_BASE;
+							end_time+=1*AV_TIME_BASE;
 							resume_decoding_ptr->store(false);
 						}
 						if (ret == AVERROR(EAGAIN)){
@@ -142,6 +142,7 @@ class MyCallback : public oboe::AudioStreamCallback{
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
+			std::cout<<"Reader: "<<mBuff.getReadCounter()<<"\n";
 			if (mBuff.getReadCounter()==mBuff.getWriteCounter()){
 				mBuff.setReadCounter(0);
 				mBuff.setWriteCounter(0);
