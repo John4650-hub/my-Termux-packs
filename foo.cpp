@@ -20,13 +20,14 @@ std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 
 
 void format_time(int64_t secs){
+	if (secs>1*AV_TIME_BASE){
 	double total_seconds = static_cast<double>(secs) / 1000000.0; // 2500.721666 seconds
 	int hours = static_cast<int>(total_seconds) / 3600; // 0 hours
 	int minutes = (static_cast<int>(total_seconds) % 3600) / 60; // 41 minutes
 	int seconds = static_cast<int>(total_seconds) % 60; // 40 seconds
 
 	std::cout << "HH:MM:SS format: " << hours << ":" << minutes << ":" << seconds << std::endl;
-//
+//}
 }
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
