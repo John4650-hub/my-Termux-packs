@@ -48,7 +48,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 							end_time*=static_cast<int>(std::round(diviser));
 							end_time_scaled=true;
 						}
-						format_time(current_pts);
 						if(current_pts>=end_time){
 							//sleep
 							while(!(resume_decoding.load())){
