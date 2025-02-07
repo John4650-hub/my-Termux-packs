@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
+#include <cmath>
 #include <thread>
 #include <chrono>
 #include <atomic>
@@ -18,8 +19,7 @@ std::atomic<bool> resume_decoding{false};
 std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
-	//end_time;
-	std::cout<<"end_time: "<<end_time<<"\n";
+	bool end_time_scaled=false;
 	while (av_read_frame(formatCtx, packet) >= 0) {
 		if (packet->stream_index == *stream_index) {
 				 int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -30,7 +30,12 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 				while (ret >= 0) {
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
-
+						
+						if(!end_time_scaled){
+							double diviser = static_cast<double>(current_pts)/static_cast<double>(end_time);
+							end_time*=static_cast<int>(std::round(diviser));
+							end_time_scaled=true;
+						}
 						if(current_pts>=end_time){
 							std::cout<<"current_pts: "<<current_pts<<"\n";
 							std::cout<<"end_time: "<<end_time<<"\n";
