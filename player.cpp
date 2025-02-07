@@ -2,6 +2,7 @@
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sstream>
 #include <cstring>
 #include <cmath>
 #include <thread>
@@ -9,6 +10,7 @@
 #include <atomic>
 #include "oboe/Oboe.h"
 #include "oboe/FifoBuffer.h"
+#include "player.hpp"
 extern "C" {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
@@ -20,6 +22,23 @@ std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 std::atomic<int> seek_progress{0};
 std::atomic<int>* seek_progress_ptr = &seek_progress;
 
+int timeToSeconds(const std::string& seek_time){
+	int hour,minute,second;
+	char delim;
+	try{
+	std::istringstream timeStream(seek_time);
+	timeStream >> hour>>delim>>minute>>delim>>second;
+	return hour*3600 + minute*60 + second;
+	}catch(const std::runtime_error& err){
+		std::cerr<<err.what()<<"\n";
+		std::cerr << "time must be valid in the format HH:MM:SS\n";
+		std::exit(1);
+
+	}
+}
+
+
+// retrieves raw pcm data
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
 	bool end_time_scaled=false;
@@ -72,7 +91,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 								std::cerr << "Error during resampling\n";
 								break;
 						}
-
+					// write pcm data to Fifobuffer
 					Buff.write(converted_data[0],frame->nb_samples);
 					av_freep(&converted_data[0]);
 		}
@@ -81,51 +100,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 }
 }
 
-uint32_t totalFrames(const char *filename,int64_t end_time,AVFrame *frame) {
-	int64_t current_pts = 0;
-    int audio_stream_index = -1;
-    uint32_t total_frames = 0;
-		AVFormatContext *fmt_ctx_t = NULL;
-		int ret = avformat_open_input(&fmt_ctx_t, filename, NULL, NULL);
-		if (ret < 0) {
-				std::cerr << "Can't open file\n";
-				return 1;
-		}
-		if (avformat_find_stream_info(fmt_ctx_t, nullptr) < 0) {
-        std::cerr << "Could not find stream information\n";
-        avformat_close_input(&fmt_ctx_t);
-        return 1;
-  }
-    for (unsigned int i = 0; i < fmt_ctx_t->nb_streams; i++) {
-        if (fmt_ctx_t->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            audio_stream_index = i;
-            break;
-        }
-    }
-
-    if (audio_stream_index == -1) {
-        std::cerr << "No audio stream found.\n";
-        return 0;
-    }
-
-    AVPacket packet1;
-    av_init_packet(&packet1);
-
-    while (av_read_frame(fmt_ctx_t, &packet1) >= 0) {
-			current_pts = frame->pts * av_q2d(fmt_ctx_t->streams[audio_stream_index]->time_base) * AV_TIME_BASE;
-			if(current_pts>=end_time){
-				break;
-			}
-        if (packet1.stream_index == audio_stream_index) {
-            total_frames += packet1.duration;
-        }
-        av_packet_unref(&packet1);
-    }
-		avformat_close_input(&fmt_ctx_t);
-		std::cout<<"total_frames = "<<total_frames<<"\n";
-    return total_frames+10000;
-}
-
+// callback class for creating oboe callback
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
 		MyCallback(oboe::FifoBuffer &buff,uint8_t* data_storage,int duration_secs) : mBuff(buff),mdata_storage(data_storage),mDuration_secs(duration_secs){}
@@ -158,39 +133,43 @@ class MyCallback : public oboe::AudioStreamCallback{
 		int mDuration_secs;
 };
 
-int main(int argc, char **argv) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <input file>\n";
-        return -1;
-    }
-		int64_t start_time= 1* AV_TIME_BASE;
+/**
+ * Take a the file name as input
+ * and plays the audio file
+ */
+void play(const char *file_name,double rate,const std:string& seek_time) {
+		int64_t start_time= timeToSeconds(seek_time)* AV_TIME_BASE;
 		int64_t end_time=(1*AV_TIME_BASE) + start_time;
+		if(rate<0.1||rate>5.0){
+			std::cerr<<"Rate must be from 0.1-3.0\n";
+			return;
+		}
 		double sampleRate=1.0;
 
     AVFormatContext *formatCtx = NULL;
-    int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
+    int ret = avformat_open_input(&formatCtx, filename, NULL, NULL);
     if (ret < 0) {
         std::cerr << "Can't open file\n";
-        return -1;
+        return;
     }
 
     ret = avformat_find_stream_info(formatCtx, NULL);
     if (ret < 0) {
         std::cerr << "Could not find any info\n";
-        return -1;
+        return;
     }
 
     int stream_index = av_find_best_stream(formatCtx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
     if (stream_index < 0) {
         std::cerr << "No audio stream found\n";
-        return -1;
+        return;
     }
 
     AVStream *media = formatCtx->streams[stream_index];
     AVCodec *decoder = avcodec_find_decoder(media->codecpar->codec_id);
     if (!decoder) {
         std::cerr << "Decoder not found\n";
-        return -1;
+        return;
     }
 		av_seek_frame(formatCtx,stream_index,start_time,AVSEEK_FLAG_BACKWARD);
 
@@ -198,32 +177,32 @@ int main(int argc, char **argv) {
 
     if (!decoder_ctx) {
         std::cerr << "Could not allocate decoder context\n";
-        return -1;
+        return;
     }
     ret = avcodec_parameters_to_context(decoder_ctx, media->codecpar);
     if (ret < 0) {
         std::cerr << "Could not copy codec parameters\n";
-        return -1;
+        return;
     }
 
     ret = avcodec_open2(decoder_ctx, decoder, NULL);
     if (ret < 0) {
         std::cerr << "Failed to open decoder\n";
-        return -1;
+        return;
     }
 
     FILE *outfile = fopen("output.pcm", "wb");
     if (!outfile) {
         std::cerr << "Could not open output file\n";
         avcodec_free_context(&decoder_ctx);
-        return -1;
+        return;
     }
 
     AVPacket *packet = av_packet_alloc();
     AVFrame *frame = av_frame_alloc();
     if (!packet || !frame) {
         std::cerr << "Could not allocate packet or frame\n";
-        return -1;
+        return;
     }
     SwrContext *swr_context = swr_alloc_set_opts(
         NULL,
@@ -238,16 +217,13 @@ int main(int argc, char **argv) {
     );
     if (!swr_context || swr_init(swr_context) < 0) {
         std::cerr << "Could not initialize resampler\n";
-        return -1;
+        return;
     }
-		int64_t duration_sec = formatCtx->duration + (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
-    int duration_seconds = duration_sec / (double)AV_TIME_BASE;
-		//OBOE GOES HERE
+		int64_t duration_microseconds = formatCtx->duration + (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
+    int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
 		std::atomic<uint64_t> read_index{}, write_index{};
-		//uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
-		int sz = std::stoi(argv[2]);
-		uint8_t* data_storage = new uint8_t[sz*4];
-		oboe::FifoBuffer buff(4,sz,&read_index,&write_index,data_storage);
+		uint8_t* data_storage = new uint8_t[400000];
+		oboe::FifoBuffer buff(4,400000,&read_index,&write_index,data_storage);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff,end_time);
 				});
@@ -268,31 +244,27 @@ while(true){
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
 		builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
 		builder.setSampleRate(decoder_ctx->sample_rate * sampleRate);
-
 		oboe::AudioStream *mediaStream=nullptr;
 		oboe::Result result = builder.openStream(&mediaStream);
 
 		if(result != oboe::Result::OK){
 			std::cerr<<"failed to create stream\n";
-			return -1;
+			return;
 		}
 
 		result=mediaStream->start();
 		if(result != oboe::Result::OK){
 			std::cerr << "failed to start stream\n";
-			return -1;
+			return;
 		}
 		std::cout<<"duration: "<<duration_seconds<<std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(duration_seconds));
 		mediaStream->stop();
 		mediaStream->close();
-
+//free up all memory
     av_frame_free(&frame);
     av_packet_free(&packet);
     avcodec_free_context(&decoder_ctx);
     avformat_close_input(&formatCtx);
     swr_free(&swr_context);
-
-    std::cout << "Decoding finished successfully\n";
-    return 0;
 }
