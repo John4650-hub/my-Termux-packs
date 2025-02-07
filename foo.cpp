@@ -17,6 +17,17 @@ extern "C" {
 }
 std::atomic<bool> resume_decoding{false};
 std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
+
+
+void format_time(int64_t secs){
+	double total_seconds = static_cast<double>(secs) / 1000000.0; // 2500.721666 seconds
+	int hours = static_cast<int>(total_seconds) / 3600; // 0 hours
+	int minutes = (static_cast<int>(total_seconds) % 3600) / 60; // 41 minutes
+	int seconds = static_cast<int>(total_seconds) % 60; // 40 seconds
+
+	std::cout << "HH:MM:SS format: " << hours << ":" << minutes << ":" << seconds << std::endl;
+//
+}
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
 	bool end_time_scaled=false;
@@ -36,15 +47,13 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 							end_time*=static_cast<int>(std::round(diviser));
 							end_time_scaled=true;
 						}
+						format_time(current_pts);
 						if(current_pts>=end_time){
-							std::cout<<"current_pts: "<<current_pts<<"\n";
-							std::cout<<"end_time: "<<end_time<<"\n";
 							//sleep
 							while(!(resume_decoding.load())){
-								std::this_thread::sleep_for(std::chrono::milliseconds(500));
-								std::cout<<"waiting... for callback to read all buffer \n";
+								std::this_thread::sleep_for(std::chrono::milliseconds(200));
 							}
-							end_time+=1*AV_TIME_BASE;
+							end_time+=2*AV_TIME_BASE;
 							resume_decoding_ptr->store(false);
 						}
 						if (ret == AVERROR(EAGAIN)){
