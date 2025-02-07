@@ -6,7 +6,7 @@
 #include "player.hpp"
 
 int main(int argc, char* argv[]) {
-	[[maybe_unused]] std::string seek{};
+	[[maybe_unused]] std::string seek{"00:00:00"};
 	[[maybe_unused]] bool loop{};
 	[[maybe_unused]] double rate{1.0};
 
