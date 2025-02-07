@@ -17,18 +17,9 @@ extern "C" {
 }
 std::atomic<bool> resume_decoding{false};
 std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
+std::atomic<int> seek_progress{0};
+std::atomic<int>* seek_progress_ptr = &seek_progress;
 
-
-void format_time(int64_t secs){
-	if (secs>1*AV_TIME_BASE){
-	double total_seconds = static_cast<double>(secs) / 1000000.0; // 2500.721666 seconds
-	int hours = static_cast<int>(total_seconds) / 3600; // 0 hours
-	int minutes = (static_cast<int>(total_seconds) % 3600) / 60; // 41 minutes
-	int seconds = static_cast<int>(total_seconds) % 60; // 40 seconds
-
-	std::cout << "HH:MM:SS format: " << hours << ":" << minutes << ":" << seconds << std::endl;
-}
-}
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
 	int64_t current_pts = 0;
 	bool end_time_scaled=false;
@@ -42,7 +33,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 				while (ret >= 0) {
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
-						
+						seek_progress_ptr->store((current_pts/AV_TIME_BASE)%60);
 						if(!(end_time_scaled)){
 							double diviser = static_cast<double>(current_pts)/static_cast<double>(end_time);
 							end_time*=static_cast<int>(std::round(diviser));
@@ -51,7 +42,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 						if(current_pts>=end_time){
 							//sleep
 							while(!(resume_decoding.load())){
-								std::this_thread::sleep_for(std::chrono::milliseconds(10));
+								std::this_thread::sleep_for(std::chrono::milliseconds(1));
 							}
 							end_time+=1*AV_TIME_BASE;
 							resume_decoding_ptr->store(false);
@@ -150,6 +141,8 @@ class MyCallback : public oboe::AudioStreamCallback{
 				mdata_storage= new uint8_t[capacity];
 				resume_decoding_ptr->store(true);
 			}
+			if(seek_progress.load()>=playback_duration)
+				return oboe::DataCallbackResult::Stop;
 		return  oboe::DataCallbackResult::Continue;
 		}
 		void onErrorBeforeClose(oboe::AudioStream *media, oboe::Result error) override {
