@@ -28,7 +28,7 @@ int timeToSeconds(const std::string& seek_time){
 	try{
 	std::istringstream timeStream(seek_time);
 	timeStream >> hour>>delim>>minute>>delim>>second;
-	return hour*3600 + minute*60 + second;
+	return (hour*3600) + (minute*60) + second;
 	}catch(const std::runtime_error& err){
 		std::cerr<<err.what()<<"\n";
 		std::cerr << "time must be valid in the format HH:MM:SS\n";
