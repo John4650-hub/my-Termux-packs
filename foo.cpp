@@ -165,6 +165,7 @@ int main(int argc, char **argv) {
     }
 		int64_t start_time= 1* AV_TIME_BASE;
 		int64_t end_time=(1*AV_TIME_BASE) + start_time;
+		double sampleRate=1.0;
 
     AVFormatContext *formatCtx = NULL;
     int ret = avformat_open_input(&formatCtx, argv[1], NULL, NULL);
@@ -224,15 +225,14 @@ int main(int argc, char **argv) {
         std::cerr << "Could not allocate packet or frame\n";
         return -1;
     }
-
     SwrContext *swr_context = swr_alloc_set_opts(
         NULL,
         av_get_default_channel_layout(2),
         AV_SAMPLE_FMT_S16,
-        decoder_ctx->sample_rate * 2,
+        decoder_ctx->sample_rate * sampleRate,
         av_get_default_channel_layout(decoder_ctx->channels),
         decoder_ctx->sample_fmt,
-        decoder_ctx->sample_rate * 2,
+        decoder_ctx->sample_rate * sampleRate,
         0,
         NULL
     );
@@ -267,7 +267,7 @@ while(true){
 		builder.setFormat(oboe::AudioFormat::I16);
 		builder.setChannelCount(oboe::ChannelCount::Stereo);
 		builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
-		builder.setSampleRate(decoder_ctx->sample_rate * 2);
+		builder.setSampleRate(decoder_ctx->sample_rate * sampleRate);
 
 		oboe::AudioStream *mediaStream=nullptr;
 		oboe::Result result = builder.openStream(&mediaStream);
