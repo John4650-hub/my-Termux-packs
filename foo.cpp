@@ -33,7 +33,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 				while (ret >= 0) {
 						ret = avcodec_receive_frame(decoder_ctx, frame);
 						current_pts = frame->pts * av_q2d(formatCtx->streams[*stream_index]->time_base) * AV_TIME_BASE;
-						seek_progress_ptr->store((current_pts/AV_TIME_BASE)%60);
+						seek_progress_ptr->store((current_pts/AV_TIME_BASE));
 						if(!(end_time_scaled)){
 							double diviser = static_cast<double>(current_pts)/static_cast<double>(end_time);
 							end_time*=static_cast<int>(std::round(diviser));
