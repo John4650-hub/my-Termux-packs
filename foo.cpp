@@ -128,7 +128,7 @@ uint32_t totalFrames(const char *filename,int64_t end_time,AVFrame *frame) {
 
 class MyCallback : public oboe::AudioStreamCallback{
 	public:
-		MyCallback(oboe::FifoBuffer &buff,uint8_t* data_storage,int duration_secs) : mBuff(buff),mdata_storage(data_storage),mDuration_secs{duration_secs}
+		MyCallback(oboe::FifoBuffer &buff,uint8_t* data_storage,int duration_secs) : mBuff(buff),mdata_storage(data_storage),mDuration_secs(duration_secs){}
 		oboe::DataCallbackResult onAudioReady(oboe::AudioStream *media,void *audioData, int32_t numFrames) override{
 			auto floatData = static_cast<float*>(audioData);
 			int32_t framesRead = mBuff.read(floatData,numFrames);
