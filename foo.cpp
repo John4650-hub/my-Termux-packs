@@ -244,9 +244,10 @@ int main(int argc, char **argv) {
     int duration_seconds = duration_sec / (double)AV_TIME_BASE;
 		//OBOE GOES HERE
 		std::atomic<uint64_t> read_index{}, write_index{};
-		uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
-		uint8_t* data_storage = new uint8_t[4 * CapacityInFrames];
-		oboe::FifoBuffer buff(4,CapacityInFrames,&read_index,&write_index,data_storage);
+		//uint32_t CapacityInFrames =totalFrames(argv[1],end_time,frame);
+		int sz = std::stoi(argv[2]);
+		uint8_t* data_storage = new uint8_t[sz*4];
+		oboe::FifoBuffer buff(4,sz,&read_index,&write_index,data_storage);
 		std::thread t([&](){
 				getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context, &stream_index,buff,end_time);
 				});
