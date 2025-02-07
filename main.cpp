@@ -6,12 +6,11 @@
 #include "player.hpp"
 
 int main(int argc, char* argv[]) {
-	char* fname{};
 	[[maybe_unused]] std::string seek{};
 	[[maybe_unused]] bool loop{};
 	[[maybe_unused]] double rate{1.0};
 
-	argparse::ArgumentParser program("oboe-play","1.0.0",default_arguments::help, false);
+	argparse::ArgumentParser program("oboe-play","1.0.0",argparse::default_arguments::help, false);
 	
 	program.add_argument("-i")
 		.required()
@@ -32,15 +31,13 @@ int main(int argc, char* argv[]) {
 	try{
 		program.parse_args(argc,argv);
 		if (auto arg=program.present("-i")){
-			fname = arg->c_str();
+			const char* fname = arg->c_str();
+			play(fname,rate,seek);
 		}
-	}catch(const std::runtime_error& error){
+	}catch(const std::runtime_error& err){
 		std::cerr<<err.what()<<"\n";
 		std::cerr<<program<<"\n";
 		return 1;
 	}
-
-	const char* audio_file_name=fname;
-	play(audio_file_name,rate,seek);
 	return 0;
 }

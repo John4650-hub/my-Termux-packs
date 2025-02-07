@@ -137,7 +137,7 @@ class MyCallback : public oboe::AudioStreamCallback{
  * Take a the file name as input
  * and plays the audio file
  */
-void play(const char *file_name,double rate,const std:string& seek_time) {
+void play(const char* file_name,double rate,const std::string& seek_time) {
 		int64_t start_time= timeToSeconds(seek_time)* AV_TIME_BASE;
 		int64_t end_time=(1*AV_TIME_BASE) + start_time;
 		if(rate<0.1||rate>5.0){
@@ -147,7 +147,7 @@ void play(const char *file_name,double rate,const std:string& seek_time) {
 		double sampleRate=1.0;
 
     AVFormatContext *formatCtx = NULL;
-    int ret = avformat_open_input(&formatCtx, filename, NULL, NULL);
+    int ret = avformat_open_input(&formatCtx, file_name, NULL, NULL);
     if (ret < 0) {
         std::cerr << "Can't open file\n";
         return;
