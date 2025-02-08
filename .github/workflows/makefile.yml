@@ -17,9 +17,10 @@ jobs:
       run: |
         clang-format --version
         sudo apt-get install findutils -y
-        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format {} \;
+        clang-format -i player.cpp
+        clang-format -i main.cpp
         (echo ${{ github.sha }}) > sha.txt
-        zip -r formatted_files.zip $(find . -name "*.cpp" -o -name "*.hpp")
+        zip -r formatted_files.zip main.cpp player.cpp
         gh release create ${{ github.run_number }}.0.0 sha.txt formatted_files.zip
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
