@@ -20,8 +20,17 @@ extern "C" {
 }
 std::atomic<bool> resume_decoding{false};
 std::atomic<bool> *resume_decoding_ptr = &resume_decoding;
+std::atomic<bool> completed{false};
+std::atomic<bool> *completed_ptr=&completed;
 std::atomic<int> seek_progress{0};
 std::atomic<int> *seek_progress_ptr = &seek_progress;
+
+//check whether audio is completed
+void onCompletePlay(){
+	while(!completed.load()){
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+	}
+}
 
 // converts time from HH:MM:SS
 int timeToSeconds(const std::string &seek_time) {
@@ -133,8 +142,10 @@ public:
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
     }
-    if (seek_progress.load() >= mDuration_secs)
+    if (seek_progress.load() >= mDuration_secs){
+			completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
+		}
     return oboe::DataCallbackResult::Continue;
   }
   void onErrorBeforeClose(oboe::AudioStream *media,
@@ -278,7 +289,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     return;
   }
   std::cout << "duration: " << formatSeconds(duration_seconds) << std::endl;
-  std::this_thread::sleep_for(std::chrono::seconds(duration_seconds-timeToSeconds(seek_time)));
+  std::thread(onCompletePlay).join();
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
