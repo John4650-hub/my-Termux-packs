@@ -15,7 +15,8 @@ jobs:
     - uses: actions/checkout@v4
     - name: create releases
       run: |
-        sudo apt-get install findutils
+        sudo apt-get update -y
+        sudo apt-get install findutils -y
         find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {}
         echo done
         (echo ${{ github.sha }}) > sha.txt
