@@ -22,6 +22,7 @@ std::atomic<bool>* resume_decoding_ptr=&resume_decoding;
 std::atomic<int> seek_progress{0};
 std::atomic<int>* seek_progress_ptr = &seek_progress;
 
+//converts time from HH:MM:SS
 int timeToSeconds(const std::string& seek_time){
 	int hour,minute,second;
 	char delim;
@@ -33,10 +34,20 @@ int timeToSeconds(const std::string& seek_time){
 		std::cerr<<err.what()<<"\n";
 		std::cerr << "time must be valid in the format HH:MM:SS\n";
 		std::exit(1);
-
 	}
 }
 
+//converts time in seconds to HH:MM:SS
+std::string formatSeconds(int total_seconds) {
+    int hours = total_seconds / 3600;
+    int minutes = (total_seconds % 3600) / 60;
+    int seconds = total_seconds % 60;
+    std::ostringstream oss;
+    oss << std::setw(2) << std::setfill('0') << hours << ":"
+        << std::setw(2) << std::setfill('0') << minutes << ":"
+        << std::setw(2) << std::setfill('0') << seconds;
+    return oss.str();
+}
 
 // retrieves raw pcm data
 void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *decoder_ctx, AVFrame *frame, SwrContext *swr_context, int *stream_index,oboe::FifoBuffer &Buff,int64_t end_time) {
@@ -86,7 +97,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet, AVCodecContext *de
 								swr_context, converted_data, frame->nb_samples,
 								(const uint8_t **)frame->data, frame->nb_samples
 						);
-
 						if (convert_ret < 0) {
 								std::cerr << "Error during resampling\n";
 								break;
@@ -256,7 +266,7 @@ while(true){
 			std::cerr << "failed to start stream\n";
 			return;
 		}
-		std::cout<<"duration: "<<duration_seconds<<std::endl;
+		std::cout<<"duration: "<<formatSeconds(duration_seconds)<<std::endl;
 		std::this_thread::sleep_for(std::chrono::seconds(duration_seconds));
 		mediaStream->stop();
 		mediaStream->close();

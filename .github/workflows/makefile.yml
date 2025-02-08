@@ -15,9 +15,11 @@ jobs:
     - uses: actions/checkout@v4
     - name: create releases
       run: |
+        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {}
         echo done
         (echo ${{ github.sha }}) > sha.txt
-        gh release create ${{ github.run_number }}.0.0 sha.txt
+        zip -r formatted_files.zip $(find . -name "*.cpp" -o -name "*.hpp")
+        gh release create ${{ github.run_number }}.0.0 sha.txt formatted_files.zip
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
       shell: bash
