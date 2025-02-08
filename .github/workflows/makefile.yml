@@ -17,7 +17,7 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install findutils -y
-        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {}
+        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {} \;
         echo done
         (echo ${{ github.sha }}) > sha.txt
         zip -r formatted_files.zip $(find . -name "*.cpp" -o -name "*.hpp")
