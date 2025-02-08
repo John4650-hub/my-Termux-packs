@@ -134,6 +134,8 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
+		std::cout<<"Readercounter: "<<mBuff.getReadCounter()<<"\n";
+		std::count<< "writeCounter: "<<mBuff.getWriteCounter()<<"\n";
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
       mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
