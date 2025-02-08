@@ -16,10 +16,8 @@ jobs:
     - name: create releases
       run: |
         clang-format --version
-        sudo apt-get update -y
         sudo apt-get install findutils -y
-        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format -i {} \;
-        echo done
+        find . -name "*.cpp" -o -name "*.hpp" -exec clang-format {} \;
         (echo ${{ github.sha }}) > sha.txt
         zip -r formatted_files.zip $(find . -name "*.cpp" -o -name "*.hpp")
         gh release create ${{ github.run_number }}.0.0 sha.txt formatted_files.zip
