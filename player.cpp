@@ -194,7 +194,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     return;
   }
   int64_t end_time = (1 * AV_TIME_BASE) + start_time;
-  av_seek_frame(formatCtx, stream_index, start_time, AVSEEK_FLAG_BACKWARD);
+  av_seek_frame(formatCtx, stream_index, start_time, AVSEEK_FLAG_ANY);
 
   AVCodecContext *decoder_ctx = avcodec_alloc_context3(decoder);
 
@@ -248,7 +248,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
                &stream_index, buff, end_time);
   });
   t.detach();
-  // wait writing to begin
+  // wait for aome data to be written  to buffer before beginning playback
   while (true) {
     if (buff.getWriteCounter() < 1000) {
       std::cout << "seeking done\n";
