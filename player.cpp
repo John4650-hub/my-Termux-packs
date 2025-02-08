@@ -278,7 +278,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     return;
   }
   std::cout << "duration: " << formatSeconds(duration_seconds) << std::endl;
-  std::this_thread::sleep_for(std::chrono::seconds(duration_seconds));
+  std::this_thread::sleep_for(std::chrono::seconds(duration_seconds-timeToSeconds(seek_time)));
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
