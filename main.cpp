@@ -1,6 +1,5 @@
 #include "player.hpp"
 #include <argparse/argparse.hpp>
-#include <vector>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,16 +7,13 @@
 
 int main(int argc, char *argv[]) {
   [[maybe_unused]] std::string seek{"00:00:00"};
-  [[maybe_unused]] bool loop{false};
+  [[maybe_unused]] bool loop{};
   [[maybe_unused]] double rate{1.0};
 
   argparse::ArgumentParser program("oboe-play", "1.0.0",
                                    argparse::default_arguments::help, false);
 
-  program.add_argument("-i")
-		.required()
-		.nargs(argparse::nargs_pattern::at_least_one)
-		.help("Name or comma separated names of the audio file(s)");
+  program.add_argument("-i").required().help("Name of the audio file");
 
   program.add_argument("-s", "--seek")
       .store_into(seek)
@@ -33,19 +29,14 @@ int main(int argc, char *argv[]) {
 
   try {
     program.parse_args(argc, argv);
+    if (auto arg = program.present("-i")) {
+      const char *fname = arg->c_str();
+      play(fname, rate, seek);
+    }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";
     std::cerr << program << "\n";
     return 1;
   }
-	auto files = program.get<std::vector<std::string>>("-i");
-	if(loop){
-		while(true){
-			for(std::string str:files)
-				play(str.c_str(), rate, seek);
-		}
-	}else
-		for(std::string str:files)
-			play(str.c_str(),rate,seek);
   return 0;
 }
