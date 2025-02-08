@@ -174,6 +174,7 @@ private:
 void play(const char *file_name, double rate, const std::string &seek_time) {
 	completed_ptr->store(false);//reset the player
 	resume_decoding_ptr->store(false);
+	seek_progress_ptr->store(0);
   if (rate < 0.1 || rate > 5.0) {
     std::cerr << "Rate must be from 0.1-3.0\n";
     return;
