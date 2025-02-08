@@ -134,8 +134,6 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-		std::cout<<"Readercounter: "<<mBuff.getReadCounter()<<"\n";
-		std::cout<< "writeCounter: "<<mBuff.getWriteCounter()<<"\n";
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
       mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
@@ -199,7 +197,7 @@ int64_t duration_microseconds =
   int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
 
 	if(seek_time_sec<duration_seconds){
-		goto end;
+		return;
 	}
   int stream_index =
       av_find_best_stream(formatCtx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
@@ -307,6 +305,4 @@ int64_t duration_microseconds =
   avcodec_free_context(&decoder_ctx);
   avformat_close_input(&formatCtx);
   swr_free(&swr_context);
-end:
-	return;
 }
