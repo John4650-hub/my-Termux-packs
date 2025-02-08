@@ -180,7 +180,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     return;
   }
   double sampleRate = rate;
-
+	int seek_time_sec = timeToSeconds(seek_time);
   AVFormatContext *formatCtx = NULL;
   int ret = avformat_open_input(&formatCtx, file_name, NULL, NULL);
   if (ret < 0) {
@@ -193,7 +193,14 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     std::cerr << "Could not find any info\n";
     return;
   }
+int64_t duration_microseconds =
+      formatCtx->duration +
+      (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
+  int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
 
+	if(seek_time_sec<duration_seconds){
+		goto end;
+	}
   int stream_index =
       av_find_best_stream(formatCtx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
   if (stream_index < 0) {
@@ -201,7 +208,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     return;
   }
   AVStream *media = formatCtx->streams[stream_index];
-  int64_t start_time = av_rescale_q(timeToSeconds(seek_time) * AV_TIME_BASE,
+  int64_t start_time = av_rescale_q(seek_time_sec * AV_TIME_BASE,
                                     AV_TIME_BASE_Q, media->time_base);
   AVCodec *decoder = avcodec_find_decoder(media->codecpar->codec_id);
   if (!decoder) {
@@ -251,18 +258,15 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     std::cerr << "Could not initialize resampler\n";
     return;
   }
-  int64_t duration_microseconds =
-      formatCtx->duration +
-      (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
-  int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
-  std::atomic<uint64_t> read_index{}, write_index{};
+	std::atomic<uint64_t> read_index{}, write_index{};
   uint8_t *data_storage = new uint8_t[400000];
   oboe::FifoBuffer buff(4, 400000, &read_index, &write_index, data_storage);
   std::thread t([&]() {
     getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
                &stream_index, buff, end_time);
   });
-  t.detach();
+
+	t.detach();
   // wait for aome data to be written  to buffer before beginning playback
   while (true) {
     if (buff.getWriteCounter() < 1000) {
@@ -272,6 +276,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     std::cout << "still seeking to right position\n";
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
+	
   MyCallback audioCallback(buff, data_storage, duration_seconds);
   oboe::AudioStreamBuilder builder;
   builder.setCallback(&audioCallback);
@@ -302,4 +307,6 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
   avcodec_free_context(&decoder_ctx);
   avformat_close_input(&formatCtx);
   swr_free(&swr_context);
+end:
+	return;
 }
