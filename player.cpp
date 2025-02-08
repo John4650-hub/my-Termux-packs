@@ -198,7 +198,7 @@ int64_t duration_microseconds =
       (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
   int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
 
-	if(seek_time_sec<duration_seconds){
+	if(seek_time_sec>duration_seconds){
 		return;
 	}
   int stream_index =
