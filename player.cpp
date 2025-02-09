@@ -89,7 +89,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           // sleep
 					
           while (!(resume_decoding.load())) {
-						if(completed){
+						if(completed.load()){
 							return;
 						}
             std::this_thread::sleep_for(std::chrono::microseconds(10));
