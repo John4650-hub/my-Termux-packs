@@ -89,12 +89,15 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           // sleep
 					
           while (!(resume_decoding.load())) {
+						if(completed){
+							return;
+						}
             std::this_thread::sleep_for(std::chrono::microseconds(10));
           }
           end_time += 1 * AV_TIME_BASE;
           resume_decoding_ptr->store(false);
         }
-        if (ret == AVERROR(EAGAIN)) {
+      if (ret == AVERROR(EAGAIN)) {
           break;
         } else if (ret == AVERROR_EOF) {
           return;
@@ -303,6 +306,7 @@ int64_t duration_microseconds =
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
+	delete[] data_storage;
   av_frame_free(&frame);
   av_packet_free(&packet);
   avcodec_free_context(&decoder_ctx);

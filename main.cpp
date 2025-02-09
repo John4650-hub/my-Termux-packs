@@ -1,7 +1,6 @@
 #include "player.hpp"
 #include <argparse/argparse.hpp>
 #include <iostream>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string>
 
