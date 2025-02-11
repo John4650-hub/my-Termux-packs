@@ -18,6 +18,7 @@ extern "C" {
 #include <libavutil/avutil.h>
 #include <libswresample/swresample.h>
 }
+
 std::atomic<bool> resume_decoding{false};
 std::atomic<bool> *resume_decoding_ptr = &resume_decoding;
 std::atomic<bool> completed{false};
