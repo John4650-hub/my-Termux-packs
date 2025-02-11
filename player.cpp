@@ -22,8 +22,8 @@ std::atomic<bool> resume_decoding{false};
 std::atomic<bool> *resume_decoding_ptr = &resume_decoding;
 std::atomic<bool> completed{false};
 std::atomic<bool> *completed_ptr=&completed;
-std::atomic<int> seek_progress{0};
-std::atomic<int> *seek_progress_ptr = &seek_progress;
+std::atomic<double> seek_progress{0};
+std::atomic<double> *seek_progress_ptr = &seek_progress;
 
 //check whether audio is completed
 void onCompletePlay(){
@@ -86,8 +86,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           end_time_scaled = true;
         }
         if (current_pts >= end_time) {
-          // sleep
-					
           while (!(resume_decoding.load())) {
 						if(completed.load()){
 							return;
@@ -146,7 +144,7 @@ public:
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
     }
-    if (seek_progress.load() >= mDuration_secs){
+    if (seek_progress.load() >= mDuration_secsi && mBuff.getReadCounter() == mBuff.getWriteCounter()){
 			delete[] mdata_storage;
 			completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
