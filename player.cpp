@@ -146,7 +146,6 @@ public:
       resume_decoding_ptr->store(true);
     }
     if (seek_progress.load() >= mDuration_secs && mBuff.getReadCounter() == mBuff.getWriteCounter()){
-			delete[] mdata_storage;
 			completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
 		}
