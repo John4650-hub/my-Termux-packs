@@ -260,7 +260,7 @@ int64_t duration_microseconds =
     return;
   }
 	std::atomic<uint64_t> read_index{}, write_index{};
-  uint8_t *data_storage = new uint8_t[4000000];
+  uint8_t *data_storage = new uint8_t[400000];
   oboe::FifoBuffer buff(4, 400000, &read_index, &write_index, data_storage);
   std::thread t([&]() {
     getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
