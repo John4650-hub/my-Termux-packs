@@ -145,7 +145,7 @@ public:
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
     }
-    if (seek_progress.load() >= mDuration_secsi && mBuff.getReadCounter() == mBuff.getWriteCounter()){
+    if (seek_progress.load() >= mDuration_secs && mBuff.getReadCounter() == mBuff.getWriteCounter()){
 			delete[] mdata_storage;
 			completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
