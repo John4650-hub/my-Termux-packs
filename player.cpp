@@ -23,8 +23,8 @@ std::atomic<bool> resume_decoding{false};
 std::atomic<bool> *resume_decoding_ptr = &resume_decoding;
 std::atomic<bool> completed{false};
 std::atomic<bool> *completed_ptr=&completed;
-std::atomic<double> seek_progress{0};
-std::atomic<double> *seek_progress_ptr = &seek_progress;
+std::atomic<double> current_stream_duration{0};
+std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 
 //check whether audio is completed
 void onCompletePlay(){
@@ -79,7 +79,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
         current_pts = frame->pts *
                       av_q2d(formatCtx->streams[*stream_index]->time_base) *
                       AV_TIME_BASE;
-        seek_progress_ptr->store((current_pts / AV_TIME_BASE));
+        current_stream_duration_ptr->store((current_pts / AV_TIME_BASE));
         if (!(end_time_scaled)) {
           double diviser =
               static_cast<double>(current_pts) / static_cast<double>(end_time);
@@ -145,9 +145,7 @@ public:
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
     }
-    if (seek_progress.load() >= mDuration_secs){
-			std::cout<<"seek: "<<seek_progress.load()<<std::endl;
-			std::cout<<"duratioSecs: "<<mDuration_secs<<std::endl;
+    if (current_stream_duration.load() >= mDuration_secs){
 			completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
 		}
@@ -158,7 +156,6 @@ public:
     std::cerr << "Error before close: " << oboe::convertToText(error)
               << std::endl;
   }
-
   void onErrorAfterClose(oboe::AudioStream *media,
                          oboe::Result error) override {
     std::cerr << "Error after close: " << oboe::convertToText(error)
@@ -178,7 +175,7 @@ private:
 void play(const char *file_name, double rate, const std::string &seek_time) {
 	completed_ptr->store(false);//reset the player
 	resume_decoding_ptr->store(false);
-	seek_progress_ptr->store(0);
+	current_stream_duration_ptr->store(0);
   if (rate < 0.1 || rate > 5.0) {
     std::cerr << "Rate must be from 0.1-3.0\n";
     return;
@@ -263,8 +260,8 @@ int64_t duration_microseconds =
     return;
   }
 	std::atomic<uint64_t> read_index{}, write_index{};
-  uint8_t *data_storage = new uint8_t[400000];
-  oboe::FifoBuffer buff(4, 400000, &read_index, &write_index, data_storage);
+  uint8_t *data_storage = new uint8_t[4000];
+  oboe::FifoBuffer buff(4, 4000, &read_index, &write_index, data_storage);
   std::thread t([&]() {
     getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
                &stream_index, buff, end_time);
