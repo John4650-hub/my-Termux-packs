@@ -151,8 +151,8 @@ public:
       delete[] mdata_storage;
       mdata_storage = nullptr;
       mdata_storage = new uint8_t[capacity];
-      resume_decoding_ptr->store(true);
 			}
+      resume_decoding_ptr->store(true);
     }
     return oboe::DataCallbackResult::Continue;
   }
