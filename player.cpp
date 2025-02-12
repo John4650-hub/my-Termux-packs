@@ -141,7 +141,7 @@ public:
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
 			if (current_stream_duration.load() >= mDuration_secs){
 				std::cout<<"Greater\n";
-				completed_ptr->store(true);
+				//completed_ptr->store(true);
 				//return oboe::DataCallbackResult::Stop;
 		}
 			mBuff.setReadCounter(0);
