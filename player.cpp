@@ -144,6 +144,7 @@ public:
 				completed_ptr->store(true);
 				//return oboe::DataCallbackResult::Stop;
 		}
+			if (!(current_stream_duration.load()>mDuration_secs-20)){
       mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
@@ -151,6 +152,7 @@ public:
       mdata_storage = nullptr;
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
+			}
     }
     return oboe::DataCallbackResult::Continue;
   }
