@@ -80,10 +80,11 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                       av_q2d(formatCtx->streams[*stream_index]->time_base) *
                       AV_TIME_BASE;
         current_stream_duration_ptr->store((current_pts / AV_TIME_BASE));
+				//Try to scale the end_time such that the intetval to make it slightly greater that the current_pts;
         if (!(end_time_scaled)) {
           double diviser =
               static_cast<double>(current_pts) / static_cast<double>(end_time);
-          end_time *= static_cast<int>(std::round(diviser));
+          end_time *= static_cast<int>(std::round(diviser)); 
           end_time_scaled = true;
         }
         if (current_pts >= end_time) {
@@ -176,7 +177,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
 	completed_ptr->store(false);//reset the player
 	resume_decoding_ptr->store(false);
 	current_stream_duration_ptr->store(0);
-  if (rate < 0.1 || rate > 5.0) {
+  if (rate < 0.1 || rate > 3.0) {
     std::cerr << "Rate must be from 0.1-3.0\n";
     return;
   }
@@ -285,9 +286,11 @@ int64_t duration_microseconds =
   builder.setChannelCount(oboe::ChannelCount::Stereo);
   builder.setPerformanceMode(oboe::PerformanceMode::LowLatency);
   builder.setSampleRate(decoder_ctx->sample_rate * sampleRate);
+  builder.setContentType(oboe::ContentType::Music);
+
   oboe::AudioStream *mediaStream = nullptr;
   oboe::Result result = builder.openStream(&mediaStream);
-
+	mediaStream->setDelayBeforeCloseMillis(1000);
   if (result != oboe::Result::OK) {
     std::cerr << "failed to create stream\n";
     return;
