@@ -29,7 +29,7 @@ std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 //check whether audio is completed
 void onCompletePlay(){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::seconds(5));
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 }
 
@@ -140,13 +140,12 @@ public:
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
 			if (current_stream_duration.load() >= mDuration_secs){
-				std::cout<<"Greater\n";
 				completed_ptr->store(true);
 				//return oboe::DataCallbackResult::Stop;
 		}
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
-
+			// stop deleting the buffer storage when the audio is left with 10 seconds to completion
 			if (!(current_stream_duration.load()>mDuration_secs-10)){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
