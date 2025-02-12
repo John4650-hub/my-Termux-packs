@@ -29,7 +29,7 @@ std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 //check whether audio is completed
 void onCompletePlay(){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 }
 
