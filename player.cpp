@@ -294,7 +294,6 @@ int64_t duration_microseconds =
 
   oboe::AudioStream *mediaStream = nullptr;
   oboe::Result result = builder.openStream(&mediaStream);
-	mediaStream->setDelayBeforeCloseMillis(1000);
   if (result != oboe::Result::OK) {
     std::cerr << "failed to create stream\n";
     return;
