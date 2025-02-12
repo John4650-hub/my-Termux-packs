@@ -29,7 +29,7 @@ std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 //check whether audio is completed
 void onCompletePlay(){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::seconds(100));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 
@@ -138,6 +138,10 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
+			if (current_stream_duration.load() >= mDuration_secs){
+				completed_ptr->store(true);
+				return oboe::DataCallbackResult::Stop;
+		}
       mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
@@ -146,10 +150,6 @@ public:
       mdata_storage = new uint8_t[capacity];
       resume_decoding_ptr->store(true);
     }
-    if (current_stream_duration.load() >= mDuration_secs){
-			completed_ptr->store(true);
-      return oboe::DataCallbackResult::Stop;
-		}
     return oboe::DataCallbackResult::Continue;
   }
   void onErrorBeforeClose(oboe::AudioStream *media,
