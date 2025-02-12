@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
   program.add_argument("-l", "--loop")
       .store_into(loop)
       .help("whether to repeat the audio playback on complete");
-	program.add_argument("-p")
+	program.add_argument("-p","--ppp")
 		.store_into(nsleep)
 		.help("Just testing for correct sleep after playing");
 
