@@ -29,7 +29,7 @@ std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 //check whether audio is completed
 void onCompletePlay(){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::seconds(3));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 	}
 }
 
@@ -145,8 +145,8 @@ public:
 		}
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
-			// stop deleting the buffer storage when the audio is left with 10 seconds to completion
-			if (!(current_stream_duration.load()>mDuration_secs-10)){
+			// stop deleting the buffer storage when the audio is left with 5 seconds to completion
+			if (!(current_stream_duration.load()>mDuration_secs-5)){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
       mdata_storage = nullptr;
@@ -294,7 +294,7 @@ int64_t duration_microseconds =
 
   oboe::AudioStream *mediaStream = nullptr;
   oboe::Result result = builder.openStream(&mediaStream);
-	mediaStream->setDelayBeforeCloseMillis(1000000);
+	mediaStream->setDelayBeforeCloseMillis(1000);
   if (result != oboe::Result::OK) {
     std::cerr << "failed to create stream\n";
     return;
