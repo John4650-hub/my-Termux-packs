@@ -94,7 +94,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
 						}
             std::this_thread::sleep_for(std::chrono::microseconds(10));
           }
-          end_time += 1 * AV_TIME_BASE;
+          end_time += AV_TIME_BASE;
           resume_decoding_ptr->store(false);
         }
       if (ret == AVERROR(EAGAIN)) {
@@ -124,7 +124,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
-}
+
 
 // callback class for creating oboe callback
 class MyCallback : public oboe::AudioStreamCallback {
@@ -137,7 +137,7 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-    if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
+    if (mBuff.getReadCounter() > mBuff.getWriteCounter()) {
 			if (current_stream_duration.load() >= mDuration_secs){
 				completed_ptr->store(true);
 				return oboe::DataCallbackResult::Stop;
