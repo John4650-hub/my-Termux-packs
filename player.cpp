@@ -27,9 +27,9 @@ std::atomic<double> current_stream_duration{0};
 std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 
 //check whether audio is completed
-void onCompletePlay(){
+void onCompletePlay(int n){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+		std::this_thread::sleep_for(std::chrono::milliseconds(n));
 	}
 }
 
@@ -177,7 +177,7 @@ private:
  * Take a the file name as input
  * and plays the audio file
  */
-void play(const char *file_name, double rate, const std::string &seek_time) {
+void play(const char *file_name, double rate, const std::string &seek_time,int nsleep) {
 	completed_ptr->store(false);//reset the player
 	resume_decoding_ptr->store(false);
 	current_stream_duration_ptr->store(0);
@@ -306,7 +306,7 @@ int64_t duration_microseconds =
     return;
   }
   std::cout << "duration: " << formatSeconds(duration_seconds) << std::endl;
-  std::thread(onCompletePlay).join();
+  std::thread(onCompletePlay,nsleep).join();
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
