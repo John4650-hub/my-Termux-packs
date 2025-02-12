@@ -144,9 +144,10 @@ public:
 				completed_ptr->store(true);
 				//return oboe::DataCallbackResult::Stop;
 		}
-			if (!(current_stream_duration.load()>mDuration_secs-20)){
-      mBuff.setReadCounter(0);
+			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
+
+			if (!(current_stream_duration.load()>mDuration_secs-10)){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
       mdata_storage = nullptr;
