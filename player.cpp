@@ -144,7 +144,7 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
-			if (current_stream_duration.load() >= mDuration_secs+10){
+			if (current_stream_duration.load() >= mDuration_secs+30){
 				completed_ptr->store(true);
 				return oboe::DataCallbackResult::Stop;
 		}
