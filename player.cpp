@@ -151,7 +151,7 @@ public:
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
 			// stop deleting the buffer storage when the audio is left with 5 seconds to completion
-			if (!(current_stream_duration.load()>mDuration_secs-5)){
+			if (!(current_stream_duration.load()>mDuration_secs-20)){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
       mdata_storage = nullptr;
