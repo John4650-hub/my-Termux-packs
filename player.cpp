@@ -144,14 +144,14 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
-			if (current_stream_duration.load() >= mDuration_secs+30){
+			if (current_stream_duration.load() >= mDuration_secs+400){
 				completed_ptr->store(true);
 				return oboe::DataCallbackResult::Stop;
 		}
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
 			// stop deleting the buffer storage when the audio is left with 5 seconds to completion
-			if (!(current_stream_duration.load()>mDuration_secs-20)){
+			if (!(current_stream_duration.load()>mDuration_secs-5)){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
       mdata_storage = nullptr;
