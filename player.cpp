@@ -124,7 +124,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
- int32_t space= Buff.getEmptyFramesAvailable();
+ int32_t space= Buff.getFullFramesAvailable();
  std::cout<<"spaceAvailable: "<<space<<"\n";
 }
 
