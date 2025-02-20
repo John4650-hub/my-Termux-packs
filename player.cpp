@@ -119,7 +119,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
         }
         // write pcm data to Fifobuffer
         Buff.write(converted_data[0], frame->nb_samples);
-        //av_freep(&converted_data[0]);
+        av_freep(&converted_data[0]);
       }
       av_packet_unref(packet);
     }
@@ -144,7 +144,7 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
-			if (current_stream_duration.load() >= mDuration_secs+400){
+			if (current_stream_duration.load() >= mDuration_secs){
 				completed_ptr->store(true);
 				return oboe::DataCallbackResult::Stop;
 		}
