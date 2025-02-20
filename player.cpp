@@ -124,8 +124,11 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
- int32_t space= Buff.getEmptyFramesAvailable();
- std::cout<<"spaceAvailable: "<<space<<"\n";
+ int32_t remaining_space = Buff.getEmptyFramesAvailable();
+ uint8_t *silence = new uint8_t[remaining_space]; // Create an array filled with zeros
+std::fill(silence, silence + remaining_space, 0); // Fill the array with zeros
+ Buff.write(silence, remaining_space); // Write silence to the buffer
+ delete[] silence; // Free the allocated memory
 }
 
 
