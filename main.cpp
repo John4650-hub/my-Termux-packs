@@ -44,6 +44,7 @@ auto timer_Options_list =  Menu(&time_options, &selected_time)|CatchEvent([&](Ev
             selected_time = (selected_time + 1) % time_options.size();
 						ptr_->store(std::stoi(time_options[selected_time]));
             return true;
+
         }
         if (event == Event::ArrowUp) {
 				g_screen.PostEvent(Event::Custom);
