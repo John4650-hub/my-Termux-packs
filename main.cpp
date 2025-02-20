@@ -8,7 +8,6 @@ int main(int argc, char *argv[]) {
   [[maybe_unused]] std::string seek{"00:00:00"};
   [[maybe_unused]] bool loop{};
   [[maybe_unused]] double rate{1.0};
-	[[maybe_unused]] int nsleep{};
 
   argparse::ArgumentParser program("oboe-play", "1.0.0",
                                    argparse::default_arguments::help, false);
@@ -26,15 +25,12 @@ int main(int argc, char *argv[]) {
   program.add_argument("-l", "--loop")
       .store_into(loop)
       .help("whether to repeat the audio playback on complete");
-	program.add_argument("-p","--ppp")
-		.store_into(nsleep)
-		.help("Just testing for correct sleep after playing");
 
   try {
     program.parse_args(argc, argv);
     if (auto arg = program.present("-i")) {
       const char *fname = arg->c_str();
-      play(fname, rate, seek,nsleep);
+      play(fname, rate, seek);
     }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";

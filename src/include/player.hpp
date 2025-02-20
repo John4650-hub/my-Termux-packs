@@ -2,6 +2,6 @@
 #define PLAYER_H
 #include <string>
 
-void play(const char* file_name,double rate,const std::string& seek_time,int nsleep);
+void play(const char* file_name,double rate,const std::string& seek_time);
 
 #endif

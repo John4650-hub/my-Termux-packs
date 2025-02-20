@@ -27,9 +27,9 @@ std::atomic<double> current_stream_duration{0};
 std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 
 //check whether audio is completed
-void onCompletePlay(int n){
+void onCompletePlay(){
 	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::milliseconds(n));
+		std::this_thread::sleep_for(std::chrono::milliseconds(0));
 	}
 }
 
@@ -126,7 +126,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
   }
  int32_t remaining_space = Buff.getEmptyFramesAvailable();
  uint8_t *silence = new uint8_t[remaining_space]; // Create an array filled with zeros
-std::fill(silence, silence + remaining_space, 0); // Fill the array with zeros
+ std::fill(silence, silence + remaining_space, 0); // Fill the array with zeros
  Buff.write(silence, remaining_space); // Write silence to the buffer
  delete[] silence; // Free the allocated memory
 }
@@ -144,9 +144,9 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
-			if (current_stream_duration.load() >= mDuration_secs){
+			if (current_stream_duration.load() >= mDuration_secs+10){
 				completed_ptr->store(true);
-				//return oboe::DataCallbackResult::Stop;
+				return oboe::DataCallbackResult::Stop;
 		}
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
@@ -182,7 +182,7 @@ private:
  * Take a the file name as input
  * and plays the audio file
  */
-void play(const char *file_name, double rate, const std::string &seek_time,int nsleep) {
+void play(const char *file_name, double rate, const std::string &seek_time) {
 	completed_ptr->store(false);//reset the player
 	resume_decoding_ptr->store(false);
 	current_stream_duration_ptr->store(0);
@@ -310,7 +310,7 @@ int64_t duration_microseconds =
     return;
   }
   std::cout << "duration: " << formatSeconds(duration_seconds) << std::endl;
-  std::thread(onCompletePlay,nsleep).join();
+  std::thread(onCompletePlay).join();
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
