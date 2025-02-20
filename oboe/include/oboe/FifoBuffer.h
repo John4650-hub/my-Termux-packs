@@ -104,6 +104,9 @@ public:
     uint32_t getFullFramesAvailable() {
         return mFifo->getFullFramesAvailable();
     }
+    uint32_t getEmptyFramesAvailable(){
+    return mFifo->getEmptyFramesAvailable();
+    }
 
 	/**
 	 * Get the amount of bytes per frame.
