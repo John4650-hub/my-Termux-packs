@@ -3,10 +3,10 @@ TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
 LDFLAGS = -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm
 
-liblisdir.so: $(FILENAME)
-	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./src/include counter.cpp main.cpp -o liblisdir.so $(LDFLAGS)
-install: liblisdir.so
-	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+timer.so: $(FILENAME)
+	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./src/include counter.cpp main.cpp -o timer.so $(LDFLAGS)
+install: timer.so
+	install timer.so $(DESTDIR)$(PREFIX)/lib/timer.so
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+	rm -f $(DESTDIR)$(PREFIX)/lib/timer.so
