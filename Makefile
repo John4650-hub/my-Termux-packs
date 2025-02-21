@@ -1,7 +1,7 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
-LDFLAGS = -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm
+LDFLAGS = -lavformat -lavcodec -lswresample -lavutil -lOpenSLES -ldl -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm
 
 timer.so: $(FILENAME)
 	$(CXX) -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./src/include player.cpp counter.cpp main.cpp -o timer.so $(LDFLAGS)
