@@ -49,7 +49,7 @@ int timeToSeconds(const std::string &seek_time) {
 }
 
 // converts time in seconds to HH:MM:SS
-std::string formatSeconds(int total_seconds) {
+std::string formPlayerSeconds(int total_seconds) {
   int hours = total_seconds / 3600;
   int minutes = (total_seconds % 3600) / 60;
   int seconds = total_seconds % 60;
@@ -272,7 +272,7 @@ int64_t duration_microseconds =
     std::cerr << "failed to start stream\n";
     return;
   }
-  std::cout << "duration: " << formatSeconds(duration_seconds) << std::endl;
+  std::cout << "duration: " << formPlayerSeconds(duration_seconds) << std::endl;
   std::thread(onCompletePlay).join();
   mediaStream->stop();
   mediaStream->close();
