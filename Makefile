@@ -4,7 +4,7 @@ CFLAGS += -Wall -Wextra -Werror
 LDFLAGS = -loboe -lavformat -lavcodec -lswresample -lavutil -lOpenSLES -ldl -lftxui-screen -lftxui-dom -lftxui-component -pthread -lm
 
 timer.so: $(FILENAME)
-	$(CXX) -g -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./src/include/ player.cpp counter.cpp main.cpp -o timer.so $(LDFLAGS)
+	$(CXX) -g -I$(TERMUX_PREFIX)/include -L$(TERMUX_PREFIX)/lib -I./src/include/ counter.cpp main.cpp -o timer.so $(LDFLAGS)
 
 install: timer.so
 	install timer.so $(DESTDIR)$(PREFIX)/lib/timer.so
