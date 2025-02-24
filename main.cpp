@@ -12,7 +12,7 @@
 using namespace ftxui;
 
 ButtonOption style(){
-	auto option = ButtonOption::Animated();
+	auto option = ButtonOption::Annimated();
 	option.transform = [](const EntryState& s){
 		auto element = text(s.label);
 		if (s.focused)
