@@ -124,11 +124,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
- int32_t remaining_space = Buff.getEmptyFramesAvailable();
- uint8_t *silence = new uint8_t[remaining_space]; // Create an array filled with zeros
- std::fill(silence, silence + remaining_space, 0); // Fill the array with zeros
- Buff.write(silence, remaining_space); // Write silence to the buffer
- delete[] silence; // Free the allocated memory
 }
 
 
@@ -151,7 +146,7 @@ public:
 			mBuff.setReadCounter(0);
       mBuff.setWriteCounter(0);
 			// stop deleting the buffer storage when the audio is left with 5 seconds to completion
-			if (!(current_stream_duration.load()>mDuration_secs-5)){
+			if (!(completed.load())){
       uint32_t capacity = mBuff.getBufferCapacityInFrames();
       delete[] mdata_storage;
       mdata_storage = nullptr;
