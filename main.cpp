@@ -18,7 +18,7 @@ ButtonOption style(){
 		if (s.focused)
 			element |= bold;
 		return element|center|borderEmpty|flex;
-	};
+};
 	return option;
 }
 
