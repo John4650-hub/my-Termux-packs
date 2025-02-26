@@ -7,7 +7,6 @@
 #include <vector>
 #include <atomic>
 #include <string>
-#include "player.hpp"
 
 using namespace ftxui;
 
@@ -23,7 +22,6 @@ ButtonOption style(){
 }
 
 int main(){
-  play("/system/media/audio/ringtones/Tango.ogg");
 	std::atomic<int>* ptr_  = &g_init_time;
 	std::vector<std::string> time_options;
 	int selected_time = 0;
