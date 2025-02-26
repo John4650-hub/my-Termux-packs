@@ -42,8 +42,6 @@ int timeToSeconds(const std::string &seek_time) {
     timeStream >> hour >> delim >> minute >> delim >> second;
     return (hour * 3600) + (minute * 60) + second;
   } catch (const std::runtime_error &err) {
-    std::cerr << err.what() << "\n";
-    std::cerr << "time must be valid in the format HH:MM:SS\n";
     std::exit(1);
   }
 }
@@ -229,7 +227,6 @@ int64_t duration_microseconds =
       av_get_default_channel_layout(decoder_ctx->channels),
       decoder_ctx->sample_fmt, decoder_ctx->sample_rate * sampleRate, 0, NULL);
   if (!swr_context || swr_init(swr_context) < 0) {
-    std::cerr << "Could not initialize resampler\n";
     return;
   }
 	std::atomic<uint64_t> read_index{}, write_index{};
@@ -244,10 +241,8 @@ int64_t duration_microseconds =
   // wait for aome data to be written  to buffer before beginning playback
   while (true) {
     if (buff.getWriteCounter() < 1000) {
-      std::cout << "seeking done\n";
       break;
     }
-    std::cout << "still seeking to right position\n";
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 	
@@ -263,16 +258,13 @@ int64_t duration_microseconds =
   oboe::AudioStream *mediaStream = nullptr;
   oboe::Result result = builder.openStream(&mediaStream);
   if (result != oboe::Result::OK) {
-    std::cerr << "failed to create stream\n";
     return;
   }
 
   result = mediaStream->start();
   if (result != oboe::Result::OK) {
-    std::cerr << "failed to start stream\n";
     return;
   }
-  std::cout << "duration: " << formPlayerSeconds(duration_seconds) << std::endl;
   std::thread(onCompletePlay).join();
   mediaStream->stop();
   mediaStream->close();
