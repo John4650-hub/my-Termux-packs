@@ -33,7 +33,7 @@ void startTimer(){
 		timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 		g_timeCount = formatSeconds(stateTime.load());
 		if(stateTime.load()<1){
-    play("/system/media/audio/ringtones/Tango.ogg")
+    play("/system/media/audio/ringtones/Tango.ogg");
 		counting.store(false);
 		}
 		std::this_thread::sleep_for(std::chrono::seconds(1));
