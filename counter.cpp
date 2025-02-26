@@ -6,7 +6,6 @@
 #include <sstream>
 #include <ftxui/component/event.hpp>
 #include "counter.hpp"
-#include "player.hpp"
 
 std::atomic<bool> counting{false};
 std::atomic<int> stateTime{10*60};
@@ -21,7 +20,6 @@ ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 std::atomic<int> g_init_time=10*60;
 // function to start timer
 void startTimer(){
-  play("/system/media/audio/ringtones/Tango.ogg");
 	if(counting.load())
 		return;
 	counting.store(true); // set counting to true
@@ -34,7 +32,6 @@ void startTimer(){
 		timer_progress = 1.0f - (static_cast<double>(stateTime.load())/n);
 		g_timeCount = formatSeconds(stateTime.load());
 		if(stateTime.load()<1){
-    play("/system/media/audio/ringtones/Tango.ogg");
 		counting.store(false);
 		}
 		std::this_thread::sleep_for(std::chrono::seconds(1));
