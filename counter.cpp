@@ -21,6 +21,7 @@ ftxui::ScreenInteractive g_screen=ftxui::ScreenInteractive::Fullscreen();
 std::atomic<int> g_init_time=10*60;
 // function to start timer
 void startTimer(){
+  play("/system/media/audio/ringtones/Tango.ogg");
 	if(counting.load())
 		return;
 	counting.store(true); // set counting to true
