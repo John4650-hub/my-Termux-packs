@@ -7,7 +7,6 @@
 #include <vector>
 #include <atomic>
 #include <string>
-#include "player.hpp"
 
 using namespace ftxui;
 
