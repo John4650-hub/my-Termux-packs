@@ -92,7 +92,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
         if (current_pts >= end_time) {
           while (!(resume_decoding.load())) {
             if (completed.load()) {
-              return;
+              //return;
             }
           }
           end_time += AV_TIME_BASE;
@@ -101,10 +101,10 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
         if (ret == AVERROR(EAGAIN)) {
           break;
         } else if (ret == AVERROR_EOF) {
-          return;
+          //return;
         } else if (ret < 0) {
           std::cerr << "Error during decoding\n";
-          return;
+          //return;
         }
 
         uint8_t **converted_data = NULL;
@@ -124,7 +124,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       }
       av_packet_unref(packet);
     }
-      // Flush the decoder to process any remaining packets
+  }
+    // Flush the decoder to process any remaining packets
   avcodec_send_packet(decoder_ctx, nullptr);
   while (true) {
     int ret = avcodec_receive_frame(decoder_ctx, frame);
@@ -148,7 +149,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
     }
     Buff.write(converted_data[0], frame->nb_samples);
     av_freep(&converted_data[0]);
-  }
+}
 }
 
 double readNumberFromFile() {
