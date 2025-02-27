@@ -91,9 +91,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
         }
         if (current_pts >= end_time) {
           while (!(resume_decoding.load())) {
-            if (completed.load()) {
-              return;
-            }
+            //if (completed.load()) {
+              //return;
+           // }
             std::this_thread::sleep_for(std::chrono::microseconds(10));
           }
           end_time += AV_TIME_BASE;
