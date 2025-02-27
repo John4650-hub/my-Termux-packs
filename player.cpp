@@ -5,8 +5,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,15 +22,15 @@ extern "C" {
 std::atomic<bool> resume_decoding{false};
 std::atomic<bool> *resume_decoding_ptr = &resume_decoding;
 std::atomic<bool> completed{false};
-std::atomic<bool> *completed_ptr=&completed;
+std::atomic<bool> *completed_ptr = &completed;
 std::atomic<double> current_stream_duration{0};
 std::atomic<double> *current_stream_duration_ptr = &current_stream_duration;
 
-//check whether audio is completed
-void onCompletePlay(){
-	while(!completed.load()){
-		std::this_thread::sleep_for(std::chrono::milliseconds(0));
-	}
+// check whether audio is completed
+void onCompletePlay() {
+  while (!completed.load()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(0));
+  }
 }
 
 // converts time from HH:MM:SS
@@ -65,10 +65,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
- while(!(completed.load())){
-    if(resume_decoding.load()){
-
   int64_t current_pts = 0;
+  bool end_time_scaled = false;
   while (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == *stream_index) {
       int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -82,7 +80,24 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                       av_q2d(formatCtx->streams[*stream_index]->time_base) *
                       AV_TIME_BASE;
         current_stream_duration_ptr->store((current_pts / AV_TIME_BASE));
-      if (ret == AVERROR(EAGAIN)) {
+        if (!(end_time_scaled)) {
+          double diviser =
+              static_cast<double>(current_pts) / static_cast<double>(end_time);
+          end_time *= static_cast<int>(std::round(diviser));
+          end_time_scaled = true;
+        }
+        if (current_pts >= end_time) {
+          while (!resume_decoding.load()) {
+            if (completed.load()) {
+              return;
+            }
+
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
+          }
+          end_time += AV_TIME_BASE;
+          resume_decoding_ptr->store(false);
+        }
+        if (ret == AVERROR(EAGAIN)) {
           break;
         } else if (ret == AVERROR_EOF) {
           return;
@@ -109,9 +124,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
-resume_decoding_ptr->store(false);
 }
-}}
 
 // callback class for creating oboe callback
 class MyCallback : public oboe::AudioStreamCallback {
@@ -124,15 +137,14 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-    if(mBuff.getReadCounter()==mBuff.getWriteCounter()){
-      std::cout<< "Reached end ok\n";
-      completed_ptr->store(true);
-      return oboe::DataCallbackResult::Stop;
-    }
-    else{
+    if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
+      if (current_stream_duration.load() >= mDuration_secs) {
+        completed_ptr->store(true);
+        return oboe::DataCallbackResult::Stop;
+      }
       resume_decoding_ptr->store(true);
-      return oboe::DataCallbackResult::Continue;
     }
+    return oboe::DataCallbackResult::Continue;
   }
   void onErrorBeforeClose(oboe::AudioStream *media,
                           oboe::Result error) override {
@@ -148,7 +160,7 @@ public:
 private:
   oboe::FifoBuffer &mBuff;
   uint8_t *mdata_storage;
-  [[maybe_unused]] int mDuration_secs;
+  int mDuration_secs;
 };
 
 /**
@@ -156,15 +168,15 @@ private:
  * and plays the audio file
  */
 void play(const char *file_name, double rate, const std::string &seek_time) {
-	completed_ptr->store(false);//reset the player
-	resume_decoding_ptr->store(false);
-	current_stream_duration_ptr->store(0);
+  completed_ptr->store(false); // reset the player
+  resume_decoding_ptr->store(false);
+  current_stream_duration_ptr->store(0);
   if (rate < 0.1 || rate > 3.0) {
     std::cerr << "Rate must be from 0.1-3.0\n";
     return;
   }
   double sampleRate = rate;
-	int seek_time_sec = timeToSeconds(seek_time);
+  int seek_time_sec = timeToSeconds(seek_time);
   AVFormatContext *formatCtx = NULL;
   int ret = avformat_open_input(&formatCtx, file_name, NULL, NULL);
   if (ret < 0) {
@@ -177,14 +189,14 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
     std::cerr << "Could not find any info\n";
     return;
   }
-int64_t duration_microseconds =
+  int64_t duration_microseconds =
       formatCtx->duration +
       (formatCtx->duration <= INT64_MAX - 5000 ? 5000 : 0);
   int duration_seconds = duration_microseconds / (double)AV_TIME_BASE;
 
-	if(seek_time_sec>duration_seconds){
-		return;
-	}
+  if (seek_time_sec > duration_seconds) {
+    return;
+  }
   int stream_index =
       av_find_best_stream(formatCtx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
   if (stream_index < 0) {
@@ -242,27 +254,25 @@ int64_t duration_microseconds =
     std::cerr << "Could not initialize resampler\n";
     return;
   }
-
-	std::atomic<uint64_t> read_index{}, write_index{};
+  std::atomic<uint64_t> read_index{}, write_index{};
   uint8_t *data_storage = new uint8_t[400000]();
   oboe::FifoBuffer buff(4, 400000, &read_index, &write_index, data_storage);
   std::thread t([&]() {
-      getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
+    getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
                &stream_index, buff, end_time);
   });
 
-	t.detach();
-  // wait for some data to be written  to buffer before beginning playback
+  t.detach();
+  // wait for aome data to be written  to buffer before beginning playback
   while (true) {
-    resume_decoding_ptr->store(true);
     if (buff.getWriteCounter() > 1000) {
-      std::cout << "Completed writing to FifoBuffer\n";
+      std::cout << "seeking done\n";
       break;
     }
-    std::cout << "still writing data to fifo\n";
+    std::cout << "still seeking to right position\n";
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
-	
+
   MyCallback audioCallback(buff, data_storage, duration_seconds);
   oboe::AudioStreamBuilder builder;
   builder.setCallback(&audioCallback);
@@ -289,7 +299,7 @@ int64_t duration_microseconds =
   mediaStream->stop();
   mediaStream->close();
   // free up all memory
-	delete[] data_storage;
+  delete[] data_storage;
   av_frame_free(&frame);
   av_packet_free(&packet);
   avcodec_free_context(&decoder_ctx);
