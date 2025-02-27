@@ -65,6 +65,9 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
+ while(!(completed.load())){
+    if(resume_decoding.load()){
+
   int64_t current_pts = 0;
   if (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == *stream_index) {
@@ -107,7 +110,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
     }
   }
 }
-
+resume_decoding_ptr->store(false);
+}}
 
 // callback class for creating oboe callback
 class MyCallback : public oboe::AudioStreamCallback {
@@ -243,13 +247,8 @@ int64_t duration_microseconds =
   uint8_t *data_storage = new uint8_t[400000]();
   oboe::FifoBuffer buff(4, 400000, &read_index, &write_index, data_storage);
   std::thread t([&]() {
-    while(!(completed.load())){
-    if(resume_decoding.load()){
-    getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
+      getPcmData(formatCtx, packet, decoder_ctx, frame, swr_context,
                &stream_index, buff, end_time);
-    resume_decoding_ptr->store(false);
-    }
-    }
   });
 
 	t.detach();
