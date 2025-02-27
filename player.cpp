@@ -138,7 +138,7 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-    if (mBuff.getReadCounter() > mBuff.getWriteCounter() * 0.95) {
+    if (mBuff.getReadCounter() > mBuff.getWriteCounter() * 0.85) {
       if (current_stream_duration.load() >= mDuration_secs) {
         completed_ptr->store(true);
         return oboe::DataCallbackResult::Stop;
