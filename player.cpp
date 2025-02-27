@@ -121,6 +121,7 @@ public:
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
     if(mBuff.getReadCounter()==mBuff.getWriteCounter()){
+      std::cout<< "Reached end ok\n";
       completed_ptr->store(true);
       return oboe::DataCallbackResult::Stop;
     }
