@@ -125,31 +125,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
-    // Flush the decoder to process any remaining packets
-  avcodec_send_packet(decoder_ctx, nullptr);
-  while (true) {
-    int ret = avcodec_receive_frame(decoder_ctx, frame);
-    if (ret == AVERROR_EOF) {
-      break;
-    } else if (ret < 0) {
-      std::cerr << "Error during flushing\n";
-      break;
-    }
-
-    uint8_t **converted_data = NULL;
-    av_samples_alloc_array_and_samples(
-        &converted_data, NULL, 2, frame->nb_samples, AV_SAMPLE_FMT_S16, 0);
-
-    int convert_ret =
-        swr_convert(swr_context, converted_data, frame->nb_samples,
-                    (const uint8_t **)frame->data, frame->nb_samples);
-    if (convert_ret < 0) {
-      std::cerr << "Error during resampling\n";
-      break;
-    }
-    Buff.write(converted_data[0], frame->nb_samples);
-    av_freep(&converted_data[0]);
-}
 }
 
 double readNumberFromFile() {
