@@ -238,6 +238,7 @@ int64_t duration_microseconds =
     std::cerr << "Could not initialize resampler\n";
     return;
   }
+
 	std::atomic<uint64_t> read_index{}, write_index{};
   uint8_t *data_storage = new uint8_t[40000]();
   oboe::FifoBuffer buff(4, 40000, &read_index, &write_index, data_storage);
