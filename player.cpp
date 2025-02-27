@@ -65,11 +65,11 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
- while(!(completed.load())){
+ while(!completed.load()){
     if(resume_decoding.load()){
 
   int64_t current_pts = 0;
-  if (av_read_frame(formatCtx, packet) >= 0) {
+  while (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == *stream_index) {
       int ret = avcodec_send_packet(decoder_ctx, packet);
       if (ret < 0) {
