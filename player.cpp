@@ -279,7 +279,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
   t.detach();
   // wait for aome data to be written  to buffer before beginning playback
   while (true) {
-    if (buff.getWriteCounter() < 1000) {
+    if (buff.getWriteCounter() > 1000) {
       std::cout << "seeking done\n";
       break;
     }
