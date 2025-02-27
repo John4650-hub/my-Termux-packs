@@ -180,7 +180,7 @@ private:
  */
 void play(const char *file_name, double rate, const std::string &seek_time) {
   completed_ptr->store(false); // reset the player
-  resume_decoding_ptr->store(false);
+  resume_decoding_ptr->store(true);
   current_stream_duration_ptr->store(0);
   if (rate < 0.1 || rate > 3.0) {
     std::cerr << "Rate must be from 0.1-3.0\n";
