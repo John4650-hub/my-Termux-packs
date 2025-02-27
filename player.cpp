@@ -65,6 +65,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
+  resume_decoding_ptr->store(true);
   int64_t current_pts = 0;
   bool end_time_scaled = false;
   while (av_read_frame(formatCtx, packet) >= 0) {
