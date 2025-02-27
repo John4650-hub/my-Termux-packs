@@ -91,12 +91,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           end_time_scaled = true;
         }
         if (current_pts >= end_time) {
-          while (!(resume_decoding.load())) {
-            if (completed.load()) {
-              return;
-            }
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
-          }
+          while (!(resume_decoding.load())){
           end_time += AV_TIME_BASE;
           resume_decoding_ptr->store(false);
         }
@@ -120,7 +115,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           std::cerr << "Error during resampling\n";
           break;
         }
-        // write pcm data to Fifobuffer
+      // write pcm data to Fifobuffer
         Buff.write(converted_data[0], frame->nb_samples);
         av_freep(&converted_data[0]);
       }
@@ -140,24 +135,6 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-    /**
-    if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
-      if (current_stream_duration.load() >= mDuration_secs) {
-        completed_ptr->store(true);
-        return oboe::DataCallbackResult::Stop;
-      }
-      mBuff.setReadCounter(0);
-      mBuff.setWriteCounter(0);
-      // stop deleting the buffer storage when the audio is left with 5 seconds
-      // to completion
-      if (!(completed.load())) {
-        uint32_t capacity = mBuff.getBufferCapacityInFrames();
-        delete[] mdata_storage;
-        mdata_storage = nullptr;
-        mdata_storage = new uint8_t[capacity]();
-      }
-    }**/
-    resume_decoding_ptr->store(true);
     return oboe::DataCallbackResult::Continue;
   }
   void onErrorBeforeClose(oboe::AudioStream *media,
