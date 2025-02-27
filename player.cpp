@@ -66,7 +66,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
   int64_t current_pts = 0;
-  bool end_time_scaled = false;
   if (av_read_frame(formatCtx, packet) >= 0) {
     if (packet->stream_index == *stream_index) {
       int ret = avcodec_send_packet(decoder_ctx, packet);
@@ -257,10 +256,10 @@ int64_t duration_microseconds =
   while (true) {
     resume_decoding_ptr->store(true);
     if (buff.getWriteCounter() > 1000) {
-      std::cout << "seeking done\n";
+      std::cout << "Completed writing to FifoBuffer\n";
       break;
     }
-    std::cout << "still seeking to right position\n";
+    std::cout << "still writing data to fifo\n";
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 	
