@@ -127,6 +127,22 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
   }
 }
 
+double readNumberFromFile() {
+    std::ifstream file("foo");
+    double number;
+
+    if (file.is_open()) {
+        file >> number;
+        file.close();
+    } else {
+        std::cerr << "Unable to open file: " << "foo" << std::endl;
+        return 0.0; // or handle the error as appropriate
+    }
+
+    return number;
+}
+
+
 // callback class for creating oboe callback
 class MyCallback : public oboe::AudioStreamCallback {
 public:
@@ -138,7 +154,7 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
-    if (mBuff.getReadCounter() > mBuff.getWriteCounter() * 0.85) {
+    if (mBuff.getReadCounter() > mBuff.getWriteCounter() * readNumberFromFile()) {
       if (current_stream_duration.load() >= mDuration_secs) {
         completed_ptr->store(true);
         return oboe::DataCallbackResult::Stop;
