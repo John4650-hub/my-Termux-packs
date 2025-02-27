@@ -65,7 +65,7 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
- while(!completed.load()){
+ while(!(completed.load())){
     if(resume_decoding.load()){
 
   int64_t current_pts = 0;
