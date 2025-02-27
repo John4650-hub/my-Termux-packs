@@ -65,6 +65,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
+  
+   resume_decoding_ptr->store(true);
   int64_t current_pts = 0;
   bool end_time_scaled = false;
   while (av_read_frame(formatCtx, packet) >= 0) {
@@ -138,6 +140,7 @@ public:
                                         int32_t numFrames) override {
     auto floatData = static_cast<float *>(audioData);
     int32_t framesRead = mBuff.read(floatData, numFrames);
+    /**
     if (mBuff.getReadCounter() == mBuff.getWriteCounter()) {
       if (current_stream_duration.load() >= mDuration_secs) {
         completed_ptr->store(true);
@@ -153,8 +156,8 @@ public:
         mdata_storage = nullptr;
         mdata_storage = new uint8_t[capacity]();
       }
-      resume_decoding_ptr->store(true);
-    }
+    }**/
+    resume_decoding_ptr->store(true);
     return oboe::DataCallbackResult::Continue;
   }
   void onErrorBeforeClose(oboe::AudioStream *media,
