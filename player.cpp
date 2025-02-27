@@ -94,16 +94,13 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
             if (completed.load()) {
               return;
             }
-            std::this_thread::sleep_for(std::chrono::microseconds(10));
           }
           end_time += AV_TIME_BASE;
           resume_decoding_ptr->store(false);
         }
         if (ret == AVERROR(EAGAIN)) {
-          std::cout << "stop1\n";
           break;
         } else if (ret == AVERROR_EOF) {
-          std::cout << "stop2\n";
           return;
         } else if (ret < 0) {
           std::cerr << "Error during decoding\n";
