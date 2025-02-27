@@ -91,10 +91,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           end_time_scaled = true;
         }
         if (current_pts >= end_time) {
-          while (!(resume_decoding.load())){
-          end_time += AV_TIME_BASE;
-          resume_decoding_ptr->store(false);
-        }
         if (ret == AVERROR(EAGAIN)) {
           break;
         } else if (ret == AVERROR_EOF) {
