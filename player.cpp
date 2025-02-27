@@ -65,7 +65,6 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                 AVCodecContext *decoder_ctx, AVFrame *frame,
                 SwrContext *swr_context, int *stream_index,
                 oboe::FifoBuffer &Buff, int64_t end_time) {
-  resume_decoding_ptr->store(true);
   int64_t current_pts = 0;
   bool end_time_scaled = false;
   while (av_read_frame(formatCtx, packet) >= 0) {
@@ -81,6 +80,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
                       av_q2d(formatCtx->streams[*stream_index]->time_base) *
                       AV_TIME_BASE;
         current_stream_duration_ptr->store((current_pts / AV_TIME_BASE));
+        // Try to scale the end_time such that the intetval to make it slightly
+        // greater that the current_pts;
         if (!(end_time_scaled)) {
           double diviser =
               static_cast<double>(current_pts) / static_cast<double>(end_time);
@@ -88,15 +89,14 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
           end_time_scaled = true;
         }
         if (current_pts >= end_time) {
-          while (!resume_decoding.load()){
+          while (!(resume_decoding.load())) {
             if (completed.load()) {
               return;
             }
-
             std::this_thread::sleep_for(std::chrono::microseconds(10));
           }
           end_time += AV_TIME_BASE;
-          resume_decoding_ptr->store(true);
+          resume_decoding_ptr->store(false);
         }
         if (ret == AVERROR(EAGAIN)) {
           break;
@@ -142,6 +142,16 @@ public:
       if (current_stream_duration.load() >= mDuration_secs) {
         completed_ptr->store(true);
         return oboe::DataCallbackResult::Stop;
+      }
+      mBuff.setReadCounter(0);
+      mBuff.setWriteCounter(0);
+      // stop deleting the buffer storage when the audio is left with 5 seconds
+      // to completion
+      if (!(completed.load())) {
+        uint32_t capacity = mBuff.getBufferCapacityInFrames();
+        delete[] mdata_storage;
+        mdata_storage = nullptr;
+        mdata_storage = new uint8_t[capacity]();
       }
       resume_decoding_ptr->store(true);
     }
@@ -266,7 +276,7 @@ void play(const char *file_name, double rate, const std::string &seek_time) {
   t.detach();
   // wait for aome data to be written  to buffer before beginning playback
   while (true) {
-    if (buff.getWriteCounter() > 1000) {
+    if (buff.getWriteCounter() < 1000) {
       std::cout << "seeking done\n";
       break;
     }
