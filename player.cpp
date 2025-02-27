@@ -144,7 +144,7 @@ public:
 private:
   oboe::FifoBuffer &mBuff;
   uint8_t *mdata_storage;
-  [[maybe_unsed]] int mDuration_secs;
+  [[maybe_unused]] int mDuration_secs;
 };
 
 /**
