@@ -109,8 +109,8 @@ void getPcmData(AVFormatContext *formatCtx, AVPacket *packet,
       av_packet_unref(packet);
     }
   }
-}
 resume_decoding_ptr->store(false);
+}
 }}
 
 // callback class for creating oboe callback
