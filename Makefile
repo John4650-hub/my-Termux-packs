@@ -8,3 +8,8 @@ main.o: main.cpp
 # Rule to create the shared library
 liblisdir.so: main.o
 	$(CXX) main.o $(TERMUX_PREFIX)/lib/libjvm.so -o liblisdir.so
+install: liblisdir.so
+	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/lib/liblisdir.so
