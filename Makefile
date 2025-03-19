@@ -4,7 +4,7 @@ CFLAGS += -Wall -Wextra -Werror -fPIC
 LDFLAGS += -shared -Wl,-soname,liblisdir.so
 
 # Rule to create the object file
-main.o: main.cpp
+main.o: main.c
 	$(CXX) $(CFLAGS) -c main.c -o main.o
 
 # Rule to create the shared library
