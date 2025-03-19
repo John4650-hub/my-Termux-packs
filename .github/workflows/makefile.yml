@@ -4,7 +4,7 @@ permissions:
   contents: write
 on:
   push:
-    branches: [ "music" ]
+    branches: [ "pkg_compat" ]
 
 jobs:
   build:
