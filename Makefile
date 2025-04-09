@@ -5,7 +5,7 @@ LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpdfium
 
 # Rule to create the shared library
 pdfviewer.so: main.cpp
-	$(CXX) $(LDFLAGS) main.cpp -o pdfviewer.so
+	$(CXX) -I$(TERMUX_PREFIX)/include $(LDFLAGS) main.cpp -o pdfviewer.so
 
 install: pdfviewer.so
 	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
