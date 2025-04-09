@@ -3,14 +3,18 @@
 #include "fpdfview.h"
 #include "fpdf_text.h"
 
-int main(){
+int main(int argc,char* argv[]){
+  if(argc<2){
+    std::cerr <<"Usage:  "<<argv[0]<<"<integer>"<<std::endl;
+    return 1;
+  }
+  int page_number=std::atoi(argv[1]);
   FPDF_InitLibrary();
   FPDF_DOCUMENT document= FPDF_LoadDocument("foo.pdf",NULL);
   if(!document){
     std::cout << "Failed to load PDF\n";
     return 1;
   }
-  int page_number = 0;
   FPDF_PAGE page = FPDF_LoadPage(document,page_number);
   if(!page){
     std::cout<< "Failed to load page\n";
