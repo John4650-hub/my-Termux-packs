@@ -1,10 +1,11 @@
-#include <stdio.h>
+#include <iostream>
+#include <cstdlib>
 #include "fpdfview.h"
 #include "fpdf_text.h"
 
 int main(){
   FPDF_InitLibrary();
-  FPDF_DOCUMENT document= FDF_LoadDocument("foo.pdf",NULL);
+  FPDF_DOCUMENT document= FPDF_LoadDocument("foo.pdf",NULL);
   if(!document){
     std::cout << "Failed to load PDF\n";
     return 1;
@@ -19,7 +20,7 @@ int main(){
   int text_length = FPDFText_CountChars(text_page);
   char* buffer = (char*)malloc(text_length + 1);
   for(int i=0; i<text_length;i++)
-    buffer[i] = FPDF_Text_GetUnicode(text_page, i);
+    buffer[i] = FPDFText_GetUnicode(text_page, i);
   buffer[text_length] = '\0';
   std::cout<<buffer<<"\n";
 
