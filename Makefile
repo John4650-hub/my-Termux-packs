@@ -1,14 +1,14 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror -fPIC
-LDFLAGS += -shared -Wl,-soname,liblisdir.so
+LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpdfium
 
 # Rule to create the shared library
-liblisdir.so: main.cpp
-	$(CXX) $(LDFLAGS) main.cpp -o liblisdir.so
+pdfviewer.so: main.cpp
+	$(CXX) $(LDFLAGS) main.cpp -o pdfviewer.so
 
-install: liblisdir.so
-	install liblisdir.so $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+install: pdfviewer.so
+	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/lib/liblisdir.so
+	rm -f $(DESTDIR)$(PREFIX)/lib/pdfviewer.so

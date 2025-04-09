@@ -4,7 +4,7 @@ permissions:
   contents: write
 on:
   push:
-    branches: [ "pkg_compat" ]
+    branches: [ "pdfViewer" ]
 
 jobs:
   build:
