@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 
     int width = (int)FPDF_GetPageWidth(page);
     int height = (int)FPDF_GetPageHeight(page);
-    FPDF_BITMAP bitmap = FPDFBitmap_Create(width, height, alpha);
+    FPDF_BITMAP bitmap = FPDFBitmap_CreateEx(width, height, FPDFBitmap_BGRA,NULL,alpha);
     FPDFBitmap_FillRect(bitmap, 0, 0, width, height, 0xFFFFFFFF); // White background
     FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, 0);
 
