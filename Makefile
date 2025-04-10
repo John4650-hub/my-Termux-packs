@@ -5,7 +5,7 @@ LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpdfium -lpng -lopencv_core -lopencv_photo -
 
 # Rule to create the shared library
 pdfviewer.so: main.cpp
-	$(CXX) -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS) main.cpp -o pdfviewer.so
+	$(CXX) -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS) src/extract_text.cpp src/gen_image.cpp main.cpp -o pdfviewer.so
 
 install: pdfviewer.so
 	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
