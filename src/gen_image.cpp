@@ -31,7 +31,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     if (!document) {
         std::cout << "Failed to load PDF\n";
         FPDF_DestroyLibrary();
-        return 1;
+        return;
     }
 
     FPDF_PAGE page = FPDF_LoadPage(document, page_number);
@@ -39,7 +39,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
         std::cout << "Failed to load page\n";
         FPDF_CloseDocument(document);
         FPDF_DestroyLibrary();
-        return 1;
+        return;
     }
 
     int width = (int)FPDF_GetPageWidth(page);
