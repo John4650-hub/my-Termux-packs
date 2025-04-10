@@ -9,13 +9,15 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
     int height = FPDFBitmap_GetHeight(bitmap);
     unsigned char* buffer = (unsigned char*)FPDFBitmap_GetBuffer(bitmap);
 
-    cv::Mat image = cv::Mat mat(height,width,CV_8UC4,buffer);
+    cv::Mat image;
+    cv::Mat mat(height,width,CV_8UC4,buffer);
     //convert to RGBA
     cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
+    image=mat;
     //scaling factor
     double scaling_factor=2.0;
     int new_width=static_cast<int>(image.cols*scaling_factor);
-    int new_height = static_cast<int>(images.rows * scaling_factor);
+    int new_height = static_cast<int>(image.rows * scaling_factor);
     cv::Mat resized_image;
     cv::resize(image,resized_image,cv::Size(new_width,new_height),0,0,cv::INTER_CUBIC);
     cv::imwrite(filename,image);
