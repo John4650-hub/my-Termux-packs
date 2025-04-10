@@ -26,7 +26,7 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_facto
 void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
 
-    FPDF_DOCUMENT document = FPDF_LoadDocument("foo.pdf", NULL);
+    FPDF_DOCUMENT document = FPDF_LoadDocument(file_name, NULL);
     if (!document) {
         std::cout << "Failed to load PDF\n";
         FPDF_DestroyLibrary();
