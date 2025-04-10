@@ -3,7 +3,7 @@
 #include "fpdfview.h"
 #include <opencv2/opencv.hpp>
 
-void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
+void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_n) {
     // Get bitmap details
     int width = FPDFBitmap_GetWidth(bitmap);
     int height = FPDFBitmap_GetHeight(bitmap);
@@ -15,7 +15,7 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
     cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
     image=mat;
     //scaling factor
-    double scaling_factor=2.0;
+    double scaling_factor=scale_n;
     int new_width=static_cast<int>(image.cols*scaling_factor);
     int new_height = static_cast<int>(image.rows * scaling_factor);
     cv::Mat resized_image;
@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
 
     int page_number = std::atoi(argv[1]);
     FPDF_InitLibrary();
+    int scale_n = std::atoi(argv[2]);
 
     FPDF_DOCUMENT document = FPDF_LoadDocument("foo.pdf", NULL);
     if (!document) {
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
     FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, 0);
 
     // Save bitmap
-    SaveBitmapAsPNG(bitmap, "foo.png");
+    SaveBitmapAsPNG(bitmap, "foo.png",scale_n);
 
     // Cleanup
     FPDFBitmap_Destroy(bitmap);
