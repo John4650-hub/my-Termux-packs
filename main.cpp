@@ -5,9 +5,8 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-  [[maybe_unused]] std::string file_name{""};
   [[maybe_unused]] bool text_extraction_mode{false};
-  [[maybe_unused]] int page{1.0};
+  [[maybe_unused]] int page_number{1.0};
   [[maybe_unused]] float scale_factor{1.0};
   [[maybe_unused]] float x_coordinate{};
   [[maybe_unused]] float y_coordinate{};
@@ -18,7 +17,7 @@ int main(int argc, char* argv[]) {
                                    argparse::default_arguments::help, false);
 
   program.add_argument("-i")
-    .store(file_name)
+    .required()
     .help("Name of the pdf file");
 
 program.add_argument("-m", "--mode")
@@ -27,7 +26,8 @@ program.add_argument("-m", "--mode")
 
 
   program.add_argument("-p", "--page")
-      .store_into(page)
+      .store_into(page_number
+          )
       .help("page to view");
 
   program.add_argument("-s", "--scale_factor")

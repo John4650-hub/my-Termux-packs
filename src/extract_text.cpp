@@ -33,6 +33,6 @@ void getSelectedText(const char* image_name,float x, float y, int width,int heig
   cv::Mat croppedImage = getRegionOfInterest(img,x,y,width,height);
   cv::Mat grayImage = convert_ROI_grayscale(croppedImage);
   std::string text_selection = extractText(grayImage);
-  std::count<<text_selection<<"\n";
+  std::cout<<text_selection<<"\n";
 }
 
