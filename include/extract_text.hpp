@@ -3,7 +3,6 @@
 
 #include <string.h>
 #include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
 
