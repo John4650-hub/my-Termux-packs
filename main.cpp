@@ -44,8 +44,28 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
     int stride = FPDFBitmap_GetStride(bitmap);
     unsigned char* buffer = (unsigned char*)FPDFBitmap_GetBuffer(bitmap);
 
+    // Validate bitmap dimensions
+    if (width <= 0 || height <= 0) {
+        fprintf(stderr, "Invalid bitmap dimensions: width=%d, height=%d\n", width, height);
+        png_destroy_write_struct(&png, &info);
+        fclose(fp);
+        return;
+    }
+
+    // Convert BGRA to RGBA
+    unsigned char* rgba_buffer = new unsigned char[width * height * 4];
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            int index = (y * width + x) * 4;
+            rgba_buffer[index] = buffer[index + 2];     // Red
+            rgba_buffer[index + 1] = buffer[index + 1]; // Green
+            rgba_buffer[index + 2] = buffer[index];     // Blue
+            rgba_buffer[index + 3] = buffer[index + 3]; // Alpha
+        }
+    }
+
     // Set PNG metadata
-    png_set_IHDR(png, info, width, height, 8 /* bit depth */, PNG_COLOR_TYPE_RGBA,
+    png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGBA,
                  PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 
     // Write header
@@ -53,13 +73,14 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
 
     // Write the image row by row
     for (int y = 0; y < height; ++y) {
-        png_write_row(png, buffer + (y * stride));
+        png_write_row(png, rgba_buffer + (y * width * 4)); // Tightly packed rows
     }
 
     // Finish writing
     png_write_end(png, NULL);
 
     // Cleanup
+    delete[] rgba_buffer;
     png_destroy_write_struct(&png, &info);
     fclose(fp);
 
