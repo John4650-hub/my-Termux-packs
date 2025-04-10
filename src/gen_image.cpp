@@ -14,9 +14,9 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_facto
     //convert to RGBA
     cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
     image=mat;
-    //scaling factor
-    int new_width=static_cast<int>(image.cols*scaling_factor);
-    int new_height = static_cast<int>(image.rows * scaling_factor);
+    //scale factor
+    int new_width=static_cast<int>(image.cols*scale_factor);
+    int new_height = static_cast<int>(image.rows * scale_factor);
     cv::Mat resized_image;
     cv::resize(image,resized_image,cv::Size(new_width,new_height),0,0,cv::INTER_CUBIC);
     cv::imwrite(filename,resized_image);

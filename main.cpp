@@ -6,8 +6,8 @@
 
 int main(int argc, char* argv[]) {
   [[maybe_unused]] bool text_extraction_mode{false};
-  [[maybe_unused]] int page_number{1.0};
-  [[maybe_unused]] float scale_factor{1.0};
+  [[maybe_unused]] int page_number{1};
+  [[maybe_unused]] float scale_factor{1.0f};
   [[maybe_unused]] float x_coordinate{};
   [[maybe_unused]] float y_coordinate{};
   [[maybe_unused]] float width_crop_dim{};
@@ -56,7 +56,7 @@ program.add_argument("-m", "--mode")
         getSelectedText(fname,x_coordinate,y_coordinate,width_crop_dim,height_crop_dim);//pass image name
         return 0;
       }
-      gen_new_page(fname,page_number,scale_factor);
+      gen_page_image(fname,page_number,scale_factor);
     }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";
