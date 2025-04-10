@@ -1,7 +1,8 @@
-#include <opencv2/opencv.hpp>
-#include <iostream>
 #include "gen_image.hpp"
-
+#include <iostream>
+#include <cstdlib>
+#include "fpdfview.h"
+#include <opencv2/opencv.hpp>
 void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_n) {
     // Get bitmap details
     int width = FPDFBitmap_GetWidth(bitmap);
@@ -23,7 +24,7 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_n) {
 }
 
 
-void gen_page_image(const char* file_name,int page_number,float scale_factor){~
+void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
 
     FPDF_DOCUMENT document = FPDF_LoadDocument("foo.pdf", NULL);
