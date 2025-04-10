@@ -20,7 +20,7 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_n) {
     int new_height = static_cast<int>(image.rows * scaling_factor);
     cv::Mat resized_image;
     cv::resize(image,resized_image,cv::Size(new_width,new_height),0,0,cv::INTER_CUBIC);
-    cv::imwrite(filename,image);
+    cv::imwrite(filename,resized_image);
 }
 
 int main(int argc, char* argv[]) {
