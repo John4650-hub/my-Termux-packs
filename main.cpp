@@ -1,69 +1,24 @@
 #include <iostream>
 #include <cstdlib>
 #include "fpdfview.h"
-#include <png.h>
+#include <opencv2/opencv.hpp>
 
 void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
-    // Open the file for writing
-    FILE* fp = fopen(filename, "wb");
-    if (!fp) {
-        fprintf(stderr, "Failed to open file for writing: %s\n", filename);
-        return;
-    }
-
-    // Initialize libpng structures
-    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png) {
-        fprintf(stderr, "Failed to create PNG write struct\n");
-        fclose(fp);
-        return;
-    }
-
-    png_infop info = png_create_info_struct(png);
-    if (!info) {
-        fprintf(stderr, "Failed to create PNG info struct\n");
-        png_destroy_write_struct(&png, NULL);
-        fclose(fp);
-        return;
-    }
-
-    // Set up error handling
-    if (setjmp(png_jmpbuf(png))) {
-        fprintf(stderr, "Error during PNG creation\n");
-        png_destroy_write_struct(&png, &info);
-        fclose(fp);
-        return;
-    }
-
-    // Set the file output
-    png_init_io(png, fp);
-
     // Get bitmap details
     int width = FPDFBitmap_GetWidth(bitmap);
     int height = FPDFBitmap_GetHeight(bitmap);
-    int stride = FPDFBitmap_GetStride(bitmap);
     unsigned char* buffer = (unsigned char*)FPDFBitmap_GetBuffer(bitmap);
 
-    // Set PNG metadata
-    png_set_IHDR(png, info, width, height, 8 /* bit depth */, PNG_COLOR_TYPE_RGBA,
-                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-    // Write header
-    png_write_info(png, info);
-
-    // Write the image row by row
-    for (int y = 0; y < height; ++y) {
-        png_write_row(png, buffer + (y * stride));
-    }
-
-    // Finish writing
-    png_write_end(png, NULL);
-
-    // Cleanup
-    png_destroy_write_struct(&png, &info);
-    fclose(fp);
-
-    printf("Saved PNG file: %s\n", filename);
+    cv::Mat image = cv::Mat mat(height,width,CV_8UC4,buffer);
+    //convert to RGBA
+    cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
+    //scaling factor
+    double scaling_factor=2.0;
+    int new_width=static_cast<int>(image.cols*scaling_factor);
+    int new_height = static_cast<int>(images.rows * scaling_factor);
+    cv::Mat resized_image;
+    cv::resize(image,resized_image,cv::Size(new_width,new_height),0,0,cv::INTER_CUBIC);
+    cv::imwrite(filename,image);
 }
 
 int main(int argc, char* argv[]) {
