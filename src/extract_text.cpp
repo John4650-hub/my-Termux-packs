@@ -19,7 +19,7 @@ cv::Mat convert_ROI_grayscale(const cv::Mat& croppedImage){
 std::string extractText(const cv::Mat& grayImage){
     const char* tess_data_path = "/data/data/com.termux/files/home/tesseract/data/data/com.termux/files/usr/share/tessdata";
     tesseract::TessBaseAPI ocr;
-    if (ocr.Init(tess_data_path, "eng") {
+    if (ocr.Init(tess_data_path, "eng")){
         std::cerr << "Could not initialize Tesseract." << std::endl;
         return "";
     }
