@@ -21,7 +21,6 @@ int main(int argc, char* argv[]) {
     .help("Name of the pdf file");
 
 program.add_argument("-m", "--mode")
-    .required()
     .help("add to change mode to text extraction mode");
 
 
