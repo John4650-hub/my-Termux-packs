@@ -21,7 +21,7 @@ program.add_argument("-m", "--mode")
     .help("add to change mode to text extraction mode");
 program.add_argument("-T","--total-pages")
   .store_into(total_pages)
-  .help("Get the total pages in the current pdf file")
+  .help("Get the total pages in the current pdf file");
 
   program.add_argument("-p", "--page")
       .store_into(page_number
@@ -37,7 +37,7 @@ program.add_argument("-T","--total-pages")
     if (auto arg = program.present("-i")) {
       const char *fname = arg->c_str();
       if(program.present("--total-pages")){
-        std::count<<get_total_pages(fname);
+        std::cout<<get_total_pages(fname);
       }else{
       gen_page_image(fname,page_number,scale_factor);
       }
