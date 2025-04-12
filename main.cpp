@@ -7,6 +7,7 @@ int main(int argc, char* argv[]) {
   [[maybe_unused]] bool text_extraction_mode{false};
   [[maybe_unused]] int page_number{1};
   [[maybe_unused]] float scale_factor{1.0f};
+  [[maybe_unused]] int total_pages{1};
   
 
   argparse::ArgumentParser program("pdfViewer using pdfmium", "135.0.7087.0",
@@ -18,7 +19,9 @@ int main(int argc, char* argv[]) {
 
 program.add_argument("-m", "--mode")
     .help("add to change mode to text extraction mode");
-
+program.add_argument("-T","--total-pages")
+  .store_into(total_pages)
+  .help("Get the total pages in the current pdf file")
 
   program.add_argument("-p", "--page")
       .store_into(page_number
@@ -33,7 +36,11 @@ program.add_argument("-m", "--mode")
     program.parse_args(argc, argv);
     if (auto arg = program.present("-i")) {
       const char *fname = arg->c_str();
+      if(program.present("--total-pages")){
+        std::count<<get_total_pages(fname);
+      }else{
       gen_page_image(fname,page_number,scale_factor);
+      }
     }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";

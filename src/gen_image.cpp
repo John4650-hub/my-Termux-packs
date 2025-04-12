@@ -1,5 +1,7 @@
 #include "gen_image.hpp"
 #include <iostream>
+#include <sstream>
+#include <string.h>
 #include <cstdlib>
 #include "fpdfview.h"
 #include <opencv2/opencv.hpp>
@@ -22,11 +24,13 @@ void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_facto
     cv::imwrite(filename,resized_image);
 }
 
+FPDF_DOCUMENT getPDF_Doc(const char* pdf_file_name){
+  return FPDF_LoadDocument(pdf_file_name, NULL);
+}
 
 void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
-
-    FPDF_DOCUMENT document = FPDF_LoadDocument(file_name, NULL);
+    FPDF_DOCUMENT document = getPDF_Doc(file_name);
     if (!document) {
         std::cout << "Failed to load PDF\n";
         FPDF_DestroyLibrary();
@@ -48,11 +52,25 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, 0);
 
     // Save bitmap
-    SaveBitmapAsPNG(bitmap, "foo.png",scale_factor);
+    std::ostringstream oss;
+    oss<<"page"<<page_number<<".png";
+    const char* output_page_name = oss.str().c_str();
+    SaveBitmapAsPNG(bitmap, output_page_name,scale_factor);
 
     // Cleanup
     FPDFBitmap_Destroy(bitmap);
     FPDF_ClosePage(page);
     FPDF_CloseDocument(document);
     FPDF_DestroyLibrary();
+}
+
+int get_total_pages(const char* pdf_file_name){
+  FPDF_InitLibrary();
+  FPDF_DOCUMENT doc = getPDF_Doc(pdf_file_name);
+  if (!doc){
+    std::cerr<<"Invalid pdf failed to open\n";
+    FPDF_DestroyLibrary();
+    return -1;
+  }
+  return FPDF_GetPageCount(doc);
 }
