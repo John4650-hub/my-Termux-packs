@@ -48,7 +48,7 @@ program.add_argument("-T","--total-pages")
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";
           std::exit(1);
-          return 1
+          return 1;
       }
       }
   } catch (const std::runtime_error &err) {
