@@ -25,11 +25,13 @@ program.add_argument("-T","--total-pages")
 
   program.add_argument("-p", "--page")
       .default_value(1)
-      .help("page to view");
+      .help("page to view")
+      .scan<'i',int>();
 
   program.add_argument("-s", "--scale_factor")
       .default_value(1.0f)
-      .help("factor by which to scale the page image");
+      .help("factor by which to scale the page image")
+      .scan<'i',float>();
 
   try {
     program.parse_args(argc, argv);
