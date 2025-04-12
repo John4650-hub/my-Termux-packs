@@ -73,5 +73,8 @@ int get_total_pages(const char* pdf_file_name){
     FPDF_DestroyLibrary();
     return -1;
   }
-  return FPDF_GetPageCount(doc);
+  int pages= FPDF_GetPageCount(doc);
+  FPDF_CloseDocument(doc);
+  FPDF_DestroyLibrary();
+return pages;
 }
