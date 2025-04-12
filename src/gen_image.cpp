@@ -53,7 +53,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
 
     // Save bitmap
     std::ostringstream oss;
-    oss<<"page"<<page_number<<".png";
+    oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
     std::string out_name_str=oss.str();
     const char* output_page_name = out_name_str.c_str();
     SaveBitmapAsPNG(bitmap, output_page_name,scale_factor);
