@@ -39,7 +39,9 @@ program.add_argument("-T","--total-pages")
         std::cout<<get_total_pages(fname);
       }else{
       page_number=program.get<int>("--page");
-      scale_factor=program.get<float>("--scale_factor");
+      if (program.is_used("--scale_factor")){
+        scale_factor=program.get<float>("--scale_factor");
+      }
       gen_page_image(fname,page_number,scale_factor);
       }
   } catch (const std::runtime_error &err) {
