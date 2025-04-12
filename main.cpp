@@ -24,25 +24,24 @@ program.add_argument("-T","--total-pages")
   .help("Get the total pages in the current pdf file");
 
   program.add_argument("-p", "--page")
-      .store_into(page_number
-          )
+      .default_value(1)
       .help("page to view");
 
   program.add_argument("-s", "--scale_factor")
-      .store_into(scale_factor)
+      .default_value(1.0f)
       .help("factor by which to scale the page image");
 
   try {
     program.parse_args(argc, argv);
-    if (auto arg = program.present("-i")) {
-      const char *fname = arg->c_str();
-      auto is_get_total_pages=program.present("--total-pages");
+      const char *fname = program.get<std::string>("-i").c_str();
+      bool is_get_total_pages=program.get<bool>("--total-pages");
       if(is_get_total_pages){
         std::cout<<get_total_pages(fname);
       }else{
+      page_number=program.get<int>("--page");
+      scale_factor=program.get<float>("--scale_factor");
       gen_page_image(fname,page_number,scale_factor);
       }
-    }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";
     std::cerr << program << "\n";
