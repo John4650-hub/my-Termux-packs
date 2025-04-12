@@ -45,7 +45,7 @@ program.add_argument("-T","--total-pages")
       }
       gen_page_image(fname,page_number,scale_factor);
       } catch(const std::runtime_error &e){
-          std::cerr << err.what() << "\n";
+          std::cerr << e.what() << "\n";
           std::cerr << program << "\n";
           std::exit(1);
           return 1
