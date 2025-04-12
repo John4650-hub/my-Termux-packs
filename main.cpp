@@ -36,7 +36,8 @@ program.add_argument("-T","--total-pages")
     program.parse_args(argc, argv);
     if (auto arg = program.present("-i")) {
       const char *fname = arg->c_str();
-      if(program["--total-pages"]){
+      auto is_get_total_pages=program["--total-pages"];
+      if(is_get_total_pages){
         std::cout<<get_total_pages(fname);
       }else{
       gen_page_image(fname,page_number,scale_factor);
