@@ -38,15 +38,23 @@ program.add_argument("-T","--total-pages")
       if(is_get_total_pages){
         std::cout<<get_total_pages(fname);
       }else{
+      try{
       page_number=program.get<int>("--page");
       if (program.is_used("--scale_factor")){
         scale_factor=program.get<float>("--scale_factor");
       }
       gen_page_image(fname,page_number,scale_factor);
+      } catch(const std::runtime_error &e){
+          std::cerr << err.what() << "\n";
+          std::cerr << program << "\n";
+          std::exit(1);
+          return 1
+      }
       }
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << "\n";
     std::cerr << program << "\n";
+    std::exit(1);
     return 1;
   }
   return 0;
