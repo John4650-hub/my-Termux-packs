@@ -31,7 +31,7 @@ program.add_argument("-T","--total-pages")
   program.add_argument("-s", "--scale_factor")
       .default_value(1.0f)
       .help("factor by which to scale the page image")
-      .scan<'i',float>();
+      .scan<'f',float>();
 
   try {
     program.parse_args(argc, argv);
