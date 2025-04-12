@@ -20,8 +20,7 @@ int main(int argc, char* argv[]) {
 program.add_argument("-m", "--mode")
     .help("add to change mode to text extraction mode");
 program.add_argument("-T","--total-pages")
-  .default_value(false)
-  .implicit_value(true)
+  .flag()
   .help("Get the total pages in the current pdf file");
 
   program.add_argument("-p", "--page")
@@ -37,8 +36,7 @@ program.add_argument("-T","--total-pages")
     program.parse_args(argc, argv);
     if (auto arg = program.present("-i")) {
       const char *fname = arg->c_str();
-      bool is_get_total_pages=program["--total-pages"];
-      if(is_get_total_pages){
+      if(program["--total-pages"]){
         std::cout<<get_total_pages(fname);
       }else{
       gen_page_image(fname,page_number,scale_factor);
