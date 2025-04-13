@@ -4,26 +4,6 @@
 #include <string.h>
 #include <cstdlib>
 #include "fpdfview.h"
-#include <opencv2/opencv.hpp>
-#include <filesystem>
-void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_factor) {
-    // Get bitmap details
-    int width = FPDFBitmap_GetWidth(bitmap);
-    int height = FPDFBitmap_GetHeight(bitmap);
-    unsigned char* buffer = (unsigned char*)FPDFBitmap_GetBuffer(bitmap);
-
-    cv::Mat image;
-    cv::Mat mat(height,width,CV_8UC4,buffer);
-    //convert to RGBA
-    cv::cvtColor(mat, mat, cv::COLOR_BGRA2RGBA);
-    image=mat;
-    //scale factor
-    int new_width=static_cast<int>(image.cols*scale_factor);
-    int new_height = static_cast<int>(image.rows * scale_factor);
-    cv::Mat resized_image;
-    cv::resize(image,resized_image,cv::Size(new_width,new_height),0,0,cv::INTER_CUBIC);
-    cv::imwrite(filename,resized_image);
-}
 
 FPDF_DOCUMENT getPDF_Doc(const char* pdf_file_name){
   return FPDF_LoadDocument(pdf_file_name, NULL);
@@ -57,7 +37,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
     std::string out_name_str=oss.str();
     const char* output_page_name = out_name_str.c_str();
-    SaveBitmapAsPNG(bitmap, output_page_name,scale_factor);
+    SaveBitmapToPNG(bitmap,output_page_name);
 
     // Cleanup
     FPDFBitmap_Destroy(bitmap);
