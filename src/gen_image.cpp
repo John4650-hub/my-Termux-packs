@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include "fpdfview.h"
 #include <opencv2/opencv.hpp>
+#include <filesystem>
 void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_factor) {
     // Get bitmap details
     int width = FPDFBitmap_GetWidth(bitmap);
@@ -30,7 +31,9 @@ FPDF_DOCUMENT getPDF_Doc(const char* pdf_file_name){
 
 void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
-    FPDF_DOCUMENT document = getPDF_Doc(file_name);
+    std::string input_file = std::filesystem::absolute(file_name);
+    std::cout<<"Openning: "<<input_file<<"\n";
+    FPDF_DOCUMENT document = getPDF_Doc(input_file->c_str());
     if (!document) {
         std::cout << "Failed to load PDF\n";
         FPDF_DestroyLibrary();
@@ -67,7 +70,9 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
 
 int get_total_pages(const char* pdf_file_name){
   FPDF_InitLibrary();
-  FPDF_DOCUMENT doc = getPDF_Doc(pdf_file_name);
+  std::string input_file = std::filesystem::absolute(pdf_file_name);
+  std::cout<<"Openning: "<<input_file<<"\n";
+  FPDF_DOCUMENT doc = getPDF_Doc(input_file->c_str());
   if (!doc){
     std::cerr<<"Invalid pdf failed to open\n";
     FPDF_DestroyLibrary();
