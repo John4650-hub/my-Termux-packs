@@ -92,9 +92,9 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
 
     int width = (int)FPDF_GetPageWidth(page);
     int height = (int)FPDF_GetPageHeight(page);
-    int renderflags = FPDF_PRINTING | FPDF_LCD_TEXT;
+    int renderflags = FPDF_PRINTING | FPDF_LCD_TEXT | FPDF_RENDER_NO_SMOOTHIMAGE | FPDF_RENDER_NO_SMOOTHPATH;
     FPDF_BITMAP bitmap = FPDFBitmap_Create(width, height, 0);
-    FPDFBitmap_FillRect(bitmap, 0, 0, width, height, 0x00000000); // White background
+    FPDFBitmap_FillRect(bitmap, 0, 0, width, height, 0xFFFFFFFF); // White background
     FPDF_RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, renderflags);
 
     // Save bitmap
