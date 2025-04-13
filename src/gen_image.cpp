@@ -70,7 +70,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_DestroyLibrary();
 }
 
-int get_total_pages(const char* pdf_file_name){
+int get_total_pages(const char* file_name){
   FPDF_InitLibrary();
   std::cout<<"name: "<<file_name<<"\n";
   std::filesystem::path p(file_name);
