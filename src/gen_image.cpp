@@ -74,7 +74,8 @@ int get_total_pages(const char* file_name){
   FPDF_InitLibrary();
   std::cout<<"name: "<<file_name<<"\n";
   std::filesystem::path p(file_name);
-  std::string input_file = std::filesystem::absolute(p);  FPDF_DOCUMENT doc = getPDF_Doc(input_file.c_str());
+  std::string input_file = std::filesystem::absolute(p).string();
+  FPDF_DOCUMENT doc = getPDF_Doc(input_file.c_str());
   if (!doc){
     std::cerr<<"Invalid pdf failed to open\n";
     FPDF_DestroyLibrary();
