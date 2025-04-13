@@ -4,6 +4,33 @@
 #include <string.h>
 #include <cstdlib>
 #include "fpdfview.h"
+#include <png.h>
+
+void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename){
+  unsigned char* data = FPDFBitmap_GetBuffer(bitmap);
+  int width = FPDFBitmap_GetWidth(bitmap);
+  int height = FPDFBitmap_GetHeight(bitmap);
+  FILE *fp = fopen(filename, "wb");
+    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+    png_infop info = png_create_info_struct(png);
+    if (setjmp(png_jmpbuf(png))) {
+        png_destroy_write_struct(&png, &info);
+        fclose(fp);
+        return;
+    }
+png_init_io(png, fp);
+    png_set_IHDR(png, width, height, 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+    png_write_info(png, info);
+
+    for (int y = 0; y < height; y++) {
+        png_write_row(png, data + y * width * 4); // Assuming 4 bytes per pixel (RGBA)
+    }
+
+    png_write_end(png, nullptr);
+    png_destroy_write_struct(&png, &info);
+    fclose(fp);
+
+}
 
 FPDF_DOCUMENT getPDF_Doc(const char* pdf_file_name){
   return FPDF_LoadDocument(pdf_file_name, NULL);

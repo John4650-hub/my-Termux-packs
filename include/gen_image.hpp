@@ -7,7 +7,7 @@
  * using opencv which scales it as required
  *
  **/
-void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename, float scale_n);
+void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename);
 
 /**
  * Generates bitmap image using pdfmium
