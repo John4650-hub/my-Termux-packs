@@ -33,7 +33,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
     std::cout<<"name: "<<file_name<<"\n";
     std::filesystem::path p(file_name);
-    std::string input_file = std::filesystem::absolute(p);
+    std::string input_file = std::filesystem::absolute(p).string();
     std::cout<<"Openning: "<<input_file<<"\n";
     FPDF_DOCUMENT document = getPDF_Doc(input_file.c_str());
     if (!document) {
