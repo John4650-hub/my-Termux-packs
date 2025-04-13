@@ -64,7 +64,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
     oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
     std::string out_name_str=oss.str();
     const char* output_page_name = out_name_str.c_str();
-    SaveBitmapToPNG(bitmap,output_page_name);
+    SaveBitmapAsPNG(bitmap,output_page_name);
 
     // Cleanup
     FPDFBitmap_Destroy(bitmap);
