@@ -17,8 +17,6 @@ int main(int argc, char* argv[]) {
     .required()
     .help("Name of the pdf file");
 
-program.add_argument("-m", "--mode")
-    .help("add to change mode to text extraction mode");
 program.add_argument("-T","--total-pages")
   .flag()
   .help("Get the total pages in the current pdf file");
