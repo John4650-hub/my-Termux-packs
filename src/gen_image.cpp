@@ -31,11 +31,7 @@ FPDF_DOCUMENT getPDF_Doc(const char* pdf_file_name){
 
 void gen_page_image(const char* file_name,int page_number,float scale_factor){
     FPDF_InitLibrary();
-    std::cout<<"name: "<<file_name<<"\n";
-    std::filesystem::path p(file_name);
-    std::string input_file = std::filesystem::absolute(p).string();
-    std::cout<<"Openning: "<<input_file<<"\n";
-    FPDF_DOCUMENT document = getPDF_Doc(input_file.c_str());
+    FPDF_DOCUMENT document = getPDF_Doc(file_name);
     if (!document) {
         std::cout << "Failed to load PDF\n";
         FPDF_DestroyLibrary();
@@ -72,10 +68,7 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
 
 int get_total_pages(const char* file_name){
   FPDF_InitLibrary();
-  std::cout<<"name: "<<file_name<<"\n";
-  std::filesystem::path p(file_name);
-  std::string input_file = std::filesystem::absolute(p).string();
-  FPDF_DOCUMENT doc = getPDF_Doc(input_file.c_str());
+  FPDF_DOCUMENT doc = getPDF_Doc(file_name);
   if (!doc){
     std::cerr<<"Invalid pdf failed to open\n";
     FPDF_DestroyLibrary();
