@@ -4,7 +4,6 @@
 #include <string.h>
 #include <cstdlib>
 #include "fpdfview.h"
-#include "fpdf_edit.h"
 #include <png.h>
 
 void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
@@ -90,8 +89,6 @@ void gen_page_image(const char* file_name,int page_number,float scale_factor){
         FPDF_DestroyLibrary();
         return;
     }
-    FPDF_BYTESTRING blend_mode = "Saturation";
-    FPDFPageObj_setBlendMode(page,blend_mode);
 
     int width = (int)FPDF_GetPageWidth(page);
     int height = (int)FPDF_GetPageHeight(page);
