@@ -4,6 +4,7 @@
 #include <string.h>
 #include <cstdlib>
 #include "fpdfview.h"
+#include "fpdf_edit.h"
 #include <png.h>
 
 void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename) {
