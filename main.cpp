@@ -1,4 +1,4 @@
-#include "gen_image.hpp"
+#include "gen_w_mupdf.hpp"
 #include <argparse/argparse.hpp>
 #include <string.h>
 #include <iostream>
@@ -37,14 +37,14 @@ program.add_argument("-T","--total-pages")
       const char *fname = arg->c_str();
       bool is_get_total_pages=program.get<bool>("--total-pages");
       if(is_get_total_pages){
-        std::cout<<get_total_pages(fname);
+        std::cout<<mupdf_get_total_pages(fname);
       }else{
       try{
       page_number=program.get<int>("--page");
       if (program.is_used("--scale_factor")){
         scale_factor=program.get<float>("--scale_factor");
       }
-      gen_page_image(fname,page_number,scale_factor);
+      mupdf_gen_page(fname,page_number);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";

@@ -1,13 +1,5 @@
 #ifndef GEN_IMG_HPP
 #define GEN_IMG_HPP
-#include "fpdfview.h"
-
-/**
- * saves the bitmap image to png 
- * using opencv which scales it as required
- *
- **/
-void SaveBitmapAsPNG(FPDF_BITMAP bitmap, const char* filename);
 
 /**
  * Generates bitmap image using pdfmium
