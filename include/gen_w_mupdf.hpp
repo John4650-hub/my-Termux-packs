@@ -1,4 +1,4 @@
-#ifdef GEN_W_MUPDF_HPP
+#ifndef GEN_W_MUPDF_HPP
 #define GEN_W_MUPDF_HPP
 /**
  * Get pages
