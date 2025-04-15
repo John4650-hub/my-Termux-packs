@@ -1,15 +1,16 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
-CFLAGS += -Wall -Wextra -Werror -fPIC
-LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpthread -lm -lpng  -lmupdf -lmupdf-third
-#for fpdfium
-#-lpdfium
-# Rule to create the shared library
-pdfviewer.so: main.cpp
-	$(CXX) -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS) src/save_to_png.cpp src/gen_w_mupdf.cpp main.cpp -o pdfviewer.so
+CFLAGS += -Wall -Wextra -Werror
 
-install: pdfviewer.so
-	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
+# Compile main.cpp to main.o
+main.o: main.cpp
+	$(CXX) $(CFLAGS) -I$(TERMUX_PREFIX)/include -c main.c -o main.o
 
+# (Optional) Build static library from main.o
+libbackport.a: main.o
+	ar rcs libbackport.a main.o
+
+install: libbackport.a
+	install libbackport.a $(DESTDIR)$(PREFIX)/lib/libbackport.a
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
+	rm -f $(DESTDIR)$(PREFIX)/lib/libbackport.a
