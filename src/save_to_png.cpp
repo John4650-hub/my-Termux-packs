@@ -43,11 +43,11 @@ void SaveBitmapAsPNG(unsigned char* buffer, const char* filename,int width,int h
 
     // Write the image row by row
     for (int y = 0; y < height; ++y) {
-        png_write_row(png, buffer + (y * stride));
+        png_write_row(png, buffer + (y * 1));
     }
 
     // Finish writing
--    png_write_end(png, NULL);
+    png_write_end(png, NULL);
 
     // Cleanup
     png_destroy_write_struct(&png, &info);

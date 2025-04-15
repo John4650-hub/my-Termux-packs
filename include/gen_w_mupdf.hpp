@@ -9,5 +9,5 @@ int mupdf_get_total_pages(fz_context* ctx, fz_document* doc);
  * generate page image
  **/
 
-int mupdf_gen_page(const char* name_pdf,int page_number)
+int mupdf_gen_page(const char* name_pdf,int page_number);
 #endif

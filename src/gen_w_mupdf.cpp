@@ -96,7 +96,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-  unsigned char* data = pixmap->samples;
+  unsigned char* data = pix->samples;
   width=pix->w;
   height=pix->h;
   std::ostringstream oss;
@@ -104,7 +104,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
   std::string out_name_str=oss.str();
   const char* output_page_name = out_name_str.c_str();
 
- SaveBitmapAsPNG(data, output_page_name,width,height)
+ SaveBitmapAsPNG(data, output_page_name,width,height);
 fz_drop_pixmap(ctx, pix);
 	fz_drop_document(ctx, doc);
 	fz_drop_context(ctx);
