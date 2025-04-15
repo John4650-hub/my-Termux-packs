@@ -2,8 +2,8 @@ TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
 
-# Compile main.cpp to main.o
-main.o: main.cpp
+# Compile main.c to main.o
+main.o: main.c
 	$(CXX) $(CFLAGS) -I$(TERMUX_PREFIX)/include -c main.c -o main.o
 
 # (Optional) Build static library from main.o
