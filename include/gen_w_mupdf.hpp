@@ -1,10 +1,9 @@
 #ifdef GEN_W_MUPDF_HPP
 #define GEN_W_MUPDF_HPP
-#include <mupdf/flitz.h>
 /**
  * Get pages
  **/
-int mupdf_get_total_pages(fz_context* ctx, fz_document* doc);
+int mupdf_get_total_pages(const char* fname);
 /**
  * generate page image
  **/

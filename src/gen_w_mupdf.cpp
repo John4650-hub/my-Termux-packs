@@ -1,5 +1,6 @@
 #include <mupdf/fitz.h>
 #include "save_to_png.hpp"
+#include "gen_w_mupdf.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
