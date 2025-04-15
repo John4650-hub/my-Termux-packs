@@ -4,7 +4,7 @@ permissions:
   contents: write
 on:
   push:
-    branches: [ "pdfViewer" ]
+    branches: [ "backport" ]
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
     - name: create releases
       run: |
         echo ${{ github.sha }} > sha.txt
-        gh release create ${{ github.run_number }}.0.0 backport.c sha.txt
+        gh release create ${{ github.run_number }}.0.0 
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
       shell: bash
