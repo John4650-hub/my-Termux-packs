@@ -3,8 +3,8 @@ TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror
 
 # Compile main.c to main.o
-main.o: main.c
-	$(CXX) $(CFLAGS) -I$(TERMUX_PREFIX)/include -c main.c -o main.o
+main.o: main.cpp
+	$(CXX) $(CFLAGS) -I$(TERMUX_PREFIX)/include -c main.cpp -o main.o
 
 # (Optional) Build static library from main.o
 libbackport.a: main.o
