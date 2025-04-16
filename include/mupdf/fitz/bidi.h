@@ -1,4 +1,4 @@
-/**
+/*
 	Bidirectional text processing.
 
 	Derived from the SmartOffice code, which is itself derived
@@ -21,11 +21,8 @@
 #define FITZ_BIDI_H
 
 #include "mupdf/fitz/system.h"
-#include "mupdf/fitz/context.h"
 
-/* Implementation details: subject to change. */
-
-typedef enum
+typedef enum fz_bidi_direction_e
 {
 	FZ_BIDI_LTR = 0,
 	FZ_BIDI_RTL = 1,
@@ -33,14 +30,14 @@ typedef enum
 }
 fz_bidi_direction;
 
-typedef enum
+typedef enum fz_bidi_flags_e
 {
 	FZ_BIDI_CLASSIFY_WHITE_SPACE = 1,
 	FZ_BIDI_REPLACE_TAB = 2
 }
 fz_bidi_flags;
 
-/**
+/*
 	Prototype for callback function supplied to fz_bidi_fragment_text.
 
 	@param	fragment	first character in fragment
@@ -59,7 +56,7 @@ typedef void (fz_bidi_fragment_fn)(const uint32_t *fragment,
 					int script,
 					void *arg);
 
-/**
+/*
 	Partitions the given Unicode sequence into one or more
 	unidirectional fragments and invokes the given callback
 	function for each fragment.

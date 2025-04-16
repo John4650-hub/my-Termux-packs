@@ -1,16 +1,14 @@
-/* Copyright (C) 2009-2022 Artifex Software, Inc.
+/* Copyright (C) 2009-2018 Artifex Software, Inc.
    All Rights Reserved.
 
    This software is provided AS-IS with no warranty, either express or
    implied.
 
-   This software is distributed under license and may not be copied,
-   modified or distributed except as expressly authorized under the terms
-   of the license contained in the file COPYING in this distribution.
-
-   Refer to licensing information at http://www.artifex.com or contact
-   Artifex Software, Inc.,  39 Mesa Street, Suite 108A, San Francisco,
-   CA 94129, USA, for further information.
+   This software is distributed under license and may not be copied, modified
+   or distributed except as expressly authorized under the terms of that
+   license. Refer to licensing information at http://www.artifex.com
+   or contact Artifex Software, Inc.,  1305 Grant Avenue - Suite 200,
+   Novato, CA 94945, U.S.A., +1(415)492-9861, for further information.
 */
 
 /* Memento: A library to aid debugging of memory leaks/heap corruption.
@@ -77,7 +75,8 @@
  * An example:
  *    Suppose we have a gs invocation that crashes with memory corruption.
  *     * Build with -DMEMENTO.
- *     * In your debugger put a breakpoint on Memento_breakpoint.
+ *     * In your debugger put breakpoints on Memento_inited and
+ *       Memento_Breakpoint.
  *     * Run the program. It will stop in Memento_inited.
  *     * Execute Memento_setParanoia(1);  (In VS use Ctrl-Alt-Q). (Note #1)
  *     * Continue execution.
@@ -93,9 +92,9 @@
  *       and 1458 - so if we rerun and stop the program at 1457, we can then
  *       step through, possibly with a data breakpoint at 0x172e710 and see
  *       when it occurs.
- *     * So restart the program from the beginning. When we stop after
- *       initialisation execute Memento_breakAt(1457); (and maybe
- *       Memento_setParanoia(1), or Memento_setParanoidAt(1457))
+ *     * So restart the program from the beginning. When we hit Memento_inited
+ *       execute Memento_breakAt(1457); (and maybe Memento_setParanoia(1), or
+ *       Memento_setParanoidAt(1457))
  *     * Continue execution until we hit Memento_breakpoint.
  *     * Now you can step through and watch the memory corruption happen.
  *
@@ -141,97 +140,28 @@
  *    Memento has some experimental code in it to trap new/delete (and
  *    new[]/delete[] if required) calls.
  *
- *    In all cases, Memento will provide a C API that new/delete
- *    operators can be built upon:
- *         void *Memento_cpp_new(size_t size);
- *         void Memento_cpp_delete(void *pointer);
- *         void *Memento_cpp_new_array(size_t size);
- *         void Memento_cpp_delete_array(void *pointer);
+ *    In order for this to work, either:
  *
- *    There are various ways that actual operator definitions can be
- *    provided:
- *
- *    1) If memento.c is built with the c++ compiler, then global new
- *    and delete operators will be built in to memento by default.
- *
- *    2) If memento.c is built as normal with the C compiler, then
- *    no such veneers will be built in. The caller must provide them
- *    themselves. This can be done either by:
- *
- *       a) Copying the lines between:
- *               // C++ Operator Veneers - START
- *       and
- *               // C++ Operator Veneers - END
- *       from memento.c into a C++ file within their own project.
+ *    1) Build memento.c with the c++ compiler.
  *
  *    or
  *
- *       b) Add the following lines to a C++ file in the project:
- *          #define MEMENTO_CPP_EXTRAS_ONLY
- *          #include "memento.c"
+ *    2) Build memento.c as normal with the C compiler, then from any
+ *       one of your .cpp files, do:
  *
- *    3) For those people that would like to be able to compile memento.c
- *    with a C compiler, and provide new/delete veneers globally
- *    within their own C++ code (so avoiding the need for memento.h to
- *    be included from every file), define MEMENTO_NO_CPLUSPLUS as you
- *    build, and Memento will not provide any veneers itself, instead
- *    relying on the library user to provide them.
+ *       #define MEMENTO_CPP_EXTRAS_ONLY
+ *       #include "memento.c"
  *
- *    For convenience the lines to implement such veneers can be found
- *    at the end of memento.c between:
- *        // C++ Operator Veneers - START
- *    and
- *        // C++ Operator Veneers - END
- *
- *    Memento's interception of new/delete can be disabled at runtime
- *    by using Memento_setIgnoreNewDelete(1). Alternatively the
- *    MEMENTO_IGNORENEWDELETE environment variable can be set to 1 to
- *    achieve the same result.
+ *       In the case where MEMENTO is not defined, this will not do anything.
  *
  *    Both Windows and GCC provide separate new[] and delete[] operators
  *    for arrays. Apparently some systems do not. If this is the case for
  *    your system, define MEMENTO_CPP_NO_ARRAY_CONSTRUCTORS.
- *
- * "libbacktrace.so failed to load"
- *
- *    In order to give nice backtraces on unix, Memento will try to use
- *    a libbacktrace dynamic library. If it can't find it, you'll see
- *    that warning, and your backtraces won't include file/line information.
- *
- *    To fix this you'll need to build your own libbacktrace. Don't worry
- *    it's really easy:
- *       git clone git://github.com/ianlancetaylor/libbacktrace
- *       cd libbacktrace
- *       ./configure --enable-shared
- *       make
- *
- *    This leaves the build .so as .libs/libbacktrace.so
- *
- *    Memento will look for this on LD_LIBRARY_PATH, or in /opt/lib/,
- *    or in /lib/, or  in /usr/lib/, or in /usr/local/lib/. I recommend
- *    using /opt/lib/ as this won't conflict with anything that you
- *    get via a package manager like apt.
- *
- *       sudo mkdir /opt
- *       sudo mkdir /opt/lib
- *       sudo cp .libs/libbacktrace.so /opt/lib/
  */
-
-#ifdef __cplusplus
-
-// Avoids problems with strdup()'s throw() attribute on Linux.
-#include <string.h>
-
-extern "C" {
-#endif
 
 #ifndef MEMENTO_H
 
-/* Include all these first, so our definitions below do
- * not conflict with them. */
 #include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
 
 #define MEMENTO_H
 
@@ -257,6 +187,8 @@ extern "C" {
 #define MEMENTO_ALLOCFILL 0xa8
 #define MEMENTO_FREEFILL  0xa9
 
+#define MEMENTO_FREELIST_MAX 0x2000000
+
 int Memento_checkBlock(void *);
 int Memento_checkAllMemory(void);
 int Memento_check(void);
@@ -273,37 +205,18 @@ int Memento_failAt(int);
 int Memento_failThisEvent(void);
 void Memento_listBlocks(void);
 void Memento_listNewBlocks(void);
-void Memento_listLargeBlocks(void);
-void Memento_listPhasedBlocks(void);
 size_t Memento_setMax(size_t);
 void Memento_stats(void);
 void *Memento_label(void *, const char *);
 void Memento_tick(void);
-int Memento_setVerbose(int);
-
-/* Terminate backtraces if we see specified function name. E.g.
-'cfunction_call' will exclude Python interpreter functions when Python calls C
-code. Returns 0 on success, -1 on failure (out of memory). */
-int Memento_addBacktraceLimitFnname(const char *fnname);
-
-/* If <atexitfin> is 0, we do not call Memento_fin() in an atexit() handler. */
-int Memento_setAtexitFin(int atexitfin);
-
-int Memento_setIgnoreNewDelete(int ignore);
 
 void *Memento_malloc(size_t s);
 void *Memento_realloc(void *, size_t s);
 void  Memento_free(void *);
 void *Memento_calloc(size_t, size_t);
-char *Memento_strdup(const char*);
-#if !defined(MEMENTO_GS_HACKS) && !defined(MEMENTO_MUPDF_HACKS)
-int Memento_asprintf(char **ret, const char *format, ...);
-int Memento_vasprintf(char **ret, const char *format, va_list ap);
-#endif
 
 void Memento_info(void *addr);
 void Memento_listBlockInfo(void);
-void Memento_blockInfo(void *blk);
 void *Memento_takeByteRef(void *blk);
 void *Memento_dropByteRef(void *blk);
 void *Memento_takeShortRef(void *blk);
@@ -323,48 +236,27 @@ int Memento_checkIntPointerOrNull(void *blk);
 void Memento_startLeaking(void);
 void Memento_stopLeaking(void);
 
-/* Returns number of allocation events so far. */
 int Memento_sequence(void);
-
-/* Returns non-zero if our process was forked by Memento squeeze. */
-int Memento_squeezing(void);
 
 void Memento_fin(void);
 
 void Memento_bt(void);
 
-void *Memento_cpp_new(size_t size);
-void Memento_cpp_delete(void *pointer);
-void *Memento_cpp_new_array(size_t size);
-void Memento_cpp_delete_array(void *pointer);
-
-void Memento_showHash(unsigned int hash);
-
 #ifdef MEMENTO
 
 #ifndef COMPILING_MEMENTO_C
-#define malloc    Memento_malloc
-#define free      Memento_free
-#define realloc   Memento_realloc
-#define calloc    Memento_calloc
-#define strdup    Memento_strdup
-#if !defined(MEMENTO_GS_HACKS) && !defined(MEMENTO_MUPDF_HACKS)
-#define asprintf  Memento_asprintf
-#define vasprintf Memento_vasprintf
-#endif
+#define malloc  Memento_malloc
+#define free    Memento_free
+#define realloc Memento_realloc
+#define calloc  Memento_calloc
 #endif
 
 #else
 
-#define Memento_malloc    MEMENTO_UNDERLYING_MALLOC
-#define Memento_free      MEMENTO_UNDERLYING_FREE
-#define Memento_realloc   MEMENTO_UNDERLYING_REALLOC
-#define Memento_calloc    MEMENTO_UNDERLYING_CALLOC
-#define Memento_strdup    strdup
-#if !defined(MEMENTO_GS_HACKS) && !defined(MEMENTO_MUPDF_HACKS)
-#define Memento_asprintf  asprintf
-#define Memento_vasprintf vasprintf
-#endif
+#define Memento_malloc  MEMENTO_UNDERLYING_MALLOC
+#define Memento_free    MEMENTO_UNDERLYING_FREE
+#define Memento_realloc MEMENTO_UNDERLYING_REALLOC
+#define Memento_calloc  MEMENTO_UNDERLYING_CALLOC
 
 #define Memento_checkBlock(A)              0
 #define Memento_checkAllMemory()           0
@@ -381,14 +273,11 @@ void Memento_showHash(unsigned int hash);
 #define Memento_failThisEvent()            0
 #define Memento_listBlocks()               do {} while (0)
 #define Memento_listNewBlocks()            do {} while (0)
-#define Memento_listLargeBlocks()          do {} while (0)
-#define Memento_listPhasedBlocks()         do {} while (0)
 #define Memento_setMax(A)                  0
 #define Memento_stats()                    do {} while (0)
 #define Memento_label(A,B)                 (A)
 #define Memento_info(A)                    do {} while (0)
 #define Memento_listBlockInfo()            do {} while (0)
-#define Memento_blockInfo(A)               do {} while (0)
 #define Memento_takeByteRef(A)             (A)
 #define Memento_dropByteRef(A)             (A)
 #define Memento_takeShortRef(A)            (A)
@@ -403,7 +292,6 @@ void Memento_showHash(unsigned int hash);
 #define Memento_checkBytePointerOrNull(A)  0
 #define Memento_checkShortPointerOrNull(A) 0
 #define Memento_checkIntPointerOrNull(A)   0
-#define Memento_setIgnoreNewDelete(v)      0
 
 #define Memento_tick()                     do {} while (0)
 #define Memento_startLeaking()             do {} while (0)
@@ -411,15 +299,7 @@ void Memento_showHash(unsigned int hash);
 #define Memento_fin()                      do {} while (0)
 #define Memento_bt()                       do {} while (0)
 #define Memento_sequence()                 (0)
-#define Memento_squeezing()                (0)
-#define Memento_setVerbose(A)              (A)
-#define Memento_addBacktraceLimitFnname(A) (0)
-#define Memento_setAtexitFin(atexitfin)    (0)
 
 #endif /* MEMENTO */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* MEMENTO_H */

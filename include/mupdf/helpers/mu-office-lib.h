@@ -1,25 +1,3 @@
-// Copyright (C) 2004-2021 Artifex Software, Inc.
-//
-// This file is part of MuPDF.
-//
-// MuPDF is free software: you can redistribute it and/or modify it under the
-// terms of the GNU Affero General Public License as published by the Free
-// Software Foundation, either version 3 of the License, or (at your option)
-// any later version.
-//
-// MuPDF is distributed in the hope that it will be useful, but WITHOUT ANY
-// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-// FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-// details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with MuPDF. If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
-//
-// Alternative licensing terms are available from the licensor.
-// For commercial licensing, see <https://www.artifex.com/> or contact
-// Artifex Software, Inc., 39 Mesa Street, Suite 108A, San Francisco,
-// CA 94129, USA, for further information.
-
 /**
  * Mu Office Library
  *
@@ -103,7 +81,7 @@ typedef enum MuOfficeDocErrorType
 /**
  *Structure holding the detail of the layout of a bitmap. b5g6r5 is assumed.
  */
-typedef struct
+typedef struct MuOfficeBitmap_s
 {
 	void *memptr;
 	int   width;
@@ -117,7 +95,7 @@ typedef struct
  *    x           x coord of point
  *    y           y coord of point
  */
-typedef struct
+typedef struct MuOfficePoint_s
 {
 	float x;
 	float y;
@@ -131,7 +109,7 @@ typedef struct
  *    width       width of area
  *    height      height of area
  */
-typedef struct
+typedef struct MuOfficeBox_s
 {
 	float x;
 	float y;
@@ -145,7 +123,7 @@ typedef enum MuOfficePointType
 	MuOfficePointType_LineTo
 } MuOfficePointType;
 
-typedef struct
+typedef struct MuOfficePathPoint
 {
 	float x;
 	float y;
@@ -159,16 +137,16 @@ typedef struct
  *    origin            coordinates of the document origin within the bitmap
  *    renderArea        the part of the bitmap to which to render
  */
-typedef struct
+typedef struct MuOfficeRenderArea_s
 {
 	MuOfficePoint   origin;
 	MuOfficeBox     renderArea;
 } MuOfficeRenderArea;
 
-typedef struct MuOfficeLib MuOfficeLib;
-typedef struct MuOfficeDoc MuOfficeDoc;
-typedef struct MuOfficePage MuOfficePage;
-typedef struct MuOfficeRender MuOfficeRender;
+typedef struct MuOfficeLib_s MuOfficeLib;
+typedef struct MuOfficeDoc_s MuOfficeDoc;
+typedef struct MuOfficePage_s MuOfficePage;
+typedef struct MuOfficeRender_s MuOfficeRender;
 
 /**
  * Allocator function used by some functions to get blocks of memory.
