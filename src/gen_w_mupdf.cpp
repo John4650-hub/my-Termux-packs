@@ -14,32 +14,33 @@ int mupdf_get_total_pages(const char* pdf_file_name){
   int page_count{};
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
-    fprintf(stderr,"can't create mupdf context");
+    std::cerr <<"can't create mupdf context\n";
     return EXIT_FAILURE;
   }
-  fz_try(ctx)
+  try{
     fz_register_document_handlers(ctx);
-  fz_catch(ctx)
+  }
+  catch (const std::runtime_error &err)
   {
-    fz_report_error(ctx);
-		fprintf(stderr, "cannot register document handlers\n");
+    std::cerr << err.what() << "\n";
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
   }
-  fz_try(ctx)
+  try{
 		doc = fz_open_document(ctx, pdf_file_name);
-	fz_catch(ctx)
+  }
+	catch (const std::runtime_error &err)
 	{
-		fz_report_error(ctx);
-		fprintf(stderr, "cannot open document\n");
+		
+    std::cerr << err.what() << "\n";
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-  fz_try(ctx)
+  try{
 		page_count = fz_count_pages(ctx, doc);
-	fz_catch(ctx)
+  }
+catch (const std::runtime_error &err)
 	{
-		fz_report_error(ctx);
 		fprintf(stderr, "cannot count number of pages\n");
 		fz_drop_document(ctx, doc);
 		fz_drop_context(ctx);
@@ -63,18 +64,20 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
     fprintf(stderr,"can't create mupdf context");
     return EXIT_FAILURE;
   }
-  fz_try(ctx)
+  try{
     fz_register_document_handlers(ctx);
-  fz_catch(ctx)
+  }
+  catch (const std::runtime_error &err)
   {
-    fz_report_error(ctx);
 		fprintf(stderr, "cannot register document handlers\n");
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
   }
-  fz_try(ctx)
+  try{
 		doc = fz_open_document(ctx, name_pdf);
-	fz_catch(ctx)
+  }
+	
+catch (const std::runtime_error &err)
 	{
 		fz_report_error(ctx);
 		fprintf(stderr, "cannot open document\n");
@@ -87,11 +90,11 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 	ctm = fz_scale(zoom / 100, zoom / 100);
 	ctm = fz_pre_rotate(ctm, rotate);
 
-  fz_try(ctx)
+  try{
 		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number, ctm, fz_device_rgb(ctx), 0);
-	fz_catch(ctx)
+  }
+	catch (const std::runtime_error &err)
 	{
-		fz_report_error(ctx);
 		fprintf(stderr, "cannot render page\n");
 		fz_drop_document(ctx, doc);
 		fz_drop_context(ctx);
