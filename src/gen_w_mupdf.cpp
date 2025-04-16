@@ -61,7 +61,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
-    std::cerr << err.what() << "\n";
+    std::cerr << "couldn't create mupdf context"<< "\n";
     return EXIT_FAILURE;
   }
   try{
