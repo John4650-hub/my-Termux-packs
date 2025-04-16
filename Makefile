@@ -1,7 +1,7 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror -fPIC
-LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpthread -lm -lpng  -lmupdf -lmupdf-third -lfreetype -lharfbuzz -lz -lopenjp2 -ljbig2dec -ljpeg -llog -lc
+LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpthread -lm -lpng  -lmupdf -lmupdf-third -lfreetype -lharfbuzz -lz -lopenjp2 -ljbig2dec -ljpeg -llog -lc -ld
 #for fpdfium
 #-lpdfium
 # Rule to create the shared library
