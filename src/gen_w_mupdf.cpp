@@ -41,7 +41,7 @@ int mupdf_get_total_pages(const char* pdf_file_name){
   }
 catch (const std::runtime_error &err)
 	{
-		fprintf(stderr, "cannot count number of pages\n");
+		std::cerr << err.what() << "\n";
 		fz_drop_document(ctx, doc);
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
@@ -61,7 +61,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
-    fprintf(stderr,"can't create mupdf context");
+    std::cerr << err.what() << "\n";
     return EXIT_FAILURE;
   }
   try{
@@ -69,7 +69,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
   }
   catch (const std::runtime_error &err)
   {
-		fprintf(stderr, "cannot register document handlers\n");
+    std::cerr << err.what() << "\n";
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
   }
@@ -79,8 +79,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 	
 catch (const std::runtime_error &err)
 	{
-		fz_report_error(ctx);
-		fprintf(stderr, "cannot open document\n");
+    std::cerr<<err.what()<<"\n";
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
@@ -95,7 +94,7 @@ catch (const std::runtime_error &err)
   }
 	catch (const std::runtime_error &err)
 	{
-		fprintf(stderr, "cannot render page\n");
+    std::cerr << err.what() << "\n";
 		fz_drop_document(ctx, doc);
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
