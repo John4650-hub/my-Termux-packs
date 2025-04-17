@@ -1,3 +1,25 @@
+// Copyright (C) 2004-2021 Artifex Software, Inc.
+//
+// This file is part of MuPDF.
+//
+// MuPDF is free software: you can redistribute it and/or modify it under the
+// terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, either version 3 of the License, or (at your option)
+// any later version.
+//
+// MuPDF is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+// FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with MuPDF. If not, see <https://www.gnu.org/licenses/agpl-3.0.en.html>
+//
+// Alternative licensing terms are available from the licensor.
+// For commercial licensing, see <https://www.artifex.com/> or contact
+// Artifex Software, Inc., 39 Mesa Street, Suite 108A, San Francisco,
+// CA 94129, USA, for further information.
+
 #ifndef MUPDF_HELPERS_MU_THREADS_H
 #define MUPDF_HELPERS_MU_THREADS_H
 
@@ -35,9 +57,9 @@
 /*
 	Types
 */
-typedef struct mu_thread_s mu_thread;
-typedef struct mu_semaphore_s mu_semaphore;
-typedef struct mu_mutex_s mu_mutex;
+typedef struct mu_thread mu_thread;
+typedef struct mu_semaphore mu_semaphore;
+typedef struct mu_mutex mu_mutex;
 
 /*
 	Semaphores
@@ -177,17 +199,17 @@ void mu_unlock_mutex(mu_mutex *mutex);
 #ifdef DISABLE_MUTHREADS
 
 /* Null implementation */
-struct mu_semaphore_s
+struct mu_semaphore
 {
 	int dummy;
 };
 
-struct mu_thread_s
+struct mu_thread
 {
 	int dummy;
 };
 
-struct mu_mutex_s
+struct mu_mutex
 {
 	int dummy;
 };
@@ -197,19 +219,19 @@ struct mu_mutex_s
 #include <windows.h>
 
 /* Windows threads */
-struct mu_semaphore_s
+struct mu_semaphore
 {
 	HANDLE handle;
 };
 
-struct mu_thread_s
+struct mu_thread
 {
 	HANDLE handle;
 	mu_thread_fn *fn;
 	void *arg;
 };
 
-struct mu_mutex_s
+struct mu_mutex
 {
 	CRITICAL_SECTION mutex;
 };
@@ -221,27 +243,27 @@ struct mu_mutex_s
 
 	Neither ios nor OSX supports unnamed semaphores.
 	Named semaphores are a pain to use, so we implement
-	our own sempahores using condition variables and
+	our own semaphores using condition variables and
 	mutexes.
 */
 
 #include <pthread.h>
 
-struct mu_semaphore_s
+struct mu_semaphore
 {
 	int count;
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
 };
 
-struct mu_thread_s
+struct mu_thread
 {
 	pthread_t thread;
 	mu_thread_fn *fn;
 	void *arg;
 };
 
-struct mu_mutex_s
+struct mu_mutex
 {
 	pthread_mutex_t mutex;
 };
