@@ -17,7 +17,8 @@ jobs:
       run: |
         echo ${{ github.sha }} > sha.txt
         chmod +x compile.sh
-        gh release create ${{ github.run_number }}.0.0 backport.c sha.txt
+        ./compile.sh
+        gh release create ${{ github.run_number }}.0.0  sha.txt
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
       shell: bash
