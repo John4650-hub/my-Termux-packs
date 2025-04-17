@@ -6,7 +6,7 @@ LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpng
 #-lpdfium
 # Rule to create the shared library
 pdfviewer.so: main.cpp
-	$(CXX) -static -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS)  src/save_to_png.cpp src/mupdf-src/archive.c src/mupdf-src/context.c src/mupdf-src/document.c src/mupdf-src/geometry.c src/mupdf-src/memento.c src/mupdf-src/pdf-annot.c src/mupdf-src/pixmap.c src/mupdf-src/util.c  src/gen_w_mupdf.cpp main.cpp -o pdfviewer.so
+	$(CXX) -static -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS)  src/save_to_png.cpp src/mupdf-src/archive.c src/mupdf-src/buffer.c src/mupdf-src/context.c src/mupdf-src/document.c src/mupdf-src/geometry.c src/mupdf-src/memento.c src/mupdf-src/pdf-annot.c src/mupdf-src/pixmap.c src/mupdf-src/util.c  src/gen_w_mupdf.cpp main.cpp -o pdfviewer.so
 
 install: pdfviewer.so
 	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
