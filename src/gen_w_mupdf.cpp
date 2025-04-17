@@ -10,7 +10,7 @@
 
 int mupdf_get_total_pages(const char* pdf_file_name){
   fz_context* ctx;
-  fz_document* doc;
+  pdf_document* doc;
   int page_count{};
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
@@ -27,26 +27,26 @@ int mupdf_get_total_pages(const char* pdf_file_name){
 		return EXIT_FAILURE;
   }
   try{
-		doc = fz_open_document(ctx, pdf_file_name);
+		doc = pdf_open_document(ctx, pdf_file_name);
   }
 	catch (const std::runtime_error &err)
 	{
 		
     std::cerr << err.what() << "\n";
-		fz_drop_context(ctx);
+		pdf_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
   try{
-		page_count = fz_count_pages(ctx, doc);
+		page_count = pdf_count_pages(ctx, doc);
   }
 catch (const std::runtime_error &err)
 	{
 		std::cerr << err.what() << "\n";
-		fz_drop_document(ctx, doc);
+		pdf_drop_document(ctx, doc);
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-	fz_drop_document(ctx, doc);
+	pdf_drop_document(ctx, doc);
 	fz_drop_context(ctx);
   return page_count;
 }
@@ -55,7 +55,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
   float zoom=5.0f,rotate=0.0f;
   int width,height, page_count;
   fz_context *ctx;
-  fz_document *doc;
+  pdf_document *doc;
   fz_pixmap *pix;
   fz_matrix ctm;
 
@@ -74,7 +74,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
 		return EXIT_FAILURE;
   }
   try{
-		doc = fz_open_document(ctx, name_pdf);
+		doc = pdf_open_document(ctx, name_pdf);
   }
 	
 catch (const std::runtime_error &err)
@@ -95,7 +95,7 @@ catch (const std::runtime_error &err)
 	catch (const std::runtime_error &err)
 	{
     std::cerr << err.what() << "\n";
-		fz_drop_document(ctx, doc);
+		pdf_drop_document(ctx, doc);
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
