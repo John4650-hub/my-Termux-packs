@@ -1,13 +1,72 @@
-﻿ ##[group]Run echo 2cd137636983b52cbbba8df102ef12259a1def8f > sha.txt
- [36;1mecho 2cd137636983b52cbbba8df102ef12259a1def8f > sha.txt[0m
- [36;1mchmod +x compile.sh[0m
- [36;1mapt-get install libpng -y[0m
- [36;1m./compile.sh[0m
- [36;1mgh release create 895.0.0 backport.c sha.txt[0m
- shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
- env:
-   GITHUB_TOKEN: ***
- ##[endgroup]
- E: Could not open lock file /var/lib/dpkg/lock-frontend - open (13: Permission denied)
- E: Unable to acquire the dpkg frontend lock (/var/lib/dpkg/lock-frontend), are you root?
- ##[error]Process completed with exit code 100.
+﻿2025-04-17T20:32:37.3852038Z ##[group]Run echo 9f39cc09c56da3d2bf519b903227f6fdff431dc3 > sha.txt
+2025-04-17T20:32:37.3854225Z [36;1mecho 9f39cc09c56da3d2bf519b903227f6fdff431dc3 > sha.txt[0m
+2025-04-17T20:32:37.3855664Z [36;1mchmod +x compile.sh[0m
+2025-04-17T20:32:37.3856627Z [36;1m./compile.sh[0m
+2025-04-17T20:32:37.3857646Z [36;1mgh release create 897.0.0 backport.c sha.txt[0m
+2025-04-17T20:32:37.3911847Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-04-17T20:32:37.3913374Z env:
+2025-04-17T20:32:37.3914636Z   GITHUB_TOKEN: ***
+2025-04-17T20:32:37.3915457Z ##[endgroup]
+2025-04-17T20:32:37.5255861Z Reading package lists...
+2025-04-17T20:32:37.6865777Z Building dependency tree...
+2025-04-17T20:32:37.6880328Z Reading state information...
+2025-04-17T20:32:37.7064852Z E: Unable to locate package libpng
+2025-04-17T20:32:37.8355705Z src/gen_image.cpp:6:10: fatal error: fpdfview.h: No such file or directory
+2025-04-17T20:32:37.8357424Z     6 | #include "fpdfview.h"
+2025-04-17T20:32:37.8358462Z       |          ^~~~~~~~~~~~
+2025-04-17T20:32:37.8359548Z compilation terminated.
+2025-04-17T20:32:38.0701793Z src/gen_w_mupdf.cpp: In function ‘int mupdf_get_total_pages(const char*)’:
+2025-04-17T20:32:38.0705689Z src/gen_w_mupdf.cpp:13:3: error: ‘pdf_document’ was not declared in this scope; did you mean ‘fz_document’?
+2025-04-17T20:32:38.0708586Z    13 |   pdf_document* doc;
+2025-04-17T20:32:38.0709921Z       |   ^~~~~~~~~~~~
+2025-04-17T20:32:38.0711129Z       |   fz_document
+2025-04-17T20:32:38.0720261Z src/gen_w_mupdf.cpp:13:17: error: ‘doc’ was not declared in this scope
+2025-04-17T20:32:38.0723071Z    13 |   pdf_document* doc;
+2025-04-17T20:32:38.0724527Z       |                 ^~~
+2025-04-17T20:32:38.0751918Z src/gen_w_mupdf.cpp:30:23: error: ‘pdf_open_document’ was not declared in this scope; did you mean ‘fz_open_document’?
+2025-04-17T20:32:38.0755474Z    30 |                 doc = pdf_open_document(ctx, pdf_file_name);
+2025-04-17T20:32:38.0757276Z       |                       ^~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0758965Z       |                       fz_open_document
+2025-04-17T20:32:38.0780885Z src/gen_w_mupdf.cpp:36:17: error: ‘pdf_drop_context’ was not declared in this scope; did you mean ‘fz_drop_context’?
+2025-04-17T20:32:38.0784136Z    36 |                 pdf_drop_context(ctx);
+2025-04-17T20:32:38.0785805Z       |                 ^~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0787346Z       |                 fz_drop_context
+2025-04-17T20:32:38.0807306Z src/gen_w_mupdf.cpp:40:30: error: ‘pdf_count_pages’ was not declared in this scope; did you mean ‘fz_count_pages’?
+2025-04-17T20:32:38.0810585Z    40 |                 page_count = pdf_count_pages(ctx, doc);
+2025-04-17T20:32:38.0812379Z       |                              ^~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0814265Z       |                              fz_count_pages
+2025-04-17T20:32:38.0837252Z src/gen_w_mupdf.cpp:45:17: error: ‘pdf_drop_document’ was not declared in this scope; did you mean ‘fz_drop_document’?
+2025-04-17T20:32:38.0840395Z    45 |                 pdf_drop_document(ctx, doc);
+2025-04-17T20:32:38.0842122Z       |                 ^~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0843908Z       |                 fz_drop_document
+2025-04-17T20:32:38.0865321Z src/gen_w_mupdf.cpp:49:9: error: ‘pdf_drop_document’ was not declared in this scope; did you mean ‘fz_drop_document’?
+2025-04-17T20:32:38.0868513Z    49 |         pdf_drop_document(ctx, doc);
+2025-04-17T20:32:38.0870092Z       |         ^~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0871510Z       |         fz_drop_document
+2025-04-17T20:32:38.0888847Z src/gen_w_mupdf.cpp: In function ‘int mupdf_gen_page(const char*, int)’:
+2025-04-17T20:32:38.0892412Z src/gen_w_mupdf.cpp:58:3: error: ‘pdf_document’ was not declared in this scope; did you mean ‘fz_document’?
+2025-04-17T20:32:38.0895401Z    58 |   pdf_document *doc;
+2025-04-17T20:32:38.0896711Z       |   ^~~~~~~~~~~~
+2025-04-17T20:32:38.0897876Z       |   fz_document
+2025-04-17T20:32:38.0903850Z src/gen_w_mupdf.cpp:58:17: error: ‘doc’ was not declared in this scope
+2025-04-17T20:32:38.0906890Z    58 |   pdf_document *doc;
+2025-04-17T20:32:38.0908313Z       |                 ^~~
+2025-04-17T20:32:38.0934982Z src/gen_w_mupdf.cpp:77:23: error: ‘pdf_open_document’ was not declared in this scope; did you mean ‘fz_open_document’?
+2025-04-17T20:32:38.0938471Z    77 |                 doc = pdf_open_document(ctx, name_pdf);
+2025-04-17T20:32:38.0940345Z       |                       ^~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0942014Z       |                       fz_open_document
+2025-04-17T20:32:38.0977762Z src/gen_w_mupdf.cpp:98:17: error: ‘pdf_drop_document’ was not declared in this scope; did you mean ‘fz_drop_document’?
+2025-04-17T20:32:38.0980450Z    98 |                 pdf_drop_document(ctx, doc);
+2025-04-17T20:32:38.0981714Z       |                 ^~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.0982765Z       |                 fz_drop_document
+2025-04-17T20:32:38.1289982Z src/save_to_png.cpp:1:10: fatal error: png.h: No such file or directory
+2025-04-17T20:32:38.1291578Z     1 | #include <png.h>
+2025-04-17T20:32:38.1293034Z       |          ^~~~~~~
+2025-04-17T20:32:38.1455934Z compilation terminated.
+2025-04-17T20:32:38.1457126Z cc1: fatal error: src/mupdf/*.c: No such file or directory
+2025-04-17T20:32:38.1458426Z compilation terminated.
+2025-04-17T20:32:38.1510913Z main.cpp:2:10: fatal error: argparse/argparse.hpp: No such file or directory
+2025-04-17T20:32:38.1512668Z     2 | #include <argparse/argparse.hpp>
+2025-04-17T20:32:38.1513927Z       |          ^~~~~~~~~~~~~~~~~~~~~~~
+2025-04-17T20:32:38.1514950Z compilation terminated.
+2025-04-17T20:32:38.1541059Z ##[error]Process completed with exit code 1.
