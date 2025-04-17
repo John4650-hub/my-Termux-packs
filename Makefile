@@ -1,8 +1,8 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror -fPIC
-LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpthread -lm -lpng  -lmupdf -lmupdf-third -lfreetype -lharfbuzz -lz -lopenjp2 -ljbig2dec -ljpeg -llog -lc -ldl
-#for fpdfium
+LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpng -lmupdf
+#f.or fpdfium
 #-lpdfium
 # Rule to create the shared library
 pdfviewer.so: main.cpp
