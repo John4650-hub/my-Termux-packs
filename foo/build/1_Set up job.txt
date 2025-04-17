@@ -1,0 +1,29 @@
+﻿2025-04-17T20:18:26.6813227Z Current runner version: '2.323.0'
+2025-04-17T20:18:26.6845227Z ##[group]Operating System
+2025-04-17T20:18:26.6846416Z Ubuntu
+2025-04-17T20:18:26.6847220Z 24.04.2
+2025-04-17T20:18:26.6848063Z LTS
+2025-04-17T20:18:26.6848768Z ##[endgroup]
+2025-04-17T20:18:26.6849566Z ##[group]Runner Image
+2025-04-17T20:18:26.6850950Z Image: ubuntu-24.04
+2025-04-17T20:18:26.6852026Z Version: 20250413.1.0
+2025-04-17T20:18:26.6853817Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250413.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-04-17T20:18:26.6856441Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250413.1
+2025-04-17T20:18:26.6858142Z ##[endgroup]
+2025-04-17T20:18:26.6859012Z ##[group]Runner Image Provisioner
+2025-04-17T20:18:26.6860090Z 2.0.422.1
+2025-04-17T20:18:26.6861136Z ##[endgroup]
+2025-04-17T20:18:26.6862814Z ##[group]GITHUB_TOKEN Permissions
+2025-04-17T20:18:26.6865325Z Contents: write
+2025-04-17T20:18:26.6866208Z Metadata: read
+2025-04-17T20:18:26.6867221Z ##[endgroup]
+2025-04-17T20:18:26.6870781Z Secret source: Actions
+2025-04-17T20:18:26.6871938Z Prepare workflow directory
+2025-04-17T20:18:26.7343858Z Prepare all required actions
+2025-04-17T20:18:26.7400322Z Getting action download info
+2025-04-17T20:18:27.0343848Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-04-17T20:18:27.0344845Z Version: 4.2.2
+2025-04-17T20:18:27.0345810Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-04-17T20:18:27.0346968Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-04-17T20:18:27.0347719Z ##[endgroup]
+2025-04-17T20:18:27.2049954Z Complete job name: build

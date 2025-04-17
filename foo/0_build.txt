@@ -1,0 +1,122 @@
+﻿2025-04-17T20:18:26.6814261Z Current runner version: '2.323.0'
+2025-04-17T20:18:26.6845253Z ##[group]Operating System
+2025-04-17T20:18:26.6846429Z Ubuntu
+2025-04-17T20:18:26.6847231Z 24.04.2
+2025-04-17T20:18:26.6848072Z LTS
+2025-04-17T20:18:26.6848772Z ##[endgroup]
+2025-04-17T20:18:26.6849574Z ##[group]Runner Image
+2025-04-17T20:18:26.6851144Z Image: ubuntu-24.04
+2025-04-17T20:18:26.6852036Z Version: 20250413.1.0
+2025-04-17T20:18:26.6853835Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250413.1/images/ubuntu/Ubuntu2404-Readme.md
+2025-04-17T20:18:26.6856468Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250413.1
+2025-04-17T20:18:26.6858164Z ##[endgroup]
+2025-04-17T20:18:26.6859022Z ##[group]Runner Image Provisioner
+2025-04-17T20:18:26.6860109Z 2.0.422.1
+2025-04-17T20:18:26.6861153Z ##[endgroup]
+2025-04-17T20:18:26.6862829Z ##[group]GITHUB_TOKEN Permissions
+2025-04-17T20:18:26.6865351Z Contents: write
+2025-04-17T20:18:26.6866226Z Metadata: read
+2025-04-17T20:18:26.6867485Z ##[endgroup]
+2025-04-17T20:18:26.6870809Z Secret source: Actions
+2025-04-17T20:18:26.6871954Z Prepare workflow directory
+2025-04-17T20:18:26.7343938Z Prepare all required actions
+2025-04-17T20:18:26.7400350Z Getting action download info
+2025-04-17T20:18:27.0343876Z ##[group]Download immutable action package 'actions/checkout@v4'
+2025-04-17T20:18:27.0344854Z Version: 4.2.2
+2025-04-17T20:18:27.0345818Z Digest: sha256:ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1
+2025-04-17T20:18:27.0347029Z Source commit SHA: 11bd71901bbe5b1630ceea73d27597364c9af683
+2025-04-17T20:18:27.0347722Z ##[endgroup]
+2025-04-17T20:18:27.2049977Z Complete job name: build
+2025-04-17T20:18:27.2690675Z ##[group]Run actions/checkout@v4
+2025-04-17T20:18:27.2691524Z with:
+2025-04-17T20:18:27.2691926Z   repository: John4650-hub/my-Termux-packs
+2025-04-17T20:18:27.2692594Z   token: ***
+2025-04-17T20:18:27.2692975Z   ssh-strict: true
+2025-04-17T20:18:27.2693366Z   ssh-user: git
+2025-04-17T20:18:27.2693759Z   persist-credentials: true
+2025-04-17T20:18:27.2694231Z   clean: true
+2025-04-17T20:18:27.2694622Z   sparse-checkout-cone-mode: true
+2025-04-17T20:18:27.2695094Z   fetch-depth: 1
+2025-04-17T20:18:27.2695474Z   fetch-tags: false
+2025-04-17T20:18:27.2695876Z   show-progress: true
+2025-04-17T20:18:27.2696280Z   lfs: false
+2025-04-17T20:18:27.2696635Z   submodules: false
+2025-04-17T20:18:27.2697038Z   set-safe-directory: true
+2025-04-17T20:18:27.2697658Z ##[endgroup]
+2025-04-17T20:18:27.4701872Z Syncing repository: John4650-hub/my-Termux-packs
+2025-04-17T20:18:27.4704276Z ##[group]Getting Git version info
+2025-04-17T20:18:27.4705597Z Working directory is '/home/runner/work/my-Termux-packs/my-Termux-packs'
+2025-04-17T20:18:27.4707256Z [command]/usr/bin/git version
+2025-04-17T20:18:27.4735322Z git version 2.49.0
+2025-04-17T20:18:27.4765689Z ##[endgroup]
+2025-04-17T20:18:27.4779816Z Temporarily overriding HOME='/home/runner/work/_temp/2d346260-19e2-415f-a142-9de11472c9b3' before making global git config changes
+2025-04-17T20:18:27.4782944Z Adding repository directory to the temporary git global config as a safe directory
+2025-04-17T20:18:27.4792427Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/my-Termux-packs/my-Termux-packs
+2025-04-17T20:18:27.4826574Z Deleting the contents of '/home/runner/work/my-Termux-packs/my-Termux-packs'
+2025-04-17T20:18:27.4831766Z ##[group]Initializing the repository
+2025-04-17T20:18:27.4836837Z [command]/usr/bin/git init /home/runner/work/my-Termux-packs/my-Termux-packs
+2025-04-17T20:18:27.4922970Z hint: Using 'master' as the name for the initial branch. This default branch name
+2025-04-17T20:18:27.4925286Z hint: is subject to change. To configure the initial branch name to use in all
+2025-04-17T20:18:27.4927292Z hint: of your new repositories, which will suppress this warning, call:
+2025-04-17T20:18:27.4929210Z hint:
+2025-04-17T20:18:27.4931002Z hint: 	git config --global init.defaultBranch <name>
+2025-04-17T20:18:27.4933082Z hint:
+2025-04-17T20:18:27.4935050Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2025-04-17T20:18:27.4938609Z hint: 'development'. The just-created branch can be renamed via this command:
+2025-04-17T20:18:27.4941528Z hint:
+2025-04-17T20:18:27.4942907Z hint: 	git branch -m <name>
+2025-04-17T20:18:27.4945799Z Initialized empty Git repository in /home/runner/work/my-Termux-packs/my-Termux-packs/.git/
+2025-04-17T20:18:27.4951170Z [command]/usr/bin/git remote add origin https://github.com/John4650-hub/my-Termux-packs
+2025-04-17T20:18:27.4978272Z ##[endgroup]
+2025-04-17T20:18:27.4981229Z ##[group]Disabling automatic garbage collection
+2025-04-17T20:18:27.4983624Z [command]/usr/bin/git config --local gc.auto 0
+2025-04-17T20:18:27.5013140Z ##[endgroup]
+2025-04-17T20:18:27.5015428Z ##[group]Setting up auth
+2025-04-17T20:18:27.5020894Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-04-17T20:18:27.5054082Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-04-17T20:18:27.5359686Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-04-17T20:18:27.5389762Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-04-17T20:18:27.5618007Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2025-04-17T20:18:27.5652688Z ##[endgroup]
+2025-04-17T20:18:27.5661621Z ##[group]Fetching the repository
+2025-04-17T20:18:27.5666654Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +2cd137636983b52cbbba8df102ef12259a1def8f:refs/remotes/origin/pdfViewer
+2025-04-17T20:18:27.8441734Z From https://github.com/John4650-hub/my-Termux-packs
+2025-04-17T20:18:27.8444427Z  * [new ref]         2cd137636983b52cbbba8df102ef12259a1def8f -> origin/pdfViewer
+2025-04-17T20:18:27.8471923Z ##[endgroup]
+2025-04-17T20:18:27.8473671Z ##[group]Determining the checkout info
+2025-04-17T20:18:27.8475620Z ##[endgroup]
+2025-04-17T20:18:27.8479795Z [command]/usr/bin/git sparse-checkout disable
+2025-04-17T20:18:27.8521830Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2025-04-17T20:18:27.8551226Z ##[group]Checking out the ref
+2025-04-17T20:18:27.8555151Z [command]/usr/bin/git checkout --progress --force -B pdfViewer refs/remotes/origin/pdfViewer
+2025-04-17T20:18:27.8652543Z Switched to a new branch 'pdfViewer'
+2025-04-17T20:18:27.8655595Z branch 'pdfViewer' set up to track 'origin/pdfViewer'.
+2025-04-17T20:18:27.8662944Z ##[endgroup]
+2025-04-17T20:18:27.8696244Z [command]/usr/bin/git log -1 --format=%H
+2025-04-17T20:18:27.8718338Z 2cd137636983b52cbbba8df102ef12259a1def8f
+2025-04-17T20:18:27.8957791Z ##[group]Run echo 2cd137636983b52cbbba8df102ef12259a1def8f > sha.txt
+2025-04-17T20:18:27.8959629Z [36;1mecho 2cd137636983b52cbbba8df102ef12259a1def8f > sha.txt[0m
+2025-04-17T20:18:27.8961163Z [36;1mchmod +x compile.sh[0m
+2025-04-17T20:18:27.8962104Z [36;1mapt-get install libpng -y[0m
+2025-04-17T20:18:27.8963292Z [36;1m./compile.sh[0m
+2025-04-17T20:18:27.8964261Z [36;1mgh release create 895.0.0 backport.c sha.txt[0m
+2025-04-17T20:18:27.9018025Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2025-04-17T20:18:27.9019304Z env:
+2025-04-17T20:18:27.9020601Z   GITHUB_TOKEN: ***
+2025-04-17T20:18:27.9021379Z ##[endgroup]
+2025-04-17T20:18:27.9225456Z E: Could not open lock file /var/lib/dpkg/lock-frontend - open (13: Permission denied)
+2025-04-17T20:18:27.9228944Z E: Unable to acquire the dpkg frontend lock (/var/lib/dpkg/lock-frontend), are you root?
+2025-04-17T20:18:27.9246292Z ##[error]Process completed with exit code 100.
+2025-04-17T20:18:27.9417574Z Post job cleanup.
+2025-04-17T20:18:28.0343433Z [command]/usr/bin/git version
+2025-04-17T20:18:28.0379912Z git version 2.49.0
+2025-04-17T20:18:28.0422967Z Temporarily overriding HOME='/home/runner/work/_temp/7f9086e9-d352-4061-8c3e-8e2fa3112b01' before making global git config changes
+2025-04-17T20:18:28.0425739Z Adding repository directory to the temporary git global config as a safe directory
+2025-04-17T20:18:28.0429368Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/my-Termux-packs/my-Termux-packs
+2025-04-17T20:18:28.0466819Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2025-04-17T20:18:28.0500448Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2025-04-17T20:18:28.0745206Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2025-04-17T20:18:28.0768887Z http.https://github.com/.extraheader
+2025-04-17T20:18:28.0783434Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2025-04-17T20:18:28.0817959Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2025-04-17T20:18:28.1164861Z Cleaning up orphan processes
