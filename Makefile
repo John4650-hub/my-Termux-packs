@@ -1,12 +1,12 @@
 TERMUX_PREFIX := /data/data/com.termux/files/usr
 TERMUX_BASE_DIR := /data/data/com.termux/files
 CFLAGS += -Wall -Wextra -Werror -fPIC
-LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -lpng
+LDFLAGS += -L$(TERMUX_PREFIX)/lib/ -static -lpng  -lmupdf -lmupdf-third -lfreetype -lharfbuzz -lz -lopenjp2 -ljbig2dec -ljpeg -llog -lc -ldl
 #f.or fpdfium
 #-lpdfium
 # Rule to create the shared library
 pdfviewer.so: main.cpp
-	$(CXX) -static -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS)  src/save_to_png.cpp src/mupdf-src/archive.c src/mupdf-src/buffer.c src/mupdf-src/context.c src/mupdf-src/document.c src/mupdf-src/geometry.c src/mupdf-src/memento.c src/mupdf-src/pdf-annot.c src/mupdf-src/pixmap.c src/mupdf-src/util.c  src/gen_w_mupdf.cpp main.cpp -o pdfviewer.so
+	$(CXX) -static -I$(TERMUX_PREFIX)/include -I./include $(LDFLAGS)  src/save_to_png.cpp src/gen_w_mupdf.cpp main.cpp -o pdfviewer.so
 
 install: pdfviewer.so
 	install pdfviewer.so $(DESTDIR)$(PREFIX)/lib/pdfviewer.so
