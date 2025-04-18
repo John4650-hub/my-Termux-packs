@@ -1,4 +1,4 @@
-// Copyright (C) 2004-2025 Artifex Software, Inc.
+// Copyright (C) 2004-2024 Artifex Software, Inc.
 //
 // This file is part of MuPDF.
 //
@@ -21,8 +21,6 @@
 // CA 94129, USA, for further information.
 
 #include "mupdf/fitz.h"
-
-#include "context-imp.h"
 
 #include <string.h>
 #ifndef _WIN32
@@ -610,9 +608,6 @@ fz_new_document_of_size(fz_context *ctx, int size)
 {
 	fz_document *doc = fz_calloc(ctx, 1, size);
 	doc->refs = 1;
-
-	fz_log_activity(ctx, FZ_ACTIVITY_NEW_DOC, NULL);
-
 	return doc;
 }
 
@@ -878,7 +873,7 @@ int fz_page_number_from_location(fz_context *ctx, fz_document *doc, fz_location 
 }
 
 int
-fz_lookup_metadata(fz_context *ctx, fz_document *doc, const char *key, char *buf, size_t size)
+fz_lookup_metadata(fz_context *ctx, fz_document *doc, const char *key, char *buf, int size)
 {
 	if (buf && size > 0)
 		buf[0] = 0;
