@@ -16,7 +16,6 @@ jobs:
     - name: create releases
       run: |
         echo ${{ github.sha }} > sha.txt
-        chmod +x compile.sh
         gh release create ${{ github.run_number }}.0.0  sha.txt
       env:
          GITHUB_TOKEN: ${{ secrets.TK }}
