@@ -99,7 +99,7 @@ catch (const std::runtime_error &err)
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-  unsigned char* data = pix->samples;
+  unsigned char* data = &pix->samples[y * pix->stride];
   width=pix->w;
   height=pix->h;
   std::ostringstream oss;
