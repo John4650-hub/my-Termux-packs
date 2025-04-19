@@ -58,6 +58,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number){
   fz_document *doc;
   fz_pixmap *pix;
   fz_matrix ctm;
+  
 
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
@@ -90,7 +91,7 @@ catch (const std::runtime_error &err)
 	ctm = fz_pre_rotate(ctm, rotate);
 
   try{
-		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number, ctm, fz_device_rgb(ctx), 0);
+		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number-1, ctm, fz_device_rgb(ctx), 0);
   }
 	catch (const std::runtime_error &err)
 	{
@@ -99,7 +100,7 @@ catch (const std::runtime_error &err)
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-  unsigned char* data = &pix->samples[y * pix->stride];
+  unsigned char* data = fz_pixmap_samples(ctx,pix);
   width=pix->w;
   height=pix->h;
   std::ostringstream oss;
