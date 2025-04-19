@@ -91,7 +91,7 @@ catch (const std::runtime_error &err)
 	ctm = fz_pre_rotate(ctm, rotate);
 
   try{
-		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number-1, ctm, fz_device_rgb(ctx), 0);
+		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number, NULL, fz_device_rgb(ctx), 0);
   }
 	catch (const std::runtime_error &err)
 	{
