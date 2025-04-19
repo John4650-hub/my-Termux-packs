@@ -51,8 +51,8 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number){
-  float zoom=500.0f,rotate=0.0f;
+int mupdf_gen_page(const char* name_pdf,int page_number,float sf){
+  float zoom=sf,rotate=0.0f;
   int width,height, page_count;
   fz_context *ctx;
   fz_document *doc;

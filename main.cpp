@@ -44,7 +44,7 @@ program.add_argument("-T","--total-pages")
       if (program.is_used("--scale_factor")){
         scale_factor=program.get<float>("--scale_factor");
       }
-      mupdf_gen_page(fname,page_number);
+      mupdf_gen_page(fname,page_number,scale_factor);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";
