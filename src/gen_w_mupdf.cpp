@@ -99,17 +99,19 @@ catch (const std::runtime_error &err)
 		fz_drop_document(ctx, doc);
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
-	}
+}
+/**
   unsigned char* data = fz_pixmap_samples(ctx,pix);
   width=pix->w;
   height=pix->h;
+  **/
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
   const char* output_page_name = out_name_str.c_str();
-
- SaveBitmapAsPNG(data, output_page_name,width,height);
-fz_drop_pixmap(ctx, pix);
+  fz_save_pixmap_as_png(ctx, pix, output_page_name);
+ //SaveBitmapAsPNG(data, output_page_name,width,height);
+  fz_drop_pixmap(ctx, pix);
 	fz_drop_document(ctx, doc);
 	fz_drop_context(ctx);
 	return EXIT_SUCCESS;
