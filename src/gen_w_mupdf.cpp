@@ -52,7 +52,7 @@ catch (const std::runtime_error &err)
 }
 
 int mupdf_gen_page(const char* name_pdf,int page_number){
-  float zoom=100.0f,rotate=0.0f;
+  float zoom=500.0f,rotate=0.0f;
   int width,height, page_count;
   fz_context *ctx;
   fz_document *doc;
