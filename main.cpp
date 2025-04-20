@@ -48,8 +48,8 @@ program.add_argument("-z", "--zoom")
       if (program.is_used("--scale_factor")){
         scale_factor=program.get<int>("--scale_factor");
       }
-      if (progran.is_used("--zoom")){
-        zoom =program.get<float>(zoom);
+      if (program.is_used("--zoom")){
+        zoom =program.get<float>("--zoom");
       }
       mupdf_gen_page(fname,page_number,scale_factor,zoom);
       } catch(const std::runtime_error &e){
