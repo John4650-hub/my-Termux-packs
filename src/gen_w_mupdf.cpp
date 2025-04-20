@@ -109,9 +109,9 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   fz_rect page_bounds = fz_bound_page(ctx,page);
-  float scale_x = (zm/100) * (page_bounds.x1 - page_bounds.x0);
-  float scale_y=(zm/100) * (page_bounds.y1 - page_bounds.y0);
-  ctm=fz_scale(scale_x,scale_y);
+  float scale_factor_max = fz_max(page_bounds.x1 - page_bounds.x0,page_bounds.y1 - page_bounds.y0);
+  float scale = zm/scale_factor_max;
+  ctm=fz_scale(scale,scale);
 
   dev = fz_new_draw_device(ctx,ctm,pix);
   fz_run_page(ctx,page,dev,ctm,NULL);
@@ -127,5 +127,4 @@ catch (const std::runtime_error &err)
 	fz_drop_document(ctx, doc);
 	fz_drop_context(ctx);
 	return EXIT_SUCCESS;
-
 }
