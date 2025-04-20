@@ -53,7 +53,7 @@ catch (const std::runtime_error &err)
 
 int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf){
   float zoom=zm,rotate=0.0f;
-  int width,height, page_count;
+  int page_count;
   fz_context *ctx;
   fz_document *doc;
   fz_pixmap *pix;
@@ -94,20 +94,6 @@ catch (const std::runtime_error &err)
     return EXIT_FAILURE;
   }
   fz_colorspace* cs = fz_device_rgb(ctx);
-  width = zm;
-  height = sf;
-
-  try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,width,height),NULL,1);
-    fz_clear_pixmap_with_value(ctx,pix,0xFF);
-  }
-	catch (const std::runtime_error &err)
-	{
-    std::cerr << err.what() << "\n";
-		fz_drop_document(ctx, doc);
-		fz_drop_context(ctx);
-		return EXIT_FAILURE;
-}
   fz_rect page_bounds = fz_bound_page(ctx,page);
   float w = page_bounds.x1 - page_bounds.x0;
   float h = page_bounds.y1 - page_bounds.y0;
@@ -119,6 +105,18 @@ catch (const std::runtime_error &err)
   std::cout<<"scale of image: "<<scale<<"\n";
   ctm=fz_scale(scale,scale);
 
+  try{
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,w,h),NULL,1);
+    fz_clear_pixmap_with_value(ctx,pix,0xFF);
+  }
+	catch (const std::runtime_error &err)
+	{
+    std::cerr << err.what() << "\n";
+		fz_drop_document(ctx, doc);
+		fz_drop_context(ctx);
+		return EXIT_FAILURE;
+}
+  
   dev = fz_new_draw_device(ctx,ctm,pix);
   fz_run_page(ctx,page,dev,ctm,NULL);
   std::ostringstream oss;
