@@ -114,7 +114,7 @@ catch (const std::runtime_error &err)
   ctm=fz_scale(scale_x,scale_y);
 
   dev = fz_new_draw_device(ctx,ctm,pix);
-  fz_run_page(doc,page,dev,ctm,NULL);
+  fz_run_page(ctx,page,dev,ctm,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
