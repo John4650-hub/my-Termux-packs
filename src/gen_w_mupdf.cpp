@@ -51,8 +51,8 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number,float sf){
-  float zoom=100.0f,rotate=0.0f;
+int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf){
+  float zoom=zm,rotate=0.0f;
   int width,height, page_count;
   fz_context *ctx;
   fz_document *doc;
@@ -101,8 +101,7 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   //resize
-  int factor= static_cast<int>(sf);
-  fz_subsample_pixmap(ctx,pix,factor);
+  fz_subsample_pixmap(ctx,pix,sf);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();

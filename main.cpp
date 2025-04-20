@@ -4,9 +4,9 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-  [[maybe_unused]] bool text_extraction_mode{false};
+  [[maybe_unused]] float  zoom{100.0f};
   [[maybe_unused]] int page_number{1};
-  [[maybe_unused]] float scale_factor{1.0f};
+  [[maybe_unused]] int scale_factor{1};
   [[maybe_unused]] int total_pages{1};
   
 
@@ -27,8 +27,12 @@ program.add_argument("-T","--total-pages")
       .scan<'i',int>();
 
   program.add_argument("-s", "--scale_factor")
-      .default_value(1.0f)
+      .default_value(1)
       .help("factor by which to scale the page image")
+      .scan<'i',int>();
+program.add_argument("-z", "--zoom")
+      .default_value(100.0f)
+      .help("factor by which to zoom the page image")
       .scan<'f',float>();
 
   try {
@@ -42,9 +46,12 @@ program.add_argument("-T","--total-pages")
       try{
       page_number=program.get<int>("--page");
       if (program.is_used("--scale_factor")){
-        scale_factor=program.get<float>("--scale_factor");
+        scale_factor=program.get<int>("--scale_factor");
       }
-      mupdf_gen_page(fname,page_number,scale_factor);
+      if (progran.is_used("--zoom")){
+        zoom =program.get<float>(zoom);
+      }
+      mupdf_gen_page(fname,page_number,scale_factor,zoom);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";
