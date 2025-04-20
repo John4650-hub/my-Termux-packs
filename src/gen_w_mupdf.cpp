@@ -52,7 +52,7 @@ catch (const std::runtime_error &err)
 }
 
 int mupdf_gen_page(const char* name_pdf,int page_number,float sf){
-  float zoom=sf,rotate=0.0f;
+  float zoom=100.0f,rotate=0.0f;
   int width,height, page_count;
   fz_context *ctx;
   fz_document *doc;
@@ -100,11 +100,9 @@ catch (const std::runtime_error &err)
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 }
-/**
-  unsigned char* data = fz_pixmap_samples(ctx,pix);
-  width=pix->w;
-  height=pix->h;
-  **/
+  //resize
+  int factor= static_cast<int>(sf);
+  fz_subsample_pixmap(ctx,pix,factor);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
