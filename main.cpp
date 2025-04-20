@@ -4,9 +4,9 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-  [[maybe_unused]] float  zoom{100.0f};
+  [[maybe_unused]] float  width{100.0f};
   [[maybe_unused]] int page_number{1};
-  [[maybe_unused]] int scale_factor{1};
+  [[maybe_unused]] int height{1};
   [[maybe_unused]] int total_pages{1};
   
 
@@ -26,13 +26,13 @@ program.add_argument("-T","--total-pages")
       .help("page to view")
       .scan<'i',int>();
 
-  program.add_argument("-s", "--scale_factor")
+  program.add_argument("-s", "--height")
       .default_value(1)
       .help("factor by which to scale the page image")
       .scan<'i',int>();
-program.add_argument("-z", "--zoom")
+program.add_argument("-z", "--width")
       .default_value(100.0f)
-      .help("factor by which to zoom the page image")
+      .help("factor by which to width the page image")
       .scan<'f',float>();
 
   try {
@@ -45,13 +45,13 @@ program.add_argument("-z", "--zoom")
       }else{
       try{
       page_number=program.get<int>("--page");
-      if (program.is_used("--scale_factor")){
-        scale_factor=program.get<int>("--scale_factor");
+      if (program.is_used("--height")){
+        height=program.get<int>("--height");
       }
-      if (program.is_used("--zoom")){
-        zoom =program.get<float>("--zoom");
+      if (program.is_used("--width")){
+        width =program.get<float>("--width");
       }
-      mupdf_gen_page(fname,page_number,zoom,scale_factor);
+      mupdf_gen_page(fname,page_number,width,height);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";

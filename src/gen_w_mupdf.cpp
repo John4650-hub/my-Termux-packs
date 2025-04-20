@@ -94,8 +94,8 @@ catch (const std::runtime_error &err)
     return EXIT_FAILURE;
   }
   fz_colorspace* cs = fz_device_rgb(ctx);
-  width = 500;
-  height = 600;
+  width = zm;
+  height = sf;
 
   try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,width,height),NULL,1);
