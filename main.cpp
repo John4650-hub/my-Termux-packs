@@ -51,7 +51,7 @@ program.add_argument("-z", "--zoom")
       if (program.is_used("--zoom")){
         zoom =program.get<float>("--zoom");
       }
-      mupdf_gen_page(fname,page_number,scale_factor,zoom);
+      mupdf_gen_page(fname,page_number,zoom,scale_factor);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";
