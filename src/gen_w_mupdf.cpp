@@ -105,7 +105,7 @@ catch (const std::runtime_error &err)
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
   float translated_width = w-(w*scale);
-  float translated_height = h - (h*scale);.
+  float translated_height = h - (h*scale);
   fz_matrix translation_matrix = fz_translate(0,0);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
