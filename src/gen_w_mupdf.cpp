@@ -95,8 +95,8 @@ catch (const std::runtime_error &err)
   }
   fz_colorspace* cs = fz_device_rgb(ctx);
   fz_rect page_bounds = fz_bound_page(ctx,page);
-  float w = page_bounds.x1 - page_bounds.x0;
-  float h = page_bounds.y1 - page_bounds.y0;
+  float w = (page_bounds.x1 - page_bounds.x0)*2.0f;
+  float h = (page_bounds.y1 - page_bounds.y0)*2.0f;
   std::cout<<"width: "<<w<<"\n";
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
@@ -109,7 +109,7 @@ catch (const std::runtime_error &err)
   fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*2,h*2),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w,h),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xFF);
   }
 	catch (const std::runtime_error &err)
