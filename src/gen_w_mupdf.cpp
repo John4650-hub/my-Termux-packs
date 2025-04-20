@@ -111,7 +111,7 @@ catch (const std::runtime_error &err)
   fz_rect page_bounds = fz_bound_page(ctx,page);
   float scale_factor_max = fz_max(page_bounds.x1 - page_bounds.x0,page_bounds.y1 - page_bounds.y0);
   float scale = zm/scale_factor_max;
-  ctm=fz_scale(scale,scale);
+  ctm=fz_scale(scale,scale*10);
 
   dev = fz_new_draw_device(ctx,ctm,pix);
   fz_run_page(ctx,page,dev,ctm,NULL);
