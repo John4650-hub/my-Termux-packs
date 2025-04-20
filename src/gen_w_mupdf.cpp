@@ -58,7 +58,7 @@ int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf){
   fz_document *doc;
   fz_pixmap *pix;
   fz_page* page;
-  fz_matrix ctm;
+  fz_matrix scale_matrix;
   fz_device* dev;
 
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
@@ -103,8 +103,11 @@ catch (const std::runtime_error &err)
   float scale_factor_max = fz_max(w,h);
   float scale = zm/scale_factor_max;
   std::cout<<"scale of image: "<<scale<<"\n";
-  ctm=fz_scale(scale,scale);
-
+  scale_matrix=fz_scale(scale,scale);
+  float translated_width = w-(w*scale);
+  float translated_height = h - (h*scale);
+  fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
+  fz_matrix final_matrix = fz_concat(translation_matrix,scale_matrix);
   try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,w,h),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xFF);
@@ -117,8 +120,8 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   
-  dev = fz_new_draw_device(ctx,ctm,pix);
-  fz_run_page(ctx,page,dev,ctm,NULL);
+  dev = fz_new_draw_device(ctx,final_matrix,pix);
+  fz_run_page(ctx,page,dev,final_matrix,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
