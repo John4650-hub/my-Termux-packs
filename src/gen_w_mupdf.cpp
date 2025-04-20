@@ -109,9 +109,15 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   fz_rect page_bounds = fz_bound_page(ctx,page);
-  float scale_factor_max = fz_max(page_bounds.x1 - page_bounds.x0,page_bounds.y1 - page_bounds.y0);
+  float w = page_bounds.x1 - page_bounds.x0;
+  float h = page_bounds.y1 - page_bounds.y0;
+  std::cout<<"width: "<<w<<"\n";
+  std::cout<<"height: "<<h<<"\n";
+  std::cout<<"ratio of width to height: "<<w/h<<"\n";
+  float scale_factor_max = fz_max(w,h);
   float scale = zm/scale_factor_max;
-  ctm=fz_scale(scale,scale*10);
+  std::cout<<"scale of image: "<<scale<<"\n";
+  ctm=fz_scale(scale,scale);
 
   dev = fz_new_draw_device(ctx,ctm,pix);
   fz_run_page(ctx,page,dev,ctm,NULL);
