@@ -106,7 +106,7 @@ catch (const std::runtime_error &err)
   scale_matrix=fz_scale(scale,scale);
   float translated_width = w-(w*scale);
   float translated_height = h - (h*scale);
-  fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
+  fz_matrix translation_matrix = fz_translate(0,0);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w,h),NULL,1);
