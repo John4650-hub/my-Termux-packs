@@ -57,8 +57,9 @@ int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf){
   fz_context *ctx;
   fz_document *doc;
   fz_pixmap *pix;
+  fz_page* page;
   fz_matrix ctm;
-  
+  fz_device* dev;
 
   ctx =fz_new_context(NULL, NULL, FZ_STORE_UNLIMITED);
   if(!ctx){
@@ -84,14 +85,21 @@ catch (const std::runtime_error &err)
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 	}
-
-	/* Compute a transformation matrix for the zoom and rotation desired. */
-	/* The default resolution without scaling is 72 dpi. */
-	ctm = fz_scale(zoom / 100, zoom / 100);
-	ctm = fz_pre_rotate(ctm, rotate);
+  try{
+    page=fz_load_page(doc,page_number);
+  }
+  catch (const std::runtime_error &err){
+    std::cerr<<err.what()<<"\n";
+    fz_drop_page(page);
+    return EXIT_FAILURE;
+  }
+  fz_colorspace* cs = fz_device_rgb(ctx);
+  width = 500;
+  height = 600;
 
   try{
-		pix = fz_new_pixmap_from_page_number(ctx, doc, page_number-1, ctm, fz_device_rgb(ctx), 0);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_bbox_from_rect(fz_make_rect(0,0,width,height)),NULL,1);
+    fz_clear_pixmap_with_value(ctx,pix,0xFF);
   }
 	catch (const std::runtime_error &err)
 	{
@@ -100,8 +108,13 @@ catch (const std::runtime_error &err)
 		fz_drop_context(ctx);
 		return EXIT_FAILURE;
 }
-  //resize
-  fz_subsample_pixmap(ctx,pix,sf);
+  fz_rect page_bounds = fz_bound_page(doc,page);
+  float scale_x = width / (page_bounds.x1 - page_bounds.x0);
+  float scale_y=height / (page_bounds.y1 - page_bounds.y0);
+  ctm=fz_scale(scale_x,scale_y);
+
+  dev = fz_new_draw_device(ctx,cmt,pix);
+  fz_run_page(doc,page,dev,cmt,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
@@ -109,6 +122,8 @@ catch (const std::runtime_error &err)
   fz_save_pixmap_as_png(ctx, pix, output_page_name);
  //SaveBitmapAsPNG(data, output_page_name,width,height);
   fz_drop_pixmap(ctx, pix);
+  fz_close_device(dev);
+  fz_drop_device(ctx,dev);
 	fz_drop_document(ctx, doc);
 	fz_drop_context(ctx);
 	return EXIT_SUCCESS;
