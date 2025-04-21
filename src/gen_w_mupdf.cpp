@@ -51,8 +51,7 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf,int inc){
-  float zoom=zm,rotate=0.0f;
+int mupdf_gen_page(const char* name_pdf,int page_number){
   int page_count;
   fz_context *ctx;
   fz_document *doc;
@@ -101,15 +100,15 @@ catch (const std::runtime_error &err)
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
   float scale_factor_max = fz_max(w,h);
-  float scale = zm/scale_factor_max;
+  float scale = 2000.0f/scale_factor_max;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
-  float translated_width = w-(sf*scale);
-  float translated_height = h - ((h/2)*scale);
+  float translated_width = w-(w*0.521f*scale);
+  float translated_height = h - ((h/1.8f)*scale);
   fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*inc*(w/h),h*inc*(w/h)),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*6.0f*(w/h),h*6.0f*(w/h)),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
   }
 	catch (const std::runtime_error &err)
