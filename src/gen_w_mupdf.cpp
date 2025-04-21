@@ -51,7 +51,7 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number,int factor){
+int mupdf_gen_page(const char* name_pdf,int page_number,float factor){
   int page_count;
   fz_context *ctx;
   fz_document *doc;
