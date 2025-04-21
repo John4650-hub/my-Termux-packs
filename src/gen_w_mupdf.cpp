@@ -104,9 +104,9 @@ catch (const std::runtime_error &err)
   float scale = zm/scale_factor_max;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
-  float translated_width = (w-(w*scale))*0;
-  float translated_height = (h - (h*scale))*0;
-  fz_matrix translation_matrix = fz_translate(sf,sf);
+  float translated_width = w-(sf*scale);
+  float translated_height = h - (sf*scale);
+  fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w,h),NULL,1);
@@ -120,8 +120,8 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   
-  dev = fz_new_draw_device(ctx,scale_matrix,pix);
-  fz_run_page(ctx,page,dev,scale_matrix,NULL);
+  dev = fz_new_draw_device(ctx,final_matrix,pix);
+  fz_run_page(ctx,page,dev,final_matrix,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
