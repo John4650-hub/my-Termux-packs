@@ -96,18 +96,20 @@ catch (const std::runtime_error &err)
   fz_rect page_bounds = fz_bound_page(ctx,page);
   float w = page_bounds.x1 - page_bounds.x0;
   float h = page_bounds.y1 - page_bounds.y0;
+  float nw_A4 = 595.28f,nh_A4=842.0f;
   std::cout<<"width: "<<w<<"\n";
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
-  float scale = 2000*(factor)/fz_max(w,h);
+
+  float scale = fz_min(w/nw_A4,h/nh_A4);
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
-  float translated_width = w-(w*0.521f*scale);
-  float translated_height = h - ((h/1.95f)*scale);
-  fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
-  fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
+ // float translated_width = nw_A4-(nw_A4*0.521f*scale);
+ // float translated_height = nh_A4 - ((nh_A4/1.95f)*scale);
+ // fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
+ // fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*6.0f*(w/h),h*6.2f*(w/h)),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,nw_A4,nh_A4),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
   }
 	catch (const std::runtime_error &err)
@@ -118,8 +120,8 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   
-  dev = fz_new_draw_device(ctx,final_matrix,pix);
-  fz_run_page(ctx,page,dev,final_matrix,NULL);
+  dev = fz_new_draw_device(ctx,scale_matrix,pix);
+  fz_run_page(ctx,page,dev,scale_matrix,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
