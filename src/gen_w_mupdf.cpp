@@ -51,7 +51,7 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf){
+int mupdf_gen_page(const char* name_pdf,int page_number,float zm,int sf,int inc){
   float zoom=zm,rotate=0.0f;
   int page_count;
   fz_context *ctx;
@@ -109,7 +109,7 @@ catch (const std::runtime_error &err)
   fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*2,h*2),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*inc,h*inc),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xFF);
   }
 	catch (const std::runtime_error &err)
