@@ -99,8 +99,7 @@ catch (const std::runtime_error &err)
   std::cout<<"width: "<<w<<"\n";
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
-  float scale_factor_max = fz_max(w,h);
-  float scale = 2000.0f/scale_factor_max;
+  float scale = 2.37561f;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
   float translated_width = w-(w*0.521f*scale);
