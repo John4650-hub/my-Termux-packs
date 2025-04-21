@@ -102,8 +102,11 @@ catch (const std::runtime_error &err)
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
 
   float scale = fz_min(w/nw_A4,h/nh_A4);
+  if(scale>1.0f){
+    scale*=0.9;
+  }
   std::cout<<"scale of image: "<<scale<<"\n";
-  scale_matrix=fz_scale(scale,scale);
+  fz_matrix scale_matrix=fz_scale(scale,scale);
  // float translated_width = nw_A4-(nw_A4*0.521f*scale);
  // float translated_height = nh_A4 - ((nh_A4/1.95f)*scale);
  // fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
