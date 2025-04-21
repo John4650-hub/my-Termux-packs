@@ -103,7 +103,7 @@ catch (const std::runtime_error &err)
 
   float scale = fz_min(w/nw_A4,h/nh_A4);
   if(scale>1.0f){
-    scale*=0.9f;
+    scale=w/h;
   }
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
