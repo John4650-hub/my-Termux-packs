@@ -105,8 +105,8 @@ catch (const std::runtime_error &err)
   if(scale<1.0f){
     scale*=1.5;
   }
-  nw_A4=*scale;
-  nh_A4=*scale;
+  nw_A4=w*scale;
+  nh_A4=h*scale;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
  // float translated_width = nw_A4-(nw_A4*0.521f*scale);
