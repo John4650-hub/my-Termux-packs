@@ -101,7 +101,7 @@ catch (const std::runtime_error &err)
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
 
-  float scale = fz_min(w/nw_A4,h/nh_A4);
+  float scale = fz_min(w/nw_A4,h/nh_A4)*factor;
   if(scale<1.0f){
     scale*=1.5;
   }
