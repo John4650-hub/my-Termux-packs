@@ -51,7 +51,7 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number){
+int mupdf_gen_page(const char* name_pdf,int page_number,int factor){
   int page_count;
   fz_context *ctx;
   fz_document *doc;
@@ -99,7 +99,7 @@ catch (const std::runtime_error &err)
   std::cout<<"width: "<<w<<"\n";
   std::cout<<"height: "<<h<<"\n";
   std::cout<<"ratio of width to height: "<<w/h<<"\n";
-  float scale = 2.37561f;
+  float scale = 2000*(factor)/fz_max(w,h);
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
   float translated_width = w-(w*0.521f*scale);
