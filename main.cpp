@@ -27,7 +27,7 @@ program.add_argument("-T","--total-pages")
 program.add_argument("-f", "--factor")
       .default_value(1.0f)
       .help("testing factor")
-      .scan<'i',int>();
+      .scan<'f',float>();
 
 
   try {
@@ -40,7 +40,7 @@ program.add_argument("-f", "--factor")
       }else{
       try{
       page_number=program.get<int>("--page");
-      factor=program.get<int>("--factor");
+      factor=program.get<float>("--factor");
       mupdf_gen_page(fname,page_number,factor);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
