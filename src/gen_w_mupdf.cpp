@@ -104,12 +104,12 @@ catch (const std::runtime_error &err)
   float scale = zm/scale_factor_max;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
-  float translated_width = w-(w*scale);
-  float translated_height = h - (h*scale);
+  float translated_width = w-(sf*scale);
+  float translated_height = h - ((h/2)*scale);
   fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
   fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*sf,h*sf),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(static_cast<int>(translated_width),static_cast<int>(translated_height),w*1.5,h*1.5),NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xFF);
   }
 	catch (const std::runtime_error &err)
