@@ -116,7 +116,8 @@ catch (const std::runtime_error &err)
  // fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
  // fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,scaled_bounds,NULL,1);
+		//pix = fz_new_pixmap_with_bbox(ctx, cs,scaled_bounds,NULL,1);
+    pix = fz_new_pixmap_from_page(ctx, page, scale_matrix, cs, 1);
     fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
   }
 	catch (const std::runtime_error &err)
@@ -127,8 +128,8 @@ catch (const std::runtime_error &err)
 		return EXIT_FAILURE;
 }
   
-  dev = fz_new_draw_device(ctx,scale_matrix,pix);
-  fz_run_page(ctx,page,dev,scale_matrix,NULL);
+  //dev = fz_new_draw_device(ctx,scale_matrix,pix);
+  //fz_run_page(ctx,page,dev,scale_matrix,NULL);
   std::ostringstream oss;
   oss<<"/storage/emulated/0/.Apps/ReadEra/images/page"<<page_number<<".png";
   std::string out_name_str=oss.str();
