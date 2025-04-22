@@ -118,7 +118,7 @@ catch (const std::runtime_error &err)
   try{
 		//pix = fz_new_pixmap_with_bbox(ctx, cs,scaled_bounds,NULL,1);
     pix = fz_new_pixmap_from_page(ctx, page, scale_matrix, cs, 1);
-    fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
+    //fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
   }
 	catch (const std::runtime_error &err)
 	{
