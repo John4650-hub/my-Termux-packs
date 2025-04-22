@@ -109,12 +109,14 @@ catch (const std::runtime_error &err)
   nh_A4=h*scale*scale;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
+  fz_irect scaled_bounds = fz_irect_from_rect(fz_transform_rect(page_bounds,scale_matrix));
+
  // float translated_width = nw_A4-(nw_A4*0.521f*scale);
  // float translated_height = nh_A4 - ((nh_A4/1.95f)*scale);
  // fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
  // fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
   try{
-		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,nw_A4,nh_A4),NULL,1);
+		pix = fz_new_pixmap_with_bbox(ctx, cs,scaled_bounds,NULL,1);
     fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
   }
 	catch (const std::runtime_error &err)
