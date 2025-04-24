@@ -110,7 +110,7 @@ catch (const std::runtime_error &err)
   scale_matrix=fz_scale(scale,scale);
    try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,nw_A4,nh_A4),NULL,1);
-    fz_clear_pixmap_with_value(ctx,pix,0);
+    fz_clear_pixmap(ctx,pix);//no value to clear with
   }
 	catch (const std::runtime_error &err)
 	{
