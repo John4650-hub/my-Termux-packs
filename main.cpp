@@ -6,7 +6,6 @@
 int main(int argc, char* argv[]) {
   [[maybe_unused]] int page_number{1};
   [[maybe_unused]] int total_pages{1};
-  [[maybe_unused]] float factor{1};
   
 
   argparse::ArgumentParser program("pdfViewer using mupdf", "1.24.10",
@@ -24,10 +23,6 @@ program.add_argument("-T","--total-pages")
       .default_value(1)
       .help("page to view")
       .scan<'i',int>();
-program.add_argument("-f", "--factor")
-      .default_value(1.0f)
-      .help("testing factor")
-      .scan<'f',float>();
 
 
   try {
@@ -40,8 +35,7 @@ program.add_argument("-f", "--factor")
       }else{
       try{
       page_number=program.get<int>("--page");
-      factor=program.get<float>("--factor");
-      mupdf_gen_page(fname,page_number,factor);
+      mupdf_gen_page(fname,page_number);
       } catch(const std::runtime_error &e){
           std::cerr << e.what() << "\n";
           std::cerr << program << "\n";

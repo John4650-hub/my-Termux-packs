@@ -51,7 +51,7 @@ catch (const std::runtime_error &err)
   return page_count;
 }
 
-int mupdf_gen_page(const char* name_pdf,int page_number,float factor){
+int mupdf_gen_page(const char* name_pdf,int page_number){
   int page_count;
   fz_context *ctx;
   fz_document *doc;
@@ -108,13 +108,9 @@ catch (const std::runtime_error &err)
   nh_A4=h*scale*scale;
   std::cout<<"scale of image: "<<scale<<"\n";
   scale_matrix=fz_scale(scale,scale);
- // float translated_width = nw_A4-(nw_A4*0.521f*scale);
- // float translated_height = nh_A4 - ((nh_A4/1.95f)*scale);
- // fz_matrix translation_matrix = fz_translate(translated_width,translated_height);
- // fz_matrix final_matrix = fz_concat(scale_matrix,translation_matrix);
-  try{
+   try{
 		pix = fz_new_pixmap_with_bbox(ctx, cs,fz_make_irect(0,0,nw_A4,nh_A4),NULL,1);
-    fz_clear_pixmap_with_value(ctx,pix,0xfaebd7);
+    fz_clear_pixmap_with_value(ctx,pix,0);
   }
 	catch (const std::runtime_error &err)
 	{
